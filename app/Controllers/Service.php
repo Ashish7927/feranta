@@ -24,9 +24,9 @@ class Service extends BaseController
             $user_id = $this->session->get('user_id');
 
             $data['Allstate'] = $this->AdminModel->getAllService();
-            $data['vehicles'] = $this->AdminModel->getAllActiveRecord('vehicle_details');
+            $data['vehicles'] = $this->AdminModel->getOwnVehicleList($user_id);
             $data['cities'] = $this->AdminModel->GetAllcity();
-
+            $data['AllVendor'] = $this->AdminModel->getAllVendor();
 
             return view('admin/service_vw', $data);
         } else {
@@ -37,7 +37,7 @@ class Service extends BaseController
     function add()
     {
         if ($this->session->get('user_id')) {
-            $user_id = $this->session->get('user_id');
+            $vendor_id = $this->request->getPost('vendor_id');
             $vehicle = $this->request->getPost('vehicle');
             $boarding_date = $this->request->getPost('boarding_date');
             $arrival_datetime = $this->request->getPost('arrival_datetime');
@@ -56,7 +56,7 @@ class Service extends BaseController
                 'full_fare' => $full_fare,
                 'fare_per_sit' => $fare_per_sit,
                 'remark' => $remark,
-                'vendor_id' => $user_id,
+                'vendor_id' => $vendor_id,
                 'status' => 1
             ];
 
@@ -83,18 +83,18 @@ class Service extends BaseController
             // Check Booking, if no booking then only can update else not! 
             // if (count($Countstate) == 0) {
 
-                $data = [
-                    'vehicle_id' => $vehicle,
-                    'boarding_date' => $boarding_date,
-                    'arrival_datetime' => $arrival_datetime,
-                    'from_city' => $from_city,
-                    'to_city' => $to_city,
-                    'full_fare' => $full_fare,
-                    'fare_per_sit' => $fare_per_sit,
-                    'remark' => $remark
-                ];
-               
-                $this->AdminModel->UpdateRecordById('service_details', $id, $data);
+            $data = [
+                'vehicle_id' => $vehicle,
+                'boarding_date' => $boarding_date,
+                'arrival_datetime' => $arrival_datetime,
+                'from_city' => $from_city,
+                'to_city' => $to_city,
+                'full_fare' => $full_fare,
+                'fare_per_sit' => $fare_per_sit,
+                'remark' => $remark
+            ];
+
+            $this->AdminModel->UpdateRecordById('service_details', $id, $data);
             // } else {
             //     $this->session->setFlashdata('msg', 'Vehicle Type Already  exist.');
             //     $this->session->setFlashdata('uid', $id);
@@ -138,12 +138,22 @@ class Service extends BaseController
         $boarding_time = $this->request->getVar('boarding_time');
         $vehicle_id = $this->request->getVar('vehicle_id');
 
-        $checkVehicleStatus=$this->AdminModel->checkVehicleStatus($boarding_time, $vehicle_id);
-        if(!empty($checkVehicleStatus) && $checkVehicleStatus !=''){
+        $checkVehicleStatus = $this->AdminModel->checkVehicleStatus($boarding_time, $vehicle_id);
+        if (!empty($checkVehicleStatus) && $checkVehicleStatus != '') {
             echo 1;
-        }else{
+        } else {
             echo 0;
         }
+    }
 
+    function getVehicleList()
+    {
+        $vendor_id = $this->request->getVar('vendor_id');
+        $allvehicles =  $this->AdminModel->getOwnVehicleList($vendor_id);
+        echo '<option value="">-- Select Vehicle --</option>';
+        foreach($allvehicles as $vehicles)
+        {
+            echo '<option value="'.$vehicles->id.'">'.$vehicles->model_name.'</option>';
+        }
     }
 }

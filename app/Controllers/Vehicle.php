@@ -25,6 +25,7 @@ class Vehicle extends BaseController
 
             $data['Allstate'] = $this->AdminModel->getAllVehicle();
             $data['vehicleType'] = $this->AdminModel->getAllActiveRecord('vehicle_types');
+            $data['AllVendor'] = $this->AdminModel->getAllVendor();
 
 
             return view('admin/vehicle_vw', $data);
@@ -36,7 +37,7 @@ class Vehicle extends BaseController
     function add()
     {
         if ($this->session->get('user_id')) {
-            $user_id = $this->session->get('user_id');
+            $vendor_id = $this->request->getPost('vendor_id');
             $no_of_sit = $this->request->getPost('no_of_sit');
             $redg_no = $this->request->getPost('redg_no');
             $model_name = $this->request->getPost('model_name');
@@ -47,7 +48,7 @@ class Vehicle extends BaseController
                 'model_name' => $model_name,
                 'regd_no' => $redg_no,
                 'no_of_sit' => $no_of_sit,
-                'vendor_id' => $user_id,
+                'vendor_id' => $vendor_id,
                 'status' => 1
             ];
 

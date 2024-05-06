@@ -1678,6 +1678,15 @@ class Admin extends BaseController
 					$imagename2 = "";
 				}
 
+				$license_img = $this->request->getFile('license_img');
+
+				if ($license_img->isValid() && !$license_img->hasMoved()) {
+					$license_img1 = $license_img->getRandomName();
+					$license_img->move('uploads/', $license_img1);
+				} else {
+					$license_img1 = "";
+				}
+
 				$data = [
 					'full_name' => $this->request->getVar('name'),
 					'email'  => $this->request->getVar('email'),
@@ -1697,9 +1706,16 @@ class Admin extends BaseController
 					'adhar_font'  => $imagename1,
 					'adhar_back'  => $imagename2,
 
-					'user_type'  => 3
+					'user_type'  => $this->request->getVar('role'),
+					'license_no'  => $this->request->getVar('license_no'),
+					'license_img'  => $license_img1
 
 				];
+
+				if($this->request->getVar('is_driver') == 1)
+				{
+					$data['is_driver']  = $this->request->getVar('is_driver');
+				}
 				//print_r($data);exit;
 
 				$this->AdminModel->adduser($data);

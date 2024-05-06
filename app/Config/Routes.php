@@ -45,5 +45,6 @@ $routes->post('/service/edit/(:num)', 'Service::edit/$1');
 $routes->post('/service/status', 'Service::status');
 $routes->post('/service/delete', 'Service::delete');
 $routes->post('/service/check-vehicle', 'Service::checkVehicleStatus');
+$routes->post('/service/get-vehicle-list', 'Service::getVehicleList');
 
 

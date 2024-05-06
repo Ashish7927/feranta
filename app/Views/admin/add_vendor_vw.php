@@ -161,6 +161,49 @@
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('password'); ?></span><?php } ?>
                                     </div>
                                 </div>
+
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Select Role</label>
+                                        <select class="form-control" name="role" onchange="CheckRole(this.value)" id="role_id">
+                                            <option value="">Select Role</option>
+                                            <option value="3">Owner</option>
+                                            <option value="4">Driver</option>
+                                        </select>
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('role'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 is_driver" style="display: none;">
+                                    <div class="form-group ">
+                                        <label>Are you a Driver?</label>
+                                        <select class="form-control" name="is_driver" onchange="IsDriver(this.value)" id="is_driver">
+                                            <option value="">Select option</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('is_driver'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 driver_div" style="display: none;">
+                                    <div class="form-group">
+                                    <label>License No.</label>
+                                        <input type="text" class="form-control driver_input" id="license_no" name="license_no" placeholder="Enter your License N0." value="<?= set_value('license_no'); ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('password'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 driver_div" style="display: none;">
+                                    <div class="form-group">
+                                    <label>License Image</label>
+                                        <input type="file" class="form-control driver_input" id="license_img" name="license_img" >
+                                    </div>
+                                </div>
+
+
+
                             </div>
 
 
@@ -199,6 +242,39 @@
             event.preventDefault();
             return false; //stop the actual form post !important!
 
+        }
+        function CheckRole(val)
+        {
+            $('#is_driver').val(''); 
+            if(val == 3){
+                $('.driver_input').prop('required',false);
+                $(".driver_div").css("display", "none");
+                $('.is_driver').css("display", "block");
+                $('#is_driver').prop('required',true); 
+            }else if(val == 4){
+                $('#is_driver').prop('required',false);
+                $('.is_driver').css("display", "none");
+                $(".driver_div").css("display", "block");
+                $('.driver_input').prop('required',true);
+            }else{
+                $('.driver_input').prop('required',false);
+                $(".driver_div").css("display", "none");
+                $('#is_driver').prop('required',false);
+                $('.is_driver').css("display", "none"); 
+            }
+            return false;
+        }
+
+        function IsDriver(val)
+        {
+            if(val == 1){
+                $(".driver_div").css("display", "block");
+                $('.driver_input').prop('required',true);
+            }else{
+                $('.driver_input').prop('required',false);
+                $(".driver_div").css("display", "none");
+            }
+            return false;
         }
     </script>
      <script>

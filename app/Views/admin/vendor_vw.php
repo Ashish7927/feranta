@@ -9,11 +9,11 @@
   <div class="uk-card uk-card-body uk-card-default uk-card-small">
     <div>
       <div class="col-sm-6">
-        <a href="<?php echo base_url(); ?>/Admin/Addvendor"><button type="submit" class="btn btn-primary">ADD VENDOR</button></a>
+        <a href="<?php echo base_url(); ?>/Admin/Addvendor"><button type="submit" class="btn btn-primary">Add User</button></a>
       </div>
 
     </div>
-    <h3>View Vendor</h3>
+    <h3>All Users</h3>
     <div class="table-responsive">
       <table id="example-datatable" class="table table-vcenter table-condensed table-bordered">
         <thead>

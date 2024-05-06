@@ -489,4 +489,22 @@ class AdminModel extends Model
 		$query = $this->db->table($tableName)->update($data, array('id' => $id));
 		return $query;
 	}
+
+	function getAllVendor()
+	{
+		$builder = $this->db->table('user');
+		$builder->select('*');
+		$builder->where('status', 1);
+		$builder->where('user_type', 3);
+		return $builder->get()->getResult();
+	}
+
+	function getOwnVehicleList($user_id)
+	{
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('*');
+		$builder->where('status', 1);
+		$builder->where('vendor_id', $user_id);
+		return $builder->get()->getResult();
+	}
 }

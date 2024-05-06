@@ -15,6 +15,16 @@
                     <div class="modal-body">
 
                         <div class="form-group">
+                            <label>Select Vehicle Owner</label>
+                            <select name="vendor_id" id="vendor_id" class="form-control" required onchange="GetVehicle(this.value,'vehicle');">
+                                <option value="">-- Select Owner --</option>
+                                <?php foreach ($AllVendor as $vendor) { ?>
+                                    <option value="<?= $vendor->id; ?>"><?= $vendor->full_name ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label>Choose Boarding Datetime</label>
                             <input type="datetime-local" name="boarding_date" id="boarding_date" onchange="SetMinArrivalTime(this.value,'arrival_datetime','vehicle');" class="form-control" required>
                         </div>
@@ -124,7 +134,7 @@
 
                                 <td class="text-center">
                                     <div class="btn-group">
-
+                                    <!-- onclick="GetVehicle(<?=$state->vendor_id?>,'vehicle<?= $state->id ?>');"  -->
                                         <a href="#modal-center<?= $state->id; ?>" uk-toggle title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
                                         <a href="javascript:void(0);" onClick="deleteRecord('<?= $state->id; ?>');" title="Delete" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
                                     </div>
@@ -165,7 +175,7 @@
 
                                     <div class="form-group">
                                         <label>Select Vehicle</label>
-                                        <select name="vehicle" id="vehicle<?= $state->id ?>" class="form-control" required onchange="CheckVehicle(this.value,'arrival_datetime<?= $state->id ?>','vehicle<?= $state->id ?>');" >
+                                        <select name="vehicle" id="vehicle<?= $state->id ?>" class="form-control" required onchange="CheckVehicle(this.value,'arrival_datetime<?= $state->id ?>','vehicle<?= $state->id ?>');">
                                             <option value="">-- Select Vehicle --</option>
                                             <?php foreach ($vehicles as $vehicle) { ?>
                                                 <option value="<?= $vehicle->id; ?>" <?php if ($state->vehicle_id == $vehicle->id) {
@@ -268,42 +278,54 @@
 </script>
 
 <script>
-function SetMinArrivalTime(val,arrival_id,vehicle_id)
-{
-    $('#'+vehicle_id).val('');
-    $('#'+arrival_id).val('');
-    $('#'+arrival_id).attr('min',val);
-}
-
-function CheckVehicle(val,time_id,vehicle_id)
-{
-    if(val != ''){
-        console.log(val,time_id,vehicle_id);
-        let boarding_time = $('#'+time_id).val();
-        // let boarding_time = $('#'+time_id).val();
-        $.ajax({
-            type: "POST",
-            url: "<?php echo base_url(); ?>/service/check-vehicle",
-            data: {
-                boarding_time: boarding_time,
-                vehicle_id: val
-            },
-            success: function(data) {
-                let result = data.trim();
-             if(result == '1' || result == 1)
-             {
-                alert('Vehicle is busy! please select another one.');
-                $('#'+vehicle_id).val('');
-             }else{
-                return false;
-             }
-            }
-        });
-
-    }else{
-        return false;
+    function SetMinArrivalTime(val, arrival_id, vehicle_id) {
+        $('#' + vehicle_id).val('');
+        $('#' + arrival_id).val('');
+        $('#' + arrival_id).attr('min', val);
     }
-}
+
+    function CheckVehicle(val, time_id, vehicle_id) {
+        if (val != '') {
+            console.log(val, time_id, vehicle_id);
+            let boarding_time = $('#' + time_id).val();
+            // let boarding_time = $('#'+time_id).val();
+            $.ajax({
+                type: "POST",
+                url: "<?php echo base_url(); ?>/service/check-vehicle",
+                data: {
+                    boarding_time: boarding_time,
+                    vehicle_id: val
+                },
+                success: function(data) {
+                    let result = data.trim();
+                    if (result == '1' || result == 1) {
+                        alert('Vehicle is busy! please select another one.');
+                        $('#' + vehicle_id).val('');
+                    } else {
+                        return false;
+                    }
+                }
+            });
+
+        } else {
+            return false;
+        }
+    }
+
+    function GetVehicle(vendor_id,vehicle_id)
+    {
+            $.ajax({
+                type: "POST",
+                url: "<?php echo base_url(); ?>/service/get-vehicle-list",
+                data: {
+                    vendor_id: vendor_id
+                },
+                success: function(data) {
+                    let result = data.trim();
+                        $('#' + vehicle_id).html(result);
+                }
+            });
+    }
 </script>
 
 <?php include('footer.php') ?>

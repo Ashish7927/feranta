@@ -31,7 +31,7 @@
               <!-- Sidebar Navigation -->
               <ul class="sidebar-nav">
                   <li><a href="<?php echo base_url(); ?>admin/dashboard"><i class="gi gi-stopwatch sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Dashboard</span></a></li>
-                  <li> <a href="<?php echo base_url(); ?>admin/Vendor"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Vendor Management</span></a></li>
+                  <li> <a href="<?php echo base_url(); ?>admin/Vendor"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Users Management</span></a></li>
 
                   <li> <a href="<?php echo base_url(); ?>vehicle"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Vehicle Management</span></a></li>
 

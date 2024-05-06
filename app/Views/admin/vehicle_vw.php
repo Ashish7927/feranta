@@ -15,6 +15,16 @@
                     <div class="modal-body">
 
                         <div class="form-group">
+                            <label>Select Vehicle Owner</label>
+                            <select name="vendor_id" id="vendor_id" class="form-control" required>
+                                <option value="">-- Select Owner --</option>
+                                <?php foreach ($AllVendor as $vendor) { ?>
+                                    <option value="<?= $vendor->id; ?>"><?= $vendor->full_name ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label>Select Vehicle Type</label>
                             <select name="vehicle_type" id="vehicle_type" class="form-control" required>
                                 <option value="">-- Select Vehicle Type --</option>
@@ -121,7 +131,9 @@
                                         <select name="vehicle_type" id="vehicle_type" class="form-control" required>
                                             <option value="">-- Select Vehicle Type --</option>
                                             <?php foreach ($vehicleType as $type) { ?>
-                                                <option value="<?= $type->id; ?>"  <?php if( $state->type_id == $type->id){ echo 'selected';}?> ><?= $type->type_name ?></option>
+                                                <option value="<?= $type->id; ?>" <?php if ($state->type_id == $type->id) {
+                                                                                        echo 'selected';
+                                                                                    } ?>><?= $type->type_name ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>
