@@ -1783,86 +1783,50 @@ class Admin extends BaseController
 							$imagename2 = "";
 						}
 
-						if ($imagename) {
-							$data = [
-								'full_name' => $name,
-								'email'  => $email,
-								'user_name'  => $username,
-								'contact_no'  => $contact,
-								'password'  => $password,
-								'alter_cnum'  => $altcontact,
-								'state_id'  => $state,
-								'city_id'  => $city,
-								'adhar_no'  => $adharno,
-								'profile_image'  => $imagename,
+						$file3 = $this->request->getFile('license_img');
 
-								'address1'  => $address1,
-								'address2'  => $address2,
-								'pin'  => $pin,
-								'details'  => $details,
-								'status'  => 1,
-								'user_type'  => 3
-							];
-						} elseif ($imagename1) {
-
-							$data = [
-								'full_name' => $name,
-								'email'  => $email,
-								'user_name'  => $username,
-								'contact_no'  => $contact,
-								'password'  => $password,
-								'alter_cnum'  => $altcontact,
-								'state_id'  => $state,
-								'city_id'  => $city,
-								'adhar_no'  => $adharno,
-								'adhar_font'  => $imagename1,
-
-								'address1'  => $address1,
-								'address2'  => $address2,
-								'pin'  => $pin,
-								'details'  => $details,
-								'status'  => 1,
-								'user_type'  => 3
-							];
-						} elseif ($imagename2) {
-
-							$data = [
-								'full_name' => $name,
-								'email'  => $email,
-								'user_name'  => $username,
-								'contact_no'  => $contact,
-								'password'  => $password,
-								'alter_cnum'  => $altcontact,
-								'state_id'  => $state,
-								'city_id'  => $city,
-								'adhar_no'  => $adharno,
-								'adhar_back'  => $imagename1,
-
-								'address1'  => $address1,
-								'address2'  => $address2,
-								'pin'  => $pin,
-								'details'  => $details,
-								'status'  => 1,
-								'user_type'  => 3
-							];
+						if ($file3->isValid() && !$file3->hasMoved()) {
+							$imagename3 = $file3->getRandomName();
+							$file3->move('uploads/', $imagename3);
 						} else {
-							$data = [
-								'full_name' => $name,
-								'email'  => $email,
-								'user_name'  => $username,
-								'contact_no'  => $contact,
-								'password'  => $password,
-								'alter_cnum'  => $altcontact,
-								'state_id'  => $state,
-								'city_id'  => $city,
-								'adhar_no'  => $adharno,
-								'address1'  => $address1,
-								'address2'  => $address2,
-								'pin'  => $pin,
-								'details'  => $details,
-								'status'  => 1,
-								'user_type'  => 3
-							];
+							$imagename3 = "";
+						}
+
+						$data = [
+							'full_name' => $name,
+							'email'  => $email,
+							'user_name'  => $username,
+							'contact_no'  => $contact,
+							'password'  => $password,
+							'alter_cnum'  => $altcontact,
+							'state_id'  => $state,
+							'city_id'  => $city,
+							'adhar_no'  => $adharno,
+							'address1'  => $address1,
+							'address2'  => $address2,
+							'pin'  => $pin,
+							'details'  => $details,
+							'status'  => 1,
+							'user_type'  => $this->request->getVar('role'),
+							'license_no'  => $this->request->getVar('license_no'),
+							'is_driver' => $this->request->getVar('is_driver')
+						];
+
+						if ($imagename != "") {
+							$data['profile_image']  = $imagename;
+						}
+						if ($imagename1 != "") {
+
+							$data['adhar_font']  = $imagename1;
+						}
+						if ($imagename2 != "") {
+
+							$data['adhar_back']  = $imagename1;
+						}
+
+						if ($imagename3 != "") {
+
+							$data['license_img']  = $imagename3;
 						}
 
 						$this->AdminModel->updateUser($data, $id);
