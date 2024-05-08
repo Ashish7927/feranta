@@ -38,6 +38,14 @@ $routes->post('/vehicle/add', 'Vehicle::add');
 $routes->post('/vehicle/edit/(:num)', 'Vehicle::edit/$1');
 $routes->post('/vehicle/status', 'Vehicle::status');
 $routes->post('/vehicle/delete', 'Vehicle::delete');
+$routes->post('/vehicle/update-driver', 'Vehicle::updateDriver');
+$routes->get('/vehicle/driver-vehicle', 'Vehicle::driverVehicle');
+
+$routes->get('/vehicle/accept/(:num)', 'Vehicle::acceptRequest/$1');
+$routes->get('/vehicle/reject/(:num)', 'Vehicle::rejectRequest/$1');
+$routes->get('/vehicle/leave/(:num)', 'Vehicle::leaveVehicle/$1');
+
+
 
 $routes->get('/service', 'Service::index');
 $routes->post('/service/add', 'Service::add');

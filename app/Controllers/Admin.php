@@ -1145,6 +1145,13 @@ class Admin extends BaseController
 <?php
 	}
 
+	function getDriverData()
+	{
+		$driver_id = $this->request->getPost('driver_id');
+		$data= $this->AdminModel->userdata($driver_id);
+		return json_encode($data[0]);
+	}
+
 	function Category()
 	{
 		if ($this->session->get('user_id')) {
@@ -1574,7 +1581,7 @@ class Admin extends BaseController
 
 			$data['setting'] = $this->AdminModel->Settingdata();
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-			$data['allvendor'] = $this->AdminModel->GetAllCustomer(3);
+			$data['allvendor'] = $this->AdminModel->GetAllUser();
 
 			return view('admin/vendor_vw.php', $data);
 		} else {
@@ -1708,7 +1715,8 @@ class Admin extends BaseController
 
 					'user_type'  => $this->request->getVar('role'),
 					'license_no'  => $this->request->getVar('license_no'),
-					'license_img'  => $license_img1
+					'license_img'  => $license_img1,
+					'status'=>1
 
 				];
 
@@ -2136,5 +2144,154 @@ class Admin extends BaseController
 		}
 
 		return true;
+	}
+	
+	
+	function Blog()
+	{
+		if($this->session->get('user_id')){
+			
+		$user_id= $this->session->get('user_id');
+			
+		$data['setting']=$this->AdminModel->Settingdata();
+		$data['singleuser']=$this->AdminModel->userdata($user_id);
+		$data['blog_data']=$this->AdminModel->getAllBlog();
+		
+	
+		
+				return view('admin/blog_vw',$data);          
+			}else{
+				return redirect()->to('admin/');
+			}
+	}
+
+function Addblog()
+	{
+		if($this->session->get('user_id')){
+			
+			$fullname=$this->request->getPost('fullname');
+			$author_name=$this->request->getPost('author_name');
+			$date=$this->request->getPost('date');
+            $details=$this->request->getPost('details');
+			$p_cat=$this->request->getPost('p_cat');
+            $file = $this->request->getFile('img');				
+				if ($file->isValid() && ! $file->hasMoved()) {					
+					$imagename = $file->getRandomName();
+					$file->move('uploads/', $imagename);
+				}else
+                { $imagename="";}
+
+                $data = [
+                    'title' => $fullname,
+					'name' => $author_name,
+					'date' => $date,
+					'message' => $details,
+                    'category' => $p_cat,
+                    'image' => $imagename,
+                    ];
+			
+			 $this->AdminModel->AddBlog($data);
+			 
+			return redirect()->to('/admin/Blog'); 
+			}else{
+            return redirect()->to('admin/');
+          }
+	}
+
+	function deleteblog ()
+	{
+		if($this->session->get('user_id')){
+			
+			$blog_id=$this->request->getPost('blog_id');
+
+            		$this->AdminModel->DeleteBlog($blog_id);
+			
+			return redirect()->to('/admin/blog');
+			}else{
+            return redirect()->to('admin/');
+          }
+		
+	}
+
+	function view_edit()
+	{
+		if($this->session->get('user_id')){
+			$user_id= $this->session->get('user_id');
+			$data['setting']=$this->AdminModel->Settingdata();
+			$data['singleuser']=$this->AdminModel->userdata($user_id);
+			
+			$blog_id = $this->request->uri->getSegment(3);
+			$data['blog_details']=$this->AdminModel->singleBlog($blog_id);
+			
+			
+
+		
+		 return view('admin/editblog_vw',$data); 
+			}else{
+            return redirect()->to('admin/');
+          }
+		
+	}
+	
+	function edit_blog()
+	{
+		if($this->session->get('user_id')){
+			$user_id= $this->session->get('user_id');
+			$data['setting']=$this->AdminModel->Settingdata();
+			$data['singleuser']=$this->AdminModel->userdata($user_id);
+			
+			$blog_id = $this->request->uri->getSegment(3);
+			$data['blog_details']=$this->AdminModel->singleBlog($blog_id);
+			
+			
+				
+				
+			$blog_id=$this->request->getPost('blog_id');
+			$title=$this->request->getPost('title');
+			$name=$this->request->getPost('name');
+			$date=$this->request->getPost('date');
+			$p_cat=$this->request->getPost('p_cat');
+            $details=$this->request->getPost('details');
+            $file = $this->request->getFile('img');
+
+				if ($file->isValid() && ! $file->hasMoved()) {					
+					$imagename = $file->getRandomName();
+					$file->move('uploads/', $imagename);
+				}else
+                { $imagename="";}
+				if ($imagename!=''){
+                $data = [
+                    'title' => $title,
+                    'name' => $name,
+                    'date' => $date,
+					'category' => $p_cat,
+                    'message' => $details,
+                    'image' => $imagename
+    
+                 ];
+				}else{
+					
+                $data = [
+                    'title' => $title,
+                    'name' => $name,
+                    'date' => $date,
+					'category' => $p_cat,
+                    'message' => $details
+                  
+    
+                 ];
+					}
+			
+			
+			
+			$this->AdminModel->UpdateBlog($data,$blog_id);
+
+		
+		   return redirect()->to('/admin/view_edit/'.$blog_id);
+		   return view('admin/editblog_vw',$data); 
+			}else{
+            return redirect()->to('admin/');
+          }
+		
 	}
 }

@@ -507,4 +507,54 @@ class AdminModel extends Model
 		$builder->where('vendor_id', $user_id);
 		return $builder->get()->getResult();
 	}
+
+	function getAllDriver()
+	{
+		$builder = $this->db->table('user');
+		$builder->select('*');
+		$builder->where('status', 1);
+		$builder->where('user_type', 4);
+		$builder->orWhere('is_driver', 1);
+		return $builder->get()->getResult();
+	}
+
+	function driverVehicleData($driver_id, $vehicleId)
+	{
+		$builder = $this->db->table('driver_vehicle_mapping');
+		$builder->select('*');
+		$builder->where('driver_id', $driver_id);
+		$builder->where('vehicle_id', $vehicleId);
+		return $builder->get()->getResult();
+	}
+
+	function GetAllUser()
+	{
+		$builder = $this->db->table('user');
+		$builder->select('*');
+		$builder->where('user_type', 3);
+		$builder->orWhere('user_type', 4);
+		return $builder->get()->getResult();
+	}
+
+	function getSingleData($table, $id)
+	{
+		$query = $this->db->query("SELECT * FROM $table  where id = $id");
+		return $query->getRow();
+	}
+
+	function getDriverVehicle()
+	{
+		$builder = $this->db->table('driver_vehicle_mapping');
+		$builder->select('driver_vehicle_mapping.*,vehicle.model_name,vehicle.regd_no,driver.full_name as drivername,driver.email,driver.contact_no,owner.full_name');
+		$builder->join('vehicle_details vehicle', 'vehicle.id = driver_vehicle_mapping.vehicle_id');
+		$builder->join('user driver', 'driver.id = driver_vehicle_mapping.driver_id');
+		$builder->join('user owner', 'owner.id = driver_vehicle_mapping.owner_id');
+		return $builder->get()->getResult();
+	}
+
+	function updateDriverRemoved($driver_id, $vehicleId, $data)
+	{
+		$query = $this->db->table('driver_vehicle_mapping')->update($data, array('driver_id' => $driver_id, 'vehicle_id' => $vehicleId));
+		return $query;
+	}
 }

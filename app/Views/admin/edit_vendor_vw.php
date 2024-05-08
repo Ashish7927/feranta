@@ -196,7 +196,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-6 driver_div" <?php if($vendor->user_type != 4 || $vendor->is_driver != 1 ){ echo 'style="display: none;"'; } ?>>
+                                <div class="col-sm-6 driver_div" <?php if($vendor->user_type != 4 && $vendor->is_driver != 1 ){ echo 'style="display: none;"'; } ?>>
                                     <div class="form-group">
                                     <label>License No.</label>
                                         <input type="text" class="form-control driver_input" id="license_no" name="license_no" placeholder="Enter your License N0." value="<?= $vendor->license_no; ?>">
@@ -204,7 +204,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-6 driver_div" <?php if($vendor->user_type != 4 || $vendor->is_driver != 1){ echo 'style="display: none;"'; } ?>>
+                                <div class="col-sm-6 driver_div" <?php if($vendor->user_type != 4 && $vendor->is_driver != 1){ echo 'style="display: none;"'; } ?>>
                                     <div class="form-group">
                                     <label>License Image</label>
                                         <input type="file" class="form-control driver_input" id="license_img" name="license_img" >

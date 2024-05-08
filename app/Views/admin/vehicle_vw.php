@@ -62,6 +62,9 @@
         <div class="uk-card uk-card-body uk-card-default uk-card-small">
 
             <h3>Vehicle Details</h3>
+            <?php if (session('message') !== null) : ?>
+                <p><?= session('message'); ?></p>
+            <?php endif; ?>
             <div class="table-responsive">
                 <table id="example-datatable" class="table table-vcenter table-condensed table-bordered">
                     <thead>
@@ -71,7 +74,8 @@
                             <th>Vehicle Type</th>
                             <th>Redg. <Noframes></Noframes>
                             </th>
-                            <th>Owner </th>
+                            <th>Owner</th>
+                            <th>Driver</th>
                             <th>Status</th>
                             <th class="text-center">Actions</th>
                         </tr>
@@ -87,7 +91,7 @@
                                 <td><?= $state->type_name; ?></td>
                                 <td><?= $state->regd_no; ?></td>
                                 <td><?= $state->full_name; ?></td>
-
+                                <td><a href="#driver-modal" uk-toggle class="btn btn-success" onclick="GetDriverDetails(<?= $state->id; ?>,'<?= $state->driver_id; ?>');">Details</a></td>
                                 <td class="text-center">
                                     <?php if ($state->status == 1) { ?>
                                         <a href="javascript:void(0);" onClick="statusupdate('<?= $state->id; ?>','0');"><button type="button" class="btn btn-danger ">Deactivate</button></a>
@@ -168,6 +172,53 @@
 </div>
 </div>
 
+
+<!-- Driver Details Modal Start  -->
+
+<div id="driver-modal" class="uk-flex-top" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+
+
+        <form action="<?php echo base_url(); ?>vehicle/update-driver" method="post" id="driver_form">
+            <input type="hidden" name="vehicleId" id="vehicleId" value="">
+
+            <div class="modal-body uk-text-left">
+                <div class="form-group">
+                    <label>Driver</label>
+                    <select name="driver_id" id="driver_id" class="form-control" required onchange="UpdateDriverDetails(this.value);">
+                        <option value="">-- Select Driver --</option>
+                        <?php foreach ($AllDriver as $driver) { ?>
+                            <option value="<?= $driver->id; ?>"><?= $driver->full_name ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone No</label>
+                    <input type="text" readonly name="phoneNo" id="phoneNo" class="form-control" value="">
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" readonly name="emailId" id="emailId" class="form-control" value="">
+                </div>
+
+                <div class="form-group">
+                    <label>License No</label>
+                    <input type="text" readonly name="licenseNo" id="licenseNo" class="form-control" value="">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Update</button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
 </div>
 <!-- END Page Content -->
 <form name="frm_deleteBanner" id="frm_deleteBanner" action="<?php echo base_url(); ?>/vehicle/delete" method="post">
@@ -198,6 +249,37 @@
         if (conf) {
             $("#status_update").submit();
         }
+    }
+
+    function GetDriverDetails(id,driver_id) {
+        // Reset Driver Form 
+        $("#driver_form")[0].reset();
+
+        $('#vehicleId').val(id);
+        if (driver_id != '') {
+            $('#driver_id').val(driver_id);
+            UpdateDriverDetails(driver_id);
+        }
+    }
+
+    function UpdateDriverDetails(val) {
+        $.ajax({
+            url: "<?php echo base_url(); ?>/Admin/getDriverData",
+            method: "POST",
+            data: {
+                driver_id: val
+            },
+
+            success: function(response) {
+                let data = JSON.parse(response);
+                $('#licenseNo').val(data.license_no);
+                $('#emailId').val(data.email);
+                $('#phoneNo').val(data.contact_no);
+            }
+
+        });
+        // event.preventDefault();
+        // return false; 
     }
 </script>
 
