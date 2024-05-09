@@ -557,4 +557,19 @@ class AdminModel extends Model
 		$query = $this->db->table('driver_vehicle_mapping')->update($data, array('driver_id' => $driver_id, 'vehicle_id' => $vehicleId));
 		return $query;
 	}
+
+	function getSingleLastData($table, $id)
+	{
+		$query = $this->db->query("SELECT * FROM $table  where vehicle_id = $id ORDER BY id DESC LIMIT 1");
+		return $query->getRow();
+	}
+
+	function getAllRates()
+	{
+		$builder = $this->db->table('service_rate');
+		$builder->select('service_rate.*,vehicle_types.type_name,state.state_name');
+		$builder->join('vehicle_types', 'vehicle_types.id = service_rate.type_id');
+		$builder->join('state', 'state.state_id = service_rate.state_id');
+		return $builder->get()->getResult();
+	}
 }

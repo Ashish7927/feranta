@@ -209,6 +209,10 @@
                     <label>License No</label>
                     <input type="text" readonly name="licenseNo" id="licenseNo" class="form-control" value="">
                 </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <input type="text" readonly name="driverStatus" id="driverStatus" class="form-control" value="">
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Update</button>
@@ -251,7 +255,7 @@
         }
     }
 
-    function GetDriverDetails(id,driver_id) {
+    function GetDriverDetails(id, driver_id) {
         // Reset Driver Form 
         $("#driver_form")[0].reset();
 
@@ -263,18 +267,28 @@
     }
 
     function UpdateDriverDetails(val) {
+        let vehicleId = $('#vehicleId').val();
         $.ajax({
             url: "<?php echo base_url(); ?>/Admin/getDriverData",
             method: "POST",
             data: {
-                driver_id: val
+                driver_id: val,
+                vehicleId: vehicleId
             },
 
             success: function(response) {
                 let data = JSON.parse(response);
-                $('#licenseNo').val(data.license_no);
-                $('#emailId').val(data.email);
-                $('#phoneNo').val(data.contact_no);
+                $('#licenseNo').val(data.userdata.license_no);
+                $('#emailId').val(data.userdata.email);
+                $('#phoneNo').val(data.userdata.contact_no);
+                if(data.status == 0 || data.status == "0")
+                {
+                    $('#driverStatus').val('Requested');
+                }else if(data.status == 1 || data.status == "1"){
+                    $('#driverStatus').val('Accepted');
+                }else{
+                    $('#driverStatus').val('--');
+                }
             }
 
         });

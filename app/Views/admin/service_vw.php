@@ -25,6 +25,16 @@
                         </div>
 
                         <div class="form-group">
+                            <label>Select Vehicle</label>
+                            <select name="vehicle" id="vehicle" class="form-control" required onchange="CheckVehicle(this.value,'boarding_date','vehicle');">
+                                <option value="">-- Select Vehicle --</option>
+                                <?php foreach ($vehicles as $vehicle) { ?>
+                                    <option value="<?= $vehicle->id; ?>"><?= $vehicle->model_name ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label>Choose Boarding Datetime</label>
                             <input type="datetime-local" name="boarding_date" id="boarding_date" onchange="SetMinArrivalTime(this.value,'arrival_datetime','vehicle');" class="form-control" required>
                         </div>
@@ -34,15 +44,7 @@
                             <input type="datetime-local" name="arrival_datetime" id="arrival_datetime" class="form-control" required>
                         </div>
 
-                        <div class="form-group">
-                            <label>Select Vehicle</label>
-                            <select name="vehicle" id="vehicle" class="form-control" required onchange="CheckVehicle(this.value,'boarding_date','vehicle');">
-                                <option value="">-- Select Vehicle --</option>
-                                <?php foreach ($vehicles as $vehicle) { ?>
-                                    <option value="<?= $vehicle->id; ?>"><?= $vehicle->model_name ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
+
 
                         <div class="form-group">
                             <label>From City</label>
@@ -64,14 +66,14 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" style="display: none;">
                             <label>Full Fare</label>
-                            <input type="number" min='00.00' name="full_fare" class="form-control" required>
+                            <input type="number" min='00.00' value="0" name="full_fare" class="form-control" required>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" style="display: none;">
                             <label>Fare Per Sit</label>
-                            <input type="number" min='00.00' name="fare_per_sit" class="form-control" required>
+                            <input type="number" min='00.00' value="0" name="fare_per_sit" class="form-control" required>
                         </div>
 
                         <div class="form-group">
@@ -102,8 +104,8 @@
                             <th>To City</th>
                             <th>Boearding Datetime</th>
                             <th>Arrival Datetime</th>
-                            <th>Full Fare </th>
-                            <th>Fare per sit</th>
+                            <!-- <th>Full Fare </th>
+                            <th>Fare per sit</th> -->
                             <th>Owner </th>
                             <th>Status</th>
                             <th class="text-center">Actions</th>
@@ -121,8 +123,8 @@
                                 <td><?= $state->to_city_name; ?></td>
                                 <td><?= $state->boarding_date; ?></td>
                                 <td><?= $state->arrival_datetime; ?></td>
-                                <td><?= $state->full_fare; ?></td>
-                                <td><?= $state->fare_per_sit; ?></td>
+                                <!-- <td><?= $state->full_fare; ?></td>
+                                <td><?= $state->fare_per_sit; ?></td> -->
                                 <td><?= $state->full_name; ?></td>
                                 <td class="text-center">
                                     <?php if ($state->status == 1) { ?>
@@ -134,7 +136,7 @@
 
                                 <td class="text-center">
                                     <div class="btn-group">
-                                    <!-- onclick="GetVehicle(<?=$state->vendor_id?>,'vehicle<?= $state->id ?>');"  -->
+                                        <!-- onclick="GetVehicle(<?= $state->vendor_id ?>,'vehicle<?= $state->id ?>');"  -->
                                         <a href="#modal-center<?= $state->id; ?>" uk-toggle title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
                                         <a href="javascript:void(0);" onClick="deleteRecord('<?= $state->id; ?>');" title="Delete" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
                                     </div>
@@ -162,15 +164,17 @@
 
                             <form action="<?php echo base_url(); ?>service/edit/<?= $state->id; ?>" method="post">
                                 <div class="modal-body uk-text-left">
-
+                                <input type="hidden" name="current_vehicle_id" id="current_vehicle_id" value="<?= $state->vehicle_id ?>">
                                     <div class="form-group">
-                                        <label>Choose Boarding Datetime</label>
-                                        <input type="datetime-local" name="boarding_date" class="form-control" onchange="SetMinArrivalTime(this.value,'arrival_datetime<?= $state->id ?>','vehicle<?= $state->id ?>');" required value="<?= $state->boarding_date; ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Choose Expected Arrival Time</label>
-                                        <input type="datetime-local" name="arrival_datetime" id="arrival_datetime<?= $state->id ?>" class="form-control" required value="<?= $state->arrival_datetime; ?>">
+                                        <label>Select Vehicle Owner</label>
+                                        <select name="vendor_id" id="vendor_id" class="form-control" required onchange="GetVehicle(this.value,'vehicle<?= $state->id ?>');">
+                                            <option value="">-- Select Owner --</option>
+                                            <?php foreach ($AllVendor as $vendor) { ?>
+                                                <option value="<?= $vendor->id; ?>" <?php if ($state->vendor_id == $vendor->id) {
+                                                                                        echo 'selected';
+                                                                                    } ?>><?= $vendor->full_name ?></option>
+                                            <?php } ?>
+                                        </select>
                                     </div>
 
                                     <div class="form-group">
@@ -184,6 +188,18 @@
                                             <?php } ?>
                                         </select>
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Choose Boarding Datetime</label>
+                                        <input type="datetime-local" name="boarding_date" class="form-control" onchange="SetMinArrivalTime(this.value,'arrival_datetime<?= $state->id ?>','vehicle<?= $state->id ?>');" required value="<?= $state->boarding_date; ?>">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Choose Expected Arrival Time</label>
+                                        <input type="datetime-local" name="arrival_datetime" id="arrival_datetime<?= $state->id ?>" class="form-control" required value="<?= $state->arrival_datetime; ?>">
+                                    </div>
+
+
 
                                     <div class="form-group">
                                         <label>From City</label>
@@ -209,12 +225,12 @@
                                         </select>
                                     </div>
 
-                                    <div class="form-group">
+                                    <div class="form-group" style="display: none;">
                                         <label>Full Fare</label>
                                         <input type="number" min='00.00' name="full_fare" class="form-control" required value="<?= $state->full_fare; ?>">
                                     </div>
 
-                                    <div class="form-group">
+                                    <div class="form-group" style="display: none;">
                                         <label>Fare Per Sit</label>
                                         <input type="number" min='00.00' name="fare_per_sit" class="form-control" required value="<?= $state->fare_per_sit; ?>">
                                     </div>
@@ -285,7 +301,8 @@
     }
 
     function CheckVehicle(val, time_id, vehicle_id) {
-        if (val != '') {
+        let crntVhcl = $('#current_vehicle_id').val();
+        if (val != '' && val != crntVhcl) {
             console.log(val, time_id, vehicle_id);
             let boarding_time = $('#' + time_id).val();
             // let boarding_time = $('#'+time_id).val();
@@ -312,19 +329,18 @@
         }
     }
 
-    function GetVehicle(vendor_id,vehicle_id)
-    {
-            $.ajax({
-                type: "POST",
-                url: "<?php echo base_url(); ?>/service/get-vehicle-list",
-                data: {
-                    vendor_id: vendor_id
-                },
-                success: function(data) {
-                    let result = data.trim();
-                        $('#' + vehicle_id).html(result);
-                }
-            });
+    function GetVehicle(vendor_id, vehicle_id) {
+        $.ajax({
+            type: "POST",
+            url: "<?php echo base_url(); ?>/service/get-vehicle-list",
+            data: {
+                vendor_id: vendor_id
+            },
+            success: function(data) {
+                let result = data.trim();
+                $('#' + vehicle_id).html(result);
+            }
+        });
     }
 </script>
 

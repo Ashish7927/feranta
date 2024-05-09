@@ -35,9 +35,11 @@
 
                   <li> <a href="<?php echo base_url(); ?>vehicle"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Vehicle Management</span></a></li>
 
-                  <li> <a href="<?php echo base_url(); ?>vehicle/driver-vehicle"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Driver-Vehicle Management</span></a></li>
+                  <li> <a href="<?php echo base_url(); ?>vehicle/driver-vehicle"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Driver-Vehicle</span></a></li>
 
                   <li> <a href="<?php echo base_url(); ?>service"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Cab Service</span></a></li>
+
+                  <li> <a href="<?php echo base_url(); ?>service-rate"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Service Price</span></a></li>
 
                   <li>
                       <a href="" class="sidebar-nav-menu">

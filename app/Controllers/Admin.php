@@ -1148,8 +1148,14 @@ class Admin extends BaseController
 	function getDriverData()
 	{
 		$driver_id = $this->request->getPost('driver_id');
-		$data= $this->AdminModel->userdata($driver_id);
-		return json_encode($data[0]);
+		$vehicleId = $this->request->getPost('vehicleId');
+		if($vehicleId != ''){
+			$driverStatus = $this->db->query("SELECT * FROM driver_vehicle_mapping  where vehicle_id = $vehicleId and driver_id = $driver_id  ORDER BY id DESC LIMIT 1")->getRow();
+		}
+		$userdata= $this->AdminModel->userdata($driver_id);
+		$data['userdata']=$userdata[0];
+		$data['status']= isset($driverStatus) && !empty($driverStatus) ? $driverStatus->status : '';
+		return json_encode($data);
 	}
 
 	function Category()

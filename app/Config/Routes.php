@@ -55,4 +55,10 @@ $routes->post('/service/delete', 'Service::delete');
 $routes->post('/service/check-vehicle', 'Service::checkVehicleStatus');
 $routes->post('/service/get-vehicle-list', 'Service::getVehicleList');
 
+$routes->get('/service-rate', 'SeviceRate::index');
+$routes->post('/service-rate/add', 'SeviceRate::add');
+$routes->post('/service-rate/edit/(:num)', 'SeviceRate::edit/$1');
+$routes->post('/service-rate/status', 'SeviceRate::status');
+$routes->post('/service-rate/delete', 'SeviceRate::delete');
+
 

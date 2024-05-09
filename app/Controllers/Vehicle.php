@@ -108,8 +108,11 @@ class Vehicle extends BaseController
             $id  = $this->request->getPost('state_id');
             $state_status = $this->request->getPost('state_status');
             $details = $this->AdminModel->getSingleData('vehicle_details', $id);
-            if(($state_status == 1 || $state_status == '1') && $details->driver_id == ''){
-                return redirect()->to('vehicle');
+            $driverStatus = $this->AdminModel->getSingleLastData('driver_vehicle_mapping', $id);
+
+            if((($state_status == 1 || $state_status == '1') && $details->driver_id == '') || (!empty($driverStatus) && $driverStatus->status == 0)){
+                
+                return redirect()->to('vehicle')->with('message', "You can't active your vehicle untill a driver assigned!");
             }
 
             $data = [
@@ -156,7 +159,11 @@ class Vehicle extends BaseController
                         $this->AdminModel->updateDriverRemoved($vehicleDetails->driver_id,$vehicleId, $data);
                         
                     }
-                    
+                    $data = [
+                        'status'  => 2,
+                        'updated_by'=>$user_id
+                    ];
+                    $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $user_id WHERE vehicle_id = $vehicleId and driver_id = $driver_id; ");
                     $data = [
                         'driver_id' => $driver_id,
                         'vehicle_id' => $vehicleId,
