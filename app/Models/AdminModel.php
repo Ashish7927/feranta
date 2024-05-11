@@ -451,7 +451,7 @@ class AdminModel extends Model
 		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name,from_city.city_name as from_city_name,to_city.city_name as to_city_name');
 		$builder->join('vehicle_details vehicle', 'vehicle.id = service_details.vehicle_id');
 		$builder->join('city from_city', 'from_city.city_id = service_details.from_city');
-		$builder->join('city to_city', 'to_city.city_id = service_details.from_city');
+		$builder->join('city to_city', 'to_city.city_id = service_details.to_city');
 		$builder->join('user', 'user.id = service_details.vendor_id');
 		return $builder->get()->getResult();
 	}
@@ -536,9 +536,9 @@ class AdminModel extends Model
 		return $builder->get()->getResult();
 	}
 
-	function getSingleData($table, $id)
+	function getSingleData($table, $id, $column_name = 'id')
 	{
-		$query = $this->db->query("SELECT * FROM $table  where id = $id");
+		$query = $this->db->query("SELECT * FROM $table  where $column_name = $id");
 		return $query->getRow();
 	}
 
@@ -570,6 +570,79 @@ class AdminModel extends Model
 		$builder->select('service_rate.*,vehicle_types.type_name,state.state_name');
 		$builder->join('vehicle_types', 'vehicle_types.id = service_rate.type_id');
 		$builder->join('state', 'state.state_id = service_rate.state_id');
+		return $builder->get()->getResult();
+	}
+
+	function checkServiceAvailbility($type,$from_location, $to_location)
+	{
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('id');
+		$builder->where('type_id',$type);
+		$VehicleIds = $builder->get()->getResultArray();
+
+		$arr = array_map(function($value){
+			return $value['id'];
+		} , $VehicleIds);
+
+		$builder = $this->db->table('service_details');
+		$builder->select('service_details.*,vehicle.driver_id');
+		$builder->where('service_details.from_city',$from_location);
+		$builder->where('service_details.to_city',$to_location);
+		$builder->whereIn('service_details.vehicle_id', $arr);
+		$builder->join('vehicle_details vehicle', 'vehicle.id = service_details.vehicle_id');
+		return $builder->get()->getResult();
+	}
+
+	function checkServicRate($state_id,$type_id)
+	{
+		$builder = $this->db->table('service_rate');
+		$builder->select('*');
+		$builder->where('state_id',$state_id);
+		$builder->where('type_id',$type_id);
+		$builder->where('status', 1);
+		return $builder->get()->getRow();
+	}
+
+	public function InsertService($data)
+	{
+		// Insert data into the 'products' table
+		$this->db->table('service_bookings')->insert($data);
+
+		// Return the last insert ID
+		return $this->db->insertID();
+	}
+
+	function getAllBookingRequest()
+	{
+		$builder = $this->db->table('service_request');
+		$builder->select('service_request.*,booking.user_id,booking.booking_type,booking.fare,service.from_city,user.full_name,service.to_city,service.vehicle_id,vehicle.regd_no,from_city.city_name,to_city.city_name as tocity' );
+		$builder->join('service_bookings booking', 'booking.id = service_request.booking_id');
+		$builder->join('user user', 'user.id = booking.user_id');
+		$builder->join('service_details service', 'service.id = service_request.service_id');
+		$builder->join('city from_city', 'from_city.city_id = service.from_city');
+		$builder->join('city to_city', 'to_city.city_id = service.to_city');
+		$builder->join('vehicle_details vehicle', 'vehicle.id = service.vehicle_id');
+		return $builder->get()->getResult();
+	}
+
+	function getAllrequestStatuswise($booking_id,$status)
+	{
+		$builder = $this->db->table('service_request');
+		$builder->select('*');
+		$builder->where('booking_id',$booking_id);
+		$builder->where('status', $status);
+		return $builder->get()->getResult();
+	}
+
+	function getAllBookingData()
+	{
+		$builder = $this->db->table('service_bookings');
+		$builder->select('service_bookings.*,type.type_name,from_city.city_name,to_city.city_name as tocity,vehicle.regd_no,vehicle.model_name,user.full_name,user.contact_no' );
+		$builder->join('vehicle_types type', 'type.id = service_bookings.vehicle_type');
+		$builder->join('city from_city', 'from_city.city_id = service_bookings.from_location');
+		$builder->join('city to_city', 'to_city.city_id = service_bookings.to_location');
+		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id','left');
+		$builder->join('user user', 'user.id = service_bookings.driver_id','left');
 		return $builder->get()->getResult();
 	}
 }

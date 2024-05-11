@@ -43,9 +43,40 @@ class Service extends BaseController
             $arrival_datetime = $this->request->getPost('arrival_datetime');
             $from_city = $this->request->getPost('from_city');
             $to_city = $this->request->getPost('to_city');
-            $full_fare = $this->request->getPost('full_fare');
-            $fare_per_sit = $this->request->getPost('fare_per_sit');
             $remark = $this->request->getPost('remark');
+
+            $origin = $this->AdminModel->getSingleData('city', $from_city, 'city_id');
+            $destination = $this->AdminModel->getSingleData('city', $to_city, 'city_id');
+            $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicle);
+            $checkServicRate = $this->AdminModel->checkServicRate($origin->state_id, $vehicleDetails->type_id);
+            if (!empty($checkServicRate)) {
+                // Set up API key and other parameters
+                $apiKey = 'AIzaSyAX9w0uT7e_Ohjm_FHv7dHNOjvoFdeDe04';
+
+
+                // Make API request
+                $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$origin->city_name}&destinations={$destination->city_name}&key={$apiKey}";
+                $response = file_get_contents($url);
+
+                // Parse API response
+                $data = json_decode($response, true);
+
+                // Check if response is successful
+                if ($data['status'] == 'OK') {
+                    $distance = $data['rows'][0]['elements'][0]['distance']['value'];
+                    $km = round($distance / 100);
+                    $full_fare = $km * $checkServicRate->full_fare;
+                    $fare_per_sit = $km * $checkServicRate->fare_per_share;
+                    $serviceRate = $checkServicRate->id;
+                } else {
+                    return redirect()->to('service')->with('message', $data['error_message']);
+                }
+            } else {
+                $full_fare = 0;
+                $fare_per_sit = 0;
+                $serviceRate = 0;
+            }
+
 
             $data = [
                 'vehicle_id' => $vehicle,
@@ -53,6 +84,7 @@ class Service extends BaseController
                 'arrival_datetime' => $arrival_datetime,
                 'from_city' => $from_city,
                 'to_city' => $to_city,
+                'service_rate' => $serviceRate,
                 'full_fare' => $full_fare,
                 'fare_per_sit' => $fare_per_sit,
                 'remark' => $remark,
@@ -76,9 +108,43 @@ class Service extends BaseController
             $arrival_datetime = $this->request->getPost('arrival_datetime');
             $from_city = $this->request->getPost('from_city');
             $to_city = $this->request->getPost('to_city');
-            $full_fare = $this->request->getPost('full_fare');
-            $fare_per_sit = $this->request->getPost('fare_per_sit');
             $remark = $this->request->getPost('remark');
+
+
+            $origin = $this->AdminModel->getSingleData('city', $from_city, 'city_id');
+            $destination = $this->AdminModel->getSingleData('city', $to_city, 'city_id');
+            $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicle);
+            $checkServicRate = $this->AdminModel->checkServicRate($origin->state_id, $vehicleDetails->type_id);
+            if (!empty($checkServicRate)) {
+                // Set up API key and other parameters
+                $apiKey = 'AIzaSyAX9w0uT7e_Ohjm_FHv7dHNOjvoFdeDe04';
+
+
+                // Make API request
+                $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$origin->city_name}&destinations={$destination->city_name}&key={$apiKey}";
+                $response = file_get_contents($url);
+
+                // Parse API response
+                $data = json_decode($response, true);
+
+                // Check if response is successful
+                if ($data['status'] == 'OK') {
+                    $distance = $data['rows'][0]['elements'][0]['distance']['value'];
+                    $km = round($distance / 100);
+                    $full_fare = $km * $checkServicRate->full_fare;
+                    $fare_per_sit = $km * $checkServicRate->fare_per_share;
+                    $serviceRate = $checkServicRate->id;
+                } else {
+                    return redirect()->to('service')->with('message', $data['error_message']);
+                }
+            } else {
+                $full_fare = 0;
+                $fare_per_sit = 0;
+                $serviceRate = 0;
+            }
+
+
+
 
             // Check Booking, if no booking then only can update else not! 
             // if (count($Countstate) == 0) {
@@ -89,6 +155,7 @@ class Service extends BaseController
                 'arrival_datetime' => $arrival_datetime,
                 'from_city' => $from_city,
                 'to_city' => $to_city,
+                'service_rate' => $serviceRate,
                 'full_fare' => $full_fare,
                 'fare_per_sit' => $fare_per_sit,
                 'remark' => $remark
@@ -151,9 +218,8 @@ class Service extends BaseController
         $vendor_id = $this->request->getVar('vendor_id');
         $allvehicles =  $this->AdminModel->getOwnVehicleList($vendor_id);
         echo '<option value="">-- Select Vehicle --</option>';
-        foreach($allvehicles as $vehicles)
-        {
-            echo '<option value="'.$vehicles->id.'">'.$vehicles->model_name.'</option>';
+        foreach ($allvehicles as $vehicles) {
+            echo '<option value="' . $vehicles->id . '">' . $vehicles->model_name . '</option>';
         }
     }
 }

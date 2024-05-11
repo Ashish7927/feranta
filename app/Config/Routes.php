@@ -61,4 +61,9 @@ $routes->post('/service-rate/edit/(:num)', 'SeviceRate::edit/$1');
 $routes->post('/service-rate/status', 'SeviceRate::status');
 $routes->post('/service-rate/delete', 'SeviceRate::delete');
 
+$routes->get('/service-booking', 'ServiceBooking::index');
+$routes->post('/service-booking/add', 'ServiceBooking::add');
+$routes->post('/service-booking/status', 'ServiceBooking::status');
 
+$routes->get('/service-request', 'ServiceRequest::index');
+$routes->post('/service-request/status', 'ServiceRequest::status');

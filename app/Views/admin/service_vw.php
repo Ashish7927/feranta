@@ -90,6 +90,7 @@
             </div>
         </div>
     </div>
+
     <div class="uk-width-expand@m">
         <div class="uk-card uk-card-body uk-card-default uk-card-small">
 
@@ -135,9 +136,8 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <div class="btn-group">
-                                        <!-- onclick="GetVehicle(<?= $state->vendor_id ?>,'vehicle<?= $state->id ?>');"  -->
-                                        <a href="#modal-center<?= $state->id; ?>" uk-toggle title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
+                                    <div class="btn-group"> 
+                                        <a href="#modal-center<?= $state->id; ?>" uk-toggle title="Edit" class="btn btn-xs btn-default" onclick="GetVehicle(<?= $state->vendor_id ?>,'vehicle<?= $state->id ?>','<?= $state->vehicle_id ?>');" ><i class="fa fa-pencil"></i></a>
                                         <a href="javascript:void(0);" onClick="deleteRecord('<?= $state->id; ?>');" title="Delete" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
                                     </div>
                                 </td>
@@ -150,7 +150,6 @@
 
 
                 <?php foreach ($Allstate as $state) { ?>
-
                     <div id="modal-center<?= $state->id; ?>" class="uk-flex-top" uk-modal>
                         <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
 
@@ -164,7 +163,7 @@
 
                             <form action="<?php echo base_url(); ?>service/edit/<?= $state->id; ?>" method="post">
                                 <div class="modal-body uk-text-left">
-                                <input type="hidden" name="current_vehicle_id" id="current_vehicle_id" value="<?= $state->vehicle_id ?>">
+                                    <input type="hidden" name="current_vehicle_id" id="current_vehicle_id" value="<?= $state->vehicle_id ?>">
                                     <div class="form-group">
                                         <label>Select Vehicle Owner</label>
                                         <select name="vendor_id" id="vendor_id" class="form-control" required onchange="GetVehicle(this.value,'vehicle<?= $state->id ?>');">
@@ -248,7 +247,6 @@
                             </form>
                         </div>
                     </div>
-
                 <?php } ?>
             </div>
         </div>
@@ -262,6 +260,11 @@
     <input type="hidden" name="id" id="user_id" value="">
 </form>
 
+<form name="status_update" id="status_update" action="<?php echo base_url(); ?>/service/status" method="post">
+    <input type="hidden" name="state_id" id="state_id" value="">
+    <input type="hidden" name="state_status" id="state_status" value="">
+</form>
+
 <script type="text/javascript">
     function deleteRecord(id) {
         $("#operation").val('delete');
@@ -272,10 +275,6 @@
         }
     }
 </script>
-<form name="status_update" id="status_update" action="<?php echo base_url(); ?>/service/status" method="post">
-    <input type="hidden" name="state_id" id="state_id" value="">
-    <input type="hidden" name="state_status" id="state_status" value="">
-</form>
 
 <script type="text/javascript">
     function statusupdate(id, status) {
@@ -329,7 +328,7 @@
         }
     }
 
-    function GetVehicle(vendor_id, vehicle_id) {
+    function GetVehicle(vendor_id, vehicle_id, vehicleData = null) {
         $.ajax({
             type: "POST",
             url: "<?php echo base_url(); ?>/service/get-vehicle-list",
@@ -339,6 +338,10 @@
             success: function(data) {
                 let result = data.trim();
                 $('#' + vehicle_id).html(result);
+
+                if(vehicleData != null && vehicleData != ''){
+                    $('#' + vehicle_id).val(vehicleData);
+                }
             }
         });
     }
