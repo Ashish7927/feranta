@@ -645,4 +645,22 @@ class AdminModel extends Model
 		$builder->join('user user', 'user.id = service_bookings.driver_id','left');
 		return $builder->get()->getResult();
 	}
+
+	function checkUserPahone($phone)
+	{
+		$builder = $this->db->table('user');
+		$builder->select('*');
+		$builder->where('contact_no', $phone);
+		return $builder->get()->getResult();
+	}
+
+	function getRateStatewise($state_id)
+	{
+		$builder = $this->db->table('service_rate');
+		$builder->select('service_rate.*,vehicle_types.type_name');
+		$builder->join('vehicle_types', 'vehicle_types.id = service_rate.type_id');
+		$builder->where('service_rate.state_id', $state_id);
+		$builder->where('service_rate.status', 1);
+		return $builder->get()->getResult();
+	}
 }

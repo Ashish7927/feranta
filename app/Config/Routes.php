@@ -67,3 +67,10 @@ $routes->post('/service-booking/status', 'ServiceBooking::status');
 
 $routes->get('/service-request', 'ServiceRequest::index');
 $routes->post('/service-request/status', 'ServiceRequest::status');
+
+
+// API Routes 
+$routes->post('api/sendOtpForLogin', 'ApiController::sendOtpForLogin');
+$routes->post('api/verifyOtpForLogin', 'ApiController::verifyOtpForLogin');
+$routes->post('api/updateProfile', 'ApiController::updateProfile');
+$routes->post('api/get-price', 'ApiController::getServicePrice');
