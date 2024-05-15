@@ -682,4 +682,13 @@ class AdminModel extends Model
 		// Return the last insert ID
 		return $this->db->insertID();
 	}
+
+	function checkUserPahoneDriver($phone)
+	{
+		$builder = $this->db->table('user');
+		$builder->select('*');
+		$builder->where('contact_no', $phone);
+		$builder->where('user_type', 4);
+		return $builder->get()->getResult();
+	}
 }

@@ -77,4 +77,5 @@ $routes->post('api/get-price', 'ApiController::getServicePrice');
 $routes->post('api/scedule-service', 'ApiController::sceduleService');
 $routes->post('api/start-service', 'ApiController::startService');
 $routes->post('api/send-live-location', 'ApiController::sendLiveLocation');
+$routes->post('api/driver-login', 'ApiController::sendOtpForLoginDriver');
 

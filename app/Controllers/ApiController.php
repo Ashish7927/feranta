@@ -122,6 +122,69 @@ class ApiController extends ResourceController
         return $this->respondCreated($response);
     }
 
+    public function sendOtpForLoginDriver()
+    {
+        $rules = [
+            'phone' => 'required|numeric|exact_length[10]'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $phone = $this->request->getVar('phone');
+            $data = $this->AdminModel->checkUserPahoneDriver($phone);
+            if (!empty($data) && $data != null) {
+
+
+            if ($data[0]->status == 1) {
+                //Send otp
+                $otp = rand(100000, 999999);
+                $updateotp = [
+                    'otp' => $otp
+                ];
+
+                $data = $this->AdminModel->UpdateProfile($updateotp, $data[0]->id);
+
+
+                $response = [
+                    'status'   => 200,
+                    'error'    => null,
+                    'response' => [
+                        'message' => 'Otp send successfully!',
+                        'otp' => $otp,
+                    ],
+                ];
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Your account is not Active, Please contact to Admin!'
+                    ]
+                ];
+            }
+        }else{
+
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => 'Phone no not registreted'
+                ]
+            ];
+
+        }
+        }
+
+        return $this->respondCreated($response);
+    }
+
     public function verifyOtpForLogin()
     {
         $rules = [
