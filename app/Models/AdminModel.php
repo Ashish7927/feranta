@@ -663,4 +663,23 @@ class AdminModel extends Model
 		$builder->where('service_rate.status', 1);
 		return $builder->get()->getResult();
 	}
+
+	function getVehicleDriverData($driver_id)
+	{
+		$builder = $this->db->table('driver_vehicle_mapping');
+		$builder->select('driver_vehicle_mapping.*,vehicle_details.type_id');
+		$builder->join('vehicle_details', 'vehicle_details.id = driver_vehicle_mapping.vehicle_id');
+		$builder->where('driver_id', $driver_id);
+		$builder->where('status', 1);
+		return $builder->get()->getResult();
+	}
+
+	public function InsertServiceDetails($data)
+	{
+		// Insert data into the 'products' table
+		$this->db->table('service_details')->insert($data);
+
+		// Return the last insert ID
+		return $this->db->insertID();
+	}
 }

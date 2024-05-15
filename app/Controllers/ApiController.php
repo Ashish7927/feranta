@@ -244,19 +244,18 @@ class ApiController extends ResourceController
                         $price = $rate * $km;
                     }
 
-                    $result[] = array('type_name' => $type_name, 'fare_price' => $price,'rate'=>$rate);
+                    $result[] = array('type_name' => $type_name, 'fare_price' => $price, 'rate' => $rate);
                 }
 
                 $response = [
                     'status'   => 201,
                     'error'    => null,
                     'response' => [
-                        'message' => 'price fetch Successfully1',
+                        'message' => 'price fetch Successfully',
                         'data' => $result,
-                        'distance'=>$km.'km'
+                        'distance' => $km . 'km'
                     ],
                 ];
-
             } else {
                 $response = [
                     'status'   => 200,
@@ -266,6 +265,197 @@ class ApiController extends ResourceController
                     ]
                 ];
             }
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function sceduleService()
+    {
+
+        $rules = [
+            'origin_lat' => 'required',
+            'origin_lng' => 'required',
+            'destination_lat' => 'required',
+            'destination_lng' => 'required',
+            'driver_id' => 'required',
+            'boarding_datetime' => 'required',
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $origin_lat = $this->request->getVar('origin_lat');
+            $origin_lng = $this->request->getVar('origin_lng');
+            $destination_lat = $this->request->getVar('destination_lat');
+            $destination_lng = $this->request->getVar('destination_lng');
+            $driver_id = $this->request->getVar('driver_id');
+            $boarding_datetime = $this->request->getVar('boarding_datetime');
+            $getVehicleId = $this->AdminModel->getVehicleDriverData($driver_id);
+
+            if (empty($getVehicleId) || $getVehicleId ==  null) {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Not a valid driver'
+                    ]
+                ];
+            } else {
+                $checkServicRate = $this->AdminModel->checkServicRate(1, $getVehicleId->type_id);
+                if (!empty($checkServicRate)) {
+                    // Set up API key and other parameters
+                    $apiKey = 'AIzaSyAX9w0uT7e_Ohjm_FHv7dHNOjvoFdeDe04';
+
+                    // Make API request
+                    $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins={$origin_lat},{$origin_lng}&destinations={$destination_lat},{$destination_lng}&key={$apiKey}";
+
+                    $response = file_get_contents($url);
+
+                    // Parse API response
+                    $data = json_decode($response, true);
+
+                    // Check if response is successful
+                    if ($data['status'] == 'OK') {
+                        $distance = $data['rows'][0]['elements'][0]['distance']['value'];
+                        $km = round($distance / 1000);
+
+                        $full_fare = $km * $checkServicRate->full_fare;
+                        $fare_per_sit = $km * $checkServicRate->fare_per_share;
+                        $serviceRate = $checkServicRate->id;
+
+                        $newTime = date("Y-m-d H:i:s", strtotime($boarding_datetime . " +30 minutes"));
+
+                        $data = [
+                            'vehicle_id' => $getVehicleId->vehicle_id,
+                            'boarding_date' => $boarding_datetime,
+                            'start_datetime' => $newTime,
+                            'origin_lat' => $origin_lat,
+                            'origin_lng' => $origin_lng,
+                            'destination_lat' => $destination_lat,
+                            'destination_lng' => $destination_lng,
+                            'service_rate' => $serviceRate,
+                            'full_fare' => $full_fare,
+                            'fare_per_sit' => $fare_per_sit,
+                            'driver_id' => $driver_id,
+                            'status' => 1
+                        ];
+
+                        $id = $this->AdminModel->InsertServiceDetails($data);
+                        $serviceDetails = $this->AdminModel->getSingleData('service_details', $id);
+                        $response = [
+                            'status'   => 201,
+                            'error'    => null,
+                            'response' => [
+                                'message' => 'Service added successfully!',
+                                'data' => $serviceDetails
+                            ],
+                        ];
+                    } else {
+                        $response = [
+                            'status'   => 200,
+                            'error'    => 1,
+                            'response' => [
+                                'message' => $data['error_message']
+                            ]
+                        ];
+                    }
+                } else {
+                    $response = [
+                        'status'   => 200,
+                        'error'    => 1,
+                        'response' => [
+                            'message' => 'Service Not Availble'
+                        ]
+                    ];
+                }
+            }
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function startService()
+    {
+        $rules = [
+            'service_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $service_id = $this->request->getVar('service_id');
+            $data = [
+                'status' => 2
+            ];
+
+            $this->AdminModel->UpdateRecordById('service_details', $service_id, $data);
+            $response = [
+                'status'   => 200,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Service updated Successfully'
+                ],
+            ];
+        }
+        return $this->respondCreated($response);
+    }
+
+    public function sendLiveLocation()
+    {
+        $rules = [
+            'driver_id' => 'required|numeric',
+            'service_id' => 'required|numeric',
+            'vehicle_id' => 'required|numeric',
+            'lat' => 'required',
+            'lng' => 'required',
+        ];
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $driver_id = $this->request->getVar('driver_id');
+            $service_id = $this->request->getVar('service_id');
+            $vehicle_id = $this->request->getVar('vehicle_id');
+            $lat = $this->request->getVar('lat');
+            $lng = $this->request->getVar('lng');
+            $data = [
+                'vehicle_id' => $vehicle_id,
+                'driver_id' => $driver_id,
+                'service_id' => $service_id,
+                'lat' => $lat,
+                'lng' => $lng,
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+
+            $this->AdminModel->InsertRecord('vehicle_location_status', $data);
+
+            $response = [
+                'status'   => 200,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Live Status Updated Successfully'
+                ],
+            ];
         }
 
         return $this->respondCreated($response);

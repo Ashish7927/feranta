@@ -74,3 +74,7 @@ $routes->post('api/sendOtpForLogin', 'ApiController::sendOtpForLogin');
 $routes->post('api/verifyOtpForLogin', 'ApiController::verifyOtpForLogin');
 $routes->post('api/updateProfile', 'ApiController::updateProfile');
 $routes->post('api/get-price', 'ApiController::getServicePrice');
+$routes->post('api/scedule-service', 'ApiController::sceduleService');
+$routes->post('api/start-service', 'ApiController::startService');
+$routes->post('api/send-live-location', 'ApiController::sendLiveLocation');
+
