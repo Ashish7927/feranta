@@ -151,6 +151,7 @@ class Service extends BaseController
 
             $data = [
                 'vehicle_id' => $vehicle,
+                'vehicle_type' => $vehicleDetails->type_id,
                 'boarding_date' => $boarding_date,
                 'arrival_datetime' => $arrival_datetime,
                 'from_city' => $from_city,
