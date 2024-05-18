@@ -78,4 +78,8 @@ $routes->post('api/scedule-service', 'ApiController::sceduleService');
 $routes->post('api/start-service', 'ApiController::startService');
 $routes->post('api/send-live-location', 'ApiController::sendLiveLocation');
 $routes->post('api/driver-login', 'ApiController::sendOtpForLoginDriver');
-
+$routes->post('api/book-service', 'ApiController::bookService');
+$routes->post('api/get-request', 'ApiController::getAllRequest');
+$routes->post('api/accept-booking', 'ApiController::acceptBooking');
+$routes->post('api/reject-booking', 'ApiController::rejectBooking');
+$routes->post('api/end-booking', 'ApiController::endBooking');
