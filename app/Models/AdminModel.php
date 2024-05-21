@@ -696,12 +696,12 @@ class AdminModel extends Model
 	function getDriverwiseBookingRequest($driver_id)
 	{
 		$builder = $this->db->table('service_request');
-		$builder->select('service_request.*,booking.user_id,booking.booking_type,booking.fare,service.from_city,user.full_name,service.to_city,service.vehicle_id,vehicle.regd_no,from_city.city_name,to_city.city_name as tocity');
+		$builder->select('service_request.*,booking.user_id,booking.booking_type,booking.fare,service.from_city,user.full_name,service.to_city,service.vehicle_id,vehicle.regd_no');
 		$builder->join('service_bookings booking', 'booking.id = service_request.booking_id');
 		$builder->join('user user', 'user.id = booking.user_id');
 		$builder->join('service_details service', 'service.id = service_request.service_id');
 		$builder->join('vehicle_details vehicle', 'vehicle.id = service.vehicle_id');
-		$builder->where('driver_id', $driver_id);
+		$builder->where('service_request.driver_id', $driver_id);
 		return $builder->get()->getResult();
 	}
 
@@ -710,6 +710,17 @@ class AdminModel extends Model
 		$builder = $this->db->table('vehicle_location_status');
 		$builder->select('*');
 		$builder->where('service_id', $service_id);
+		return $builder->get()->getResult();
+	}
+
+	function getBookingData($booking_id)
+	{
+		$builder = $this->db->table('service_bookings');
+		$builder->select('service_bookings.*,type.type_name,vehicle.regd_no,vehicle.model_name,user.full_name,user.contact_no');
+		$builder->join('vehicle_types type', 'type.id = service_bookings.vehicle_type');
+		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id', 'left');
+		$builder->join('user user', 'user.id = service_bookings.driver_id', 'left');
+		$builder->where('service_bookings.id',$booking_id);
 		return $builder->get()->getResult();
 	}
 }

@@ -19,6 +19,20 @@ class ApiController extends ResourceController
         helper(['form', 'url', 'validation']);
     }
 
+    public function vehcileTypeMaster()
+    {
+        $alltytpes = $this->AdminModel->GetAllRecord('vehicle_types');
+        $response = [
+            'status'   => 200,
+            'error'    => null,
+            'response' => [
+                'message' => 'All Vehcile date!',
+                'data' => $alltytpes,
+            ],
+        ];
+        return $this->respondCreated($response);
+    }
+
 
     public function sendOtpForLogin()
     {
@@ -368,7 +382,7 @@ class ApiController extends ResourceController
                             'fare_per_sit' => $fare_per_sit,
                             'driver_id' => $driver_id,
                             'status' => 0,
-                            'booking_status'=> 0
+                            'booking_status' => 0
                         ];
 
                         $id = $this->AdminModel->InsertServiceDetails($data);
@@ -471,13 +485,12 @@ class ApiController extends ResourceController
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             $checkUpdate = $this->AdminModel->checkDriverStatus($service_id);
-            if(!empty($checkUpdate) && count($checkUpdate) > 0)
-            {
-                $this->AdminModel->UpdateRecordById('vehicle_location_status',$checkUpdate[0]->id , $data);
-            }else{
+            if (!empty($checkUpdate) && count($checkUpdate) > 0) {
+                $this->AdminModel->UpdateRecordById('vehicle_location_status', $checkUpdate[0]->id, $data);
+            } else {
                 $this->AdminModel->InsertRecord('vehicle_location_status', $data);
             }
-            
+
             $response = [
                 'status'   => 200,
                 'error'    => null,
@@ -525,10 +538,14 @@ class ApiController extends ResourceController
             if ($booking_type == 'cab') {
                 $getAvailableServiceId = $this->db->query("SELECT id, ( 6371 * acos( cos( radians($destination_lat) ) * cos( radians( destination_lat ) ) * cos( radians( destination_lng ) - radians($destination_lng) ) + sin( radians($destination_lat) ) * sin( radians( destination_lat ) ) ) ) AS distance FROM service_details WHERE status != 1 AND vehicle_type = $vehicle_type HAVING distance < $radius ORDER BY distance")->getResultArray();
 
-                $checkAvailbility = $this->db->query("SELECT id, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( lat ) ) ) ) AS distance FROM vehicle_location_status WHERE service_id IN($getAvailableServiceId) HAVING distance < $radius ORDER BY distance")->getResult();
+                $arr = array_map(function ($value) {
+                    return $value['id'];
+                }, $getAvailableServiceId);
+                $getAvailableServiceId = implode(',', $arr);
+                $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( lat ) ) ) ) AS distance FROM vehicle_location_status WHERE service_id IN($getAvailableServiceId) HAVING distance < $radius ORDER BY distance")->getResult();
 
                 if (empty($checkAvailbility) || count($checkAvailbility) == 0) {
-                    $checkAvailbility = $this->db->query("SELECT id, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( origin_lat ) ) * cos( radians( origin_lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( origin_lat ) ) ) ) AS distance FROM service_details WHERE boarding_date BETWEEN DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AND DATE_FORMAT(NOW() + INTERVAL 30 MINUTE, '%Y-%m-%d %H:%i:%s') HAVING distance < $radius ORDER BY distance")->getResult();
+                    $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( origin_lat ) ) * cos( radians( origin_lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( origin_lat ) ) ) ) AS distance FROM service_details WHERE start_datetime BETWEEN DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AND DATE_FORMAT(NOW() + INTERVAL 30 MINUTE, '%Y-%m-%d %H:%i:%s') HAVING distance < $radius ORDER BY distance")->getResult();
                 }
 
                 if (!empty($checkAvailbility) && count($checkAvailbility) > 0) {
@@ -600,20 +617,15 @@ class ApiController extends ResourceController
                     $this->AdminModel->InsertRecord('service_request', $data);
                 }
 
+                $BookingData = $this->AdminModel->getBookingData($booking_id);
+
                 $response = [
                     'status'   => 200,
                     'error'    => null,
                     'response' => [
-                        'success' => 'Booking register successfully!'
+                        'success' => 'Booking register successfully!',
+                        'data' => $BookingData
                     ],
-                ];
-            } else {
-                $response = [
-                    'status'   => 200,
-                    'error'    => 1,
-                    'response' => [
-                        'message' => 'Something went wrong!'
-                    ]
                 ];
             }
         }
@@ -647,7 +659,6 @@ class ApiController extends ResourceController
                     'data' => $allRequest
                 ],
             ];
-
         }
 
         return $this->respondCreated($response);
@@ -671,7 +682,7 @@ class ApiController extends ResourceController
 
             $request_id  = $this->request->getPost('request_id');
             $requestDetails = $this->AdminModel->getSingleData('service_request', $request_id);
-            if($requestDetails->status != 0){
+            if ($requestDetails->status != 0) {
 
                 $response = [
                     'status'   => 200,
@@ -680,24 +691,25 @@ class ApiController extends ResourceController
                         'message' => 'Booking alredy assigned!'
                     ]
                 ];
-
-            }else{
-            $serviceDetails = $this->AdminModel->getSingleData('service_details', $requestDetails->service_id);
+            } else {
+                $serviceDetails = $this->AdminModel->getSingleData('service_details', $requestDetails->service_id);
 
                 $data = [
                     'status'  => 1,
                 ];
                 $this->AdminModel->UpdateRecordById('service_request', $request_id, $data);
+                $otp = rand(100000, 999999);
                 $data = [
                     'vehicle_id'  => $serviceDetails->vehicle_id,
                     'driver_id'  => $requestDetails->driver_id,
+                    'otp' => $otp,
                     'status'  => 1
                 ];
-                $this->AdminModel->UpdateRecordById('service_bookings', $serviceDetails->booking_id, $data);
+                $this->AdminModel->UpdateRecordById('service_bookings', $requestDetails->booking_id, $data);
                 $data = [
                     'status'  => 2,
                 ];
-                $this->db->query("UPDATE service_request SET status = 2 WHERE booking_id = $serviceDetails->booking_id AND status = 0 ");
+                $this->db->query("UPDATE service_request SET status = 2 WHERE booking_id = $requestDetails->booking_id AND status = 0 ");
 
                 $response = [
                     'status'   => 200,
@@ -728,7 +740,7 @@ class ApiController extends ResourceController
             ];
         } else {
             $request_id  = $this->request->getPost('request_id');
-            $requestDetails = $this->AdminModel->getSingleData('service_request', $id);
+            $requestDetails = $this->AdminModel->getSingleData('service_request', $request_id);
             $data = [
                 'status'  => 3,
             ];
@@ -749,7 +761,6 @@ class ApiController extends ResourceController
                     'success' => 'Booking rejected successfully!'
                 ],
             ];
-
         }
 
         return $this->respondCreated($response);
@@ -773,7 +784,7 @@ class ApiController extends ResourceController
 
             $service_id = $this->request->getVar('service_id');
             $serviceDetails = $this->AdminModel->getSingleData('service_details', $service_id);
-            if($serviceDetails->booking_status == 1){
+            if ($serviceDetails->booking_status == 1) {
 
                 $this->db->query("UPDATE service_bookings SET status = 3 WHERE service_id = $service_id ");
             }
@@ -792,8 +803,8 @@ class ApiController extends ResourceController
         return $this->respondCreated($response);
     }
 
-// customer cancel
-//driver cancel (cancel service or cancel booking only)
+    // customer cancel
+    //driver cancel (cancel service or cancel booking only)
     public function cancelBooking()
     {
         $rules = [
@@ -818,15 +829,10 @@ class ApiController extends ResourceController
         return $this->respondCreated($response);
     }
 
-    
-    public function verifyBookingOtp()
+    public function checkBookingService()
     {
         $rules = [
-            'origin_lat' => 'required',
-            'origin_lng' => 'required',
-            'destination_lat' => 'required',
-            'destination_lng' => 'required',
-            'type' => 'required'
+            'booking_id' => 'required'
         ];
 
         if (!$this->validate($rules)) {
@@ -838,6 +844,172 @@ class ApiController extends ResourceController
                 ]
             ];
         } else {
+            $booking_id = $this->request->getVar('booking_id');
+            $BookingData = $this->AdminModel->getBookingData($booking_id);
+
+            $response = [
+                'status'   => 200,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Booking status data',
+                    'BookingData' => $BookingData
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+
+    public function verifyBookingOtp()
+    {
+        $rules = [
+            'booking_id' => 'required|numeric',
+            'otp' => 'required|numeric|exact_length[6]',
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $booking_id = $this->request->getVar('booking_id');
+            $otp = $this->request->getVar('otp');
+            $data = $this->AdminModel->getBookingData($booking_id);
+            if (!empty($data) && $data != null) {
+
+                //verify otp
+                $actuallOtp = $data[0]->otp;
+                if ($otp == $actuallOtp) {
+
+                    $response = [
+                        'status'   => 201,
+                        'error'    => null,
+                        'response' => [
+                            'success' => 'OTP matched',
+                            'userDetails' => $data
+                        ],
+                    ];
+                } else {
+                    $response = [
+                        'status'   => 200,
+                        'error'    => 1,
+                        'response' => [
+                            'message' => 'Invalid OTP'
+                        ]
+                    ];
+                }
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Invalid Booking Id!'
+                    ]
+                ];
+            }
+        }
+        return $this->respondCreated($response);
+    }
+
+
+    public function updateProfile()
+    {
+        $rules = [
+            'customer_id' => 'required',
+            'name' => 'required',
+            'email' => 'required',
+            'contact_no' => 'required'
+
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $customer_id = $this->request->getVar('customer_id');
+            $name = $this->request->getVar('name');
+            $email = $this->request->getVar('email');
+            $contact_no = $this->request->getVar('contact_no');
+            // $userDetails = $this->AdminModel->getSingleData('user', $customer_id);
+
+            // $CountEmail = $this->db->query("SELECT * FROM user  where email=$email and id!=$customer_id ")->getResult();
+            // $CountContact = $this->db->query("SELECT * FROM user  where contact_no=$contact_no and id!=$customer_id ")->getResult();
+            // if(){
+
+            // }else{
+
+            // }
+            $data = [
+                'full_name' => $name,
+                'email' => $email,
+                'contact_no' => $contact_no
+            ];
+
+            $id = $this->AdminModel->InsertServiceDetails($data);
+            $serviceDetails = $this->AdminModel->getSingleData('service_details', $id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'message' => 'Profile updated successfully!',
+                    'data' => $serviceDetails
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function profileDetails()
+    {
+        $rules = [
+            'user_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $user_id = $this->request->getVar('user_id');
+            $userDetails = $this->AdminModel->getSingleData('user', $user_id);
+            if(!empty($userDetails)){
+
+                $response = [
+                    'status'   => 201,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'User Profile Details',
+                        'userDetails' => $userDetails
+                    ],
+                ];
+
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Invalid user Id!'
+                    ]
+                ];
+            }
+
         }
 
         return $this->respondCreated($response);

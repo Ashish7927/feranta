@@ -70,6 +70,7 @@ $routes->post('/service-request/status', 'ServiceRequest::status');
 
 
 // API Routes 
+$routes->get('api/get-vehcle-type', 'ApiController::vehcileTypeMaster');
 $routes->post('api/sendOtpForLogin', 'ApiController::sendOtpForLogin');
 $routes->post('api/verifyOtpForLogin', 'ApiController::verifyOtpForLogin');
 $routes->post('api/updateProfile', 'ApiController::updateProfile');
@@ -83,3 +84,6 @@ $routes->post('api/get-request', 'ApiController::getAllRequest');
 $routes->post('api/accept-booking', 'ApiController::acceptBooking');
 $routes->post('api/reject-booking', 'ApiController::rejectBooking');
 $routes->post('api/end-booking', 'ApiController::endBooking');
+$routes->post('api/check-booking-status', 'ApiController::checkBookingService');
+$routes->post('api/verify-booking-otp', 'ApiController::verifyBookingOtp');
+$routes->post('api/get-profile-details', 'ApiController::profileDetails');
