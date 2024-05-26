@@ -29,8 +29,8 @@
                                 <td><?= $request->booking_type; ?></td>
                                 <td><?= $request->full_name; ?></td>
                                 <td><?= $request->regd_no; ?></td>
-                                <td><?= $request->city_name; ?></td>
-                                <td><?= $request->tocity; ?></td>
+                                <td><?= $request->from_location; ?></td>
+                                <td><?= $request->to_location; ?></td>
                                 <td><?= $request->fare; ?></td>
 
                                 <td class="text-center">

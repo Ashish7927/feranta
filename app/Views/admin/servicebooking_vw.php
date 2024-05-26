@@ -103,8 +103,8 @@
                                 <td class="text-center"><?= $i++; ?></td>
                                 <td><?= $booking->booking_type; ?></td>
                                 <td><?= $booking->type_name; ?></td>
-                                <td><?= $booking->city_name; ?></td>
-                                <td><?= $booking->tocity; ?></td>
+                                <td><?= $booking->from_location; ?></td>
+                                <td><?= $booking->to_location; ?></td>
                                 <td><?= $booking->model_name; ?></td>
                                 <td><?= $booking->regd_no; ?></td>
                                 <td><?= $booking->full_name; ?></td>

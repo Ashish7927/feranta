@@ -120,8 +120,8 @@
                             <tr>
                                 <td class="text-center"><?= $i++; ?></td>
                                 <td><?= $state->model_name; ?></td>
-                                <td><?= $state->from_city_name; ?></td>
-                                <td><?= $state->to_city_name; ?></td>
+                                <td><?= $state->from_city; ?></td>
+                                <td><?= $state->to_city; ?></td>
                                 <td><?= $state->boarding_date; ?></td>
                                 <td><?= $state->start_datetime; ?></td>
                                 <!-- <td><?= $state->full_fare; ?></td>
