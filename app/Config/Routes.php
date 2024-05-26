@@ -95,7 +95,7 @@ $routes->post('api/cancel-booking', 'ApiController::cancelBooking');
 
 $routes->post('api/register-driver', 'ApiController::driverRegister');
 $routes->post('api/driver-update-profile', 'ApiController::driverUpdateProfile');
-
+$routes->post('api/get-all-notification', 'ApiController::getAllNotification');
 
 
 

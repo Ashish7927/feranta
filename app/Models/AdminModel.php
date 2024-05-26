@@ -448,10 +448,8 @@ class AdminModel extends Model
 	function getAllService()
 	{
 		$builder = $this->db->table('service_details');
-		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name,from_city.city_name as from_city_name,to_city.city_name as to_city_name');
+		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name');
 		$builder->join('vehicle_details vehicle', 'vehicle.id = service_details.vehicle_id');
-		$builder->join('city from_city', 'from_city.city_id = service_details.from_city');
-		$builder->join('city to_city', 'to_city.city_id = service_details.to_city');
 		$builder->join('user', 'user.id = service_details.vendor_id');
 		return $builder->get()->getResult();
 	}
@@ -615,12 +613,10 @@ class AdminModel extends Model
 	function getAllBookingRequest()
 	{
 		$builder = $this->db->table('service_request');
-		$builder->select('service_request.*,booking.user_id,booking.booking_type,booking.fare,service.from_city,user.full_name,service.to_city,service.vehicle_id,vehicle.regd_no,from_city.city_name,to_city.city_name as tocity');
+		$builder->select('service_request.*,booking.user_id,booking.booking_type,booking.fare,booking.from_location,booking.to_location,user.full_name,service.vehicle_id,vehicle.regd_no');
 		$builder->join('service_bookings booking', 'booking.id = service_request.booking_id');
 		$builder->join('user user', 'user.id = booking.user_id');
 		$builder->join('service_details service', 'service.id = service_request.service_id');
-		$builder->join('city from_city', 'from_city.city_id = service.from_city');
-		$builder->join('city to_city', 'to_city.city_id = service.to_city');
 		$builder->join('vehicle_details vehicle', 'vehicle.id = service.vehicle_id');
 		return $builder->get()->getResult();
 	}
@@ -637,10 +633,8 @@ class AdminModel extends Model
 	function getAllBookingData()
 	{
 		$builder = $this->db->table('service_bookings');
-		$builder->select('service_bookings.*,type.type_name,from_city.city_name,to_city.city_name as tocity,vehicle.regd_no,vehicle.model_name,user.full_name,user.contact_no');
+		$builder->select('service_bookings.*,type.type_name,vehicle.regd_no,vehicle.model_name,user.full_name,user.contact_no');
 		$builder->join('vehicle_types type', 'type.id = service_bookings.vehicle_type');
-		$builder->join('city from_city', 'from_city.city_id = service_bookings.from_location', 'left');
-		$builder->join('city to_city', 'to_city.city_id = service_bookings.to_location', 'left');
 		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id', 'left');
 		$builder->join('user user', 'user.id = service_bookings.driver_id', 'left');
 		return $builder->get()->getResult();
@@ -696,7 +690,7 @@ class AdminModel extends Model
 	function getDriverwiseBookingRequest($driver_id)
 	{
 		$builder = $this->db->table('service_request');
-		$builder->select('service_request.*,booking.user_id,booking.booking_type,booking.fare,service.from_city,user.full_name,service.to_city,service.vehicle_id,vehicle.regd_no');
+		$builder->select('service_request.*,booking.user_id,booking.booking_type,booking.fare,booking.from_location,user.full_name,booking.to_location,service.vehicle_id,vehicle.regd_no');
 		$builder->join('service_bookings booking', 'booking.id = service_request.booking_id');
 		$builder->join('user user', 'user.id = booking.user_id');
 		$builder->join('service_details service', 'service.id = service_request.service_id');
@@ -727,9 +721,10 @@ class AdminModel extends Model
 	function getAllDriverService($driver_id)
 	{
 		$builder = $this->db->table('service_details');
-		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name');
+		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name,booking.from_location,booking.to_location,booking.booking_type,booking.id as bookingid');
 		$builder->join('vehicle_details vehicle', 'vehicle.id = service_details.vehicle_id');
 		$builder->join('user', 'user.id = service_details.driver_id');
+		$builder->join('service_bookings booking', 'booking.service_id = service_details.id','left');
 		$builder->where('service_details.driver_id',$driver_id);
 		return $builder->get()->getResult();
 	}
@@ -742,6 +737,14 @@ class AdminModel extends Model
 		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id', 'left');
 		$builder->join('user user', 'user.id = service_bookings.driver_id', 'left');
 		$builder->where('service_bookings.user_id',$customer_id);
+		return $builder->get()->getResult();
+	}
+
+	function getAllDriverNotification($user_id)
+	{
+		$builder = $this->db->table('service_details');
+		$builder->select('*');
+		$builder->where('user_id',$user_id);
 		return $builder->get()->getResult();
 	}
 }

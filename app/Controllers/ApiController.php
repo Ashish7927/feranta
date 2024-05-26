@@ -75,12 +75,23 @@ class ApiController extends ResourceController
         // Use this $token in your HTTP requests to authenticate
     }
 
-    public function sendPushNotification($title, $message, $sender_id)
+    public function sendPushNotification($user_id, $title, $message)
     {
+
+        $userDetails = $this->AdminModel->getSingleData('user', $user_id);
+
+        $data_array = [
+            'user_id' => $user_id,
+            'title' => $title,
+            'message' => $message,
+            'details' => ''
+        ];
+        $this->AdminModel->InsertRecord('notifications', $data_array);
+
         $projectId = 'fernata-48950';
         $messageData = [
             'message' => [
-                'token' =>$sender_id,
+                'token' => $userDetails->device_token,
                 'notification' => [
                     'title' => $title,
                     'body' => $message
@@ -478,8 +489,8 @@ class ApiController extends ResourceController
 
                         $newTime = date("Y-m-d H:i:s", strtotime($boarding_datetime . " +30 minutes"));
 
-                        $from_add = $this->getAddressFromLatLng($origin_lat,$origin_lng);
-                        $to_add = $this->getAddressFromLatLng($destination_lat,$destination_lng);
+                        $from_add = $this->getAddressFromLatLng($origin_lat, $origin_lng);
+                        $to_add = $this->getAddressFromLatLng($destination_lat, $destination_lng);
 
                         $data = [
                             'vehicle_id' => $getVehicleId->vehicle_id,
@@ -668,7 +679,7 @@ class ApiController extends ResourceController
             $radius = 5; // Radius in kilometers
 
             if ($booking_type == 'cab') {
-                $getAvailableServiceId = $this->db->query("SELECT id, ( 6371 * acos( cos( radians($destination_lat) ) * cos( radians( destination_lat ) ) * cos( radians( destination_lng ) - radians($destination_lng) ) + sin( radians($destination_lat) ) * sin( radians( destination_lat ) ) ) ) AS distance FROM service_details WHERE status != 1 AND vehicle_type = $vehicle_type HAVING distance < $radius ORDER BY distance")->getResultArray();
+                $getAvailableServiceId = $this->db->query("SELECT id, ( 6371 * acos( cos( radians($destination_lat) ) * cos( radians( destination_lat ) ) * cos( radians( destination_lng ) - radians($destination_lng) ) + sin( radians($destination_lat) ) * sin( radians( destination_lat ) ) ) ) AS distance FROM service_details WHERE booking_status != 1 AND  share_status = 0 AND vehicle_type = $vehicle_type HAVING distance < $radius ORDER BY distance")->getResultArray();
 
                 $arr = array_map(function ($value) {
                     return $value['id'];
@@ -677,7 +688,7 @@ class ApiController extends ResourceController
                 $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( lat ) ) ) ) AS distance FROM vehicle_location_status WHERE service_id IN($getAvailableServiceId) HAVING distance < $radius ORDER BY distance")->getResult();
 
                 if (empty($checkAvailbility) || count($checkAvailbility) == 0) {
-                    $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( origin_lat ) ) * cos( radians( origin_lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( origin_lat ) ) ) ) AS distance FROM service_details WHERE start_datetime BETWEEN DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AND DATE_FORMAT(NOW() + INTERVAL 30 MINUTE, '%Y-%m-%d %H:%i:%s') HAVING distance < $radius ORDER BY distance")->getResult();
+                    $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( origin_lat ) ) * cos( radians( origin_lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( origin_lat ) ) ) ) AS distance FROM service_details WHERE id IN($getAvailableServiceId) AND start_datetime BETWEEN DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AND DATE_FORMAT(NOW() + INTERVAL 30 MINUTE, '%Y-%m-%d %H:%i:%s') HAVING distance < $radius ORDER BY distance")->getResult();
                 }
 
                 if (!empty($checkAvailbility) && count($checkAvailbility) > 0) {
@@ -695,14 +706,34 @@ class ApiController extends ResourceController
                     ];
                 }
             } elseif ($booking_type == 'sharing') {
-                $checkAvailbility = $this->AdminModel->checkServiceAvailbility($vehicle_type, $from_location, $to_location);
+
+                $getAvailableServiceId = $this->db->query("SELECT id, ( 6371 * acos( cos( radians($destination_lat) ) * cos( radians( destination_lat ) ) * cos( radians( destination_lng ) - radians($destination_lng) ) + sin( radians($destination_lat) ) * sin( radians( destination_lat ) ) ) ) AS distance FROM service_details WHERE booking_status != 1 AND vehicle_type = $vehicle_type HAVING distance < $radius ORDER BY distance")->getResultArray();
+
+                $arr = array_map(function ($value) {
+                    return $value['id'];
+                }, $getAvailableServiceId);
+                $getAvailableServiceId = implode(',', $arr);
+                $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( lat ) ) ) ) AS distance FROM vehicle_location_status WHERE service_id IN($getAvailableServiceId) HAVING distance < $radius ORDER BY distance")->getResult();
+
+                if (empty($checkAvailbility) || count($checkAvailbility) == 0) {
+                    $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( origin_lat ) ) * cos( radians( origin_lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( origin_lat ) ) ) ) AS distance FROM service_details WHERE id IN($getAvailableServiceId) AND start_datetime BETWEEN DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AND DATE_FORMAT(NOW() + INTERVAL 30 MINUTE, '%Y-%m-%d %H:%i:%s') HAVING distance < $radius ORDER BY distance")->getResult();
+                }
+
                 if (!empty($checkAvailbility) && count($checkAvailbility) > 0) {
+
                     $success = 1;
                     $service_rate = $checkAvailbility[0]->service_rate;
                     $totalfare = $checkAvailbility[0]->fare_per_sit;
                 } else {
-                    return redirect()->to('service-booking')->with('message', 'Sorry! No service availble on this root');
+                    $response = [
+                        'status'   => 200,
+                        'error'    => 1,
+                        'response' => [
+                            'message' => 'Sorry! No service availble on this root'
+                        ]
+                    ];
                 }
+               
             } elseif ($booking_type == 'future_cab') {
                 $success = 0;
             } else {
@@ -716,8 +747,8 @@ class ApiController extends ResourceController
             }
 
             if ($success == 1) {
-                $from_add = $this->getAddressFromLatLng($origin_lat,$origin_lng);
-                $to_add = $this->getAddressFromLatLng($destination_lat,$destination_lng);
+                $from_add = $this->getAddressFromLatLng($origin_lat, $origin_lng);
+                $to_add = $this->getAddressFromLatLng($destination_lat, $destination_lng);
                 $data = [
                     'user_id' => $cutomer_id,
                     'booking_type' => $booking_type,
@@ -743,6 +774,8 @@ class ApiController extends ResourceController
                 $booking_id = $this->AdminModel->InsertService($data);
 
                 foreach ($checkAvailbility as $service) {
+
+                    $this->sendPushNotification($service->driver_id,'A new booking request','Here is a booking request from '.$from_add.'to '.$to_add);
 
                     $data = [
                         'booking_id' => $booking_id,
@@ -829,7 +862,7 @@ class ApiController extends ResourceController
                 ];
             } else {
                 $serviceDetails = $this->AdminModel->getSingleData('service_details', $requestDetails->service_id);
-
+                $bookingDetails = $this->AdminModel->getSingleData('service_bookings', $requestDetails->booking_id);
                 $data = [
                     'status'  => 1,
                 ];
@@ -847,7 +880,16 @@ class ApiController extends ResourceController
                     'status'  => 2,
                 ];
                 $this->db->query("UPDATE service_request SET status = 2 WHERE booking_id = $requestDetails->booking_id AND status = 0 ");
-                $this->db->query("UPDATE service_details SET status = 1 WHERE id = $serviceDetails->id");
+
+                if($bookingDetails->booking_type == 'cab' || $bookingDetails->booking_type == 'cab' ){
+                    $this->db->query("UPDATE service_details SET booking_status = 1 WHERE id = $serviceDetails->id");
+                }else{
+                    $this->db->query("UPDATE service_details SET share_status = 1 WHERE id = $serviceDetails->id");
+
+                    // coount share boooking 
+                    // if share booking limit reached update status to 1
+                }
+                
                 $response = [
                     'status'   => 200,
                     'error'    => null,
@@ -1074,6 +1116,11 @@ class ApiController extends ResourceController
                 $actuallOtp = $data[0]->otp;
                 if ($otp == $actuallOtp) {
 
+                    $dataU = [
+                        'otp_verify_status' => 1
+                    ];
+                    $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $dataU);
+
                     $response = [
                         'status'   => 201,
                         'error'    => null,
@@ -1133,7 +1180,7 @@ class ApiController extends ResourceController
 
             $CountEmail = $this->db->query("SELECT * FROM user  where email= '" . $email . "' and id!= $customer_id ")->getResult();
             $CountContact = $this->db->query("SELECT * FROM user  where contact_no=" . $contact_no . " and id!=$customer_id ")->getResult();
-            if ($CountEmail >= 0) {
+            if (count($CountEmail) > 0) {
                 $response = [
                     'status'   => 200,
                     'error'    => 1,
@@ -1143,7 +1190,7 @@ class ApiController extends ResourceController
                 ];
                 return $this->respondCreated($response);
             }
-            if ($CountContact >= 0) {
+            if (count($CountContact) > 0) {
                 $response = [
                     'status'   => 200,
                     'error'    => 1,
@@ -1162,7 +1209,7 @@ class ApiController extends ResourceController
 
             $file = $this->request->getFile('image');
 
-            if ($file->isValid() && !$file->hasMoved()) {
+            if ($file != null && $file->isValid() && !$file->hasMoved()) {
                 $imagename = $file->getRandomName();
                 $file->move('uploads/', $imagename);
                 $data['profile_image'] = $imagename;
@@ -1430,6 +1477,39 @@ class ApiController extends ResourceController
                 'response' => [
                     'message' => 'Profile updated successfully!',
                     'data' => $serviceDetails
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+
+
+    public function getAllNotification()
+    {
+        $rules = [
+            'user_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $user_id = $this->request->getVar('user_id');
+            $allNotification = $this->AdminModel->getAllDriverNotification($user_id);
+            $this->db->query("UPDATE notifications SET status = 1 WHERE user_id = $user_id");
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Scedule Service List',
+                    'allNotification' => $allNotification
                 ],
             ];
         }
