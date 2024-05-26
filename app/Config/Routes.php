@@ -97,5 +97,10 @@ $routes->post('api/register-driver', 'ApiController::driverRegister');
 $routes->post('api/driver-update-profile', 'ApiController::driverUpdateProfile');
 $routes->post('api/get-all-notification', 'ApiController::getAllNotification');
 
+$routes->post('api/add-ratting-review', 'ApiController::addRatingReviews');
+$routes->post('api/edit-ratting-review', 'ApiController::editRattingReview');
+$routes->post('api/get-booking-ratting-review', 'ApiController::getBookingRatting');
+$routes->post('api/edit-scedule-service', 'ApiController::editSceduleService');
+$routes->post('api/get-current-service', 'ApiController::onGoingRide');
 
 

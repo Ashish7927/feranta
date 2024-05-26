@@ -733,7 +733,6 @@ class ApiController extends ResourceController
                         ]
                     ];
                 }
-               
             } elseif ($booking_type == 'future_cab') {
                 $success = 0;
             } else {
@@ -775,7 +774,7 @@ class ApiController extends ResourceController
 
                 foreach ($checkAvailbility as $service) {
 
-                    $this->sendPushNotification($service->driver_id,'A new booking request','Here is a booking request from '.$from_add.'to '.$to_add);
+                    $this->sendPushNotification($service->driver_id, 'A new booking request', 'Here is a booking request from ' . $from_add . 'to ' . $to_add);
 
                     $data = [
                         'booking_id' => $booking_id,
@@ -881,15 +880,28 @@ class ApiController extends ResourceController
                 ];
                 $this->db->query("UPDATE service_request SET status = 2 WHERE booking_id = $requestDetails->booking_id AND status = 0 ");
 
-                if($bookingDetails->booking_type == 'cab' || $bookingDetails->booking_type == 'cab' ){
+                if ($bookingDetails->booking_type == 'cab' || $bookingDetails->booking_type == 'cab') {
                     $this->db->query("UPDATE service_details SET booking_status = 1 WHERE id = $serviceDetails->id");
-                }else{
-                    $this->db->query("UPDATE service_details SET share_status = 1 WHERE id = $serviceDetails->id");
-
-                    // coount share boooking 
-                    // if share booking limit reached update status to 1
+                } else {
+                    
+                    if($serviceDetails->share_booking_ids != ''){
+                        $allBookingids = explode(',',$serviceDetails->share_booking_ids);
+                        array_push($allBookingids,$requestDetails->booking_id);
+                        $booking_ids = implode(',',$allBookingids);
+                        $totelBooking = count($allBookingids);
+                        $serviceRate = $this->AdminModel->getSingleData('service_rate', $requestDetails->service_rate);
+                        if($totelBooking >= $serviceRate->max_no_share)
+                        {
+                            $this->db->query("UPDATE service_details SET status =1, share_status = 1,share_booking_ids = $booking_ids WHERE id = $serviceDetails->id");
+                        }else{
+                            $this->db->query("UPDATE service_details SET share_status = 1,share_booking_ids = $booking_ids WHERE id = $serviceDetails->id");
+                        }
+                        
+                    }else{
+                        $this->db->query("UPDATE service_details SET share_status = 1,share_booking_ids = $requestDetails->booking_id WHERE id = $serviceDetails->id");
+                    }
                 }
-                
+
                 $response = [
                     'status'   => 200,
                     'error'    => null,
@@ -1484,8 +1496,6 @@ class ApiController extends ResourceController
         return $this->respondCreated($response);
     }
 
-
-
     public function getAllNotification()
     {
         $rules = [
@@ -1503,13 +1513,263 @@ class ApiController extends ResourceController
         } else {
             $user_id = $this->request->getVar('user_id');
             $allNotification = $this->AdminModel->getAllDriverNotification($user_id);
-            $this->db->query("UPDATE notifications SET status = 1 WHERE user_id = $user_id");
+            $this->db->query("UPDATE notifications SET status = 1 WHERE 'user_id' = $user_id");
             $response = [
                 'status'   => 201,
                 'error'    => null,
                 'response' => [
                     'success' => 'Scedule Service List',
                     'allNotification' => $allNotification
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+
+    public function addRatingReviews()
+    {
+        $rules = [
+            'user_id' => 'required',
+            'driver_id' => 'required',
+            'booking_id' => 'required',
+            'rating' => 'required'
+
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $user_id = $this->request->getVar('user_id');
+            $driver_id = $this->request->getVar('driver_id');
+            $booking_id = $this->request->getVar('booking_id');
+            $rating = $this->request->getVar('rating');
+            $review = $this->request->getVar('review');
+
+            $data = [
+                'user_id' => $user_id,
+                'driver_id' => $driver_id,
+                'booking_id' => $booking_id,
+                'ratting' => $rating,
+                'review' => $review,
+                'status' => 1
+            ];
+
+            $this->AdminModel->InsertRecord('ratting_review', $data);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'rating added successfully!'
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function editRattingReview()
+    {
+        $rules = [
+            'ratting_id' => 'required',
+            'rating' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $ratting_id = $this->request->getVar('ratting_id');
+            $rating = $this->request->getVar('rating');
+            $review = $this->request->getVar('review');
+
+            $data = [
+                'ratting' => $rating,
+                'review' => $review
+            ];
+
+            $this->AdminModel->UpdateRecordById('ratting_review', $ratting_id, $data);
+
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'rating updated successfully!'
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function getBookingRatting()
+    {
+        $rules = [
+            'booking_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $booking_id = $this->request->getVar('booking_id');
+            $ratting = $this->AdminModel->getSingleData('ratting_review', $booking_id, 'booking_id');
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'here is the booking ratting review details',
+                    'ratting' => $ratting
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    function editSceduleService()
+    {
+        $rules = [
+            'service_id' => 'required',
+            'origin_lat' => 'required',
+            'origin_lng' => 'required',
+            'destination_lat' => 'required',
+            'destination_lng' => 'required',
+            'boarding_datetime' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $service_id = $this->request->getVar('service_id');
+            $serviceDetails = $this->AdminModel->getSingleData('service_details', $service_id);
+            if (!empty($serviceDetails) && $serviceDetails->booking_status == 0 && $serviceDetails->status == 0) {
+
+
+                $checkServicRate = $this->AdminModel->getSingleData('service_rate', $serviceDetails->service_rate);
+                $origin_lat = $this->request->getVar('origin_lat');
+                $origin_lng = $this->request->getVar('origin_lng');
+                $destination_lat = $this->request->getVar('destination_lat');
+                $destination_lng = $this->request->getVar('destination_lng');
+                $boarding_datetime = $this->request->getVar('boarding_datetime');
+
+                // Set up API key and other parameters
+                $apiKey = 'AIzaSyAX9w0uT7e_Ohjm_FHv7dHNOjvoFdeDe04';
+
+                // Make API request
+                $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins={$origin_lat},{$origin_lng}&destinations={$destination_lat},{$destination_lng}&key={$apiKey}";
+
+                $response = file_get_contents($url);
+
+                // Parse API response
+                $data = json_decode($response, true);
+
+                // Check if response is successful
+                if ($data['status'] == 'OK') {
+                    $distance = $data['rows'][0]['elements'][0]['distance']['value'];
+                    $km = round($distance / 1000);
+
+                    $full_fare = $km * $checkServicRate->full_fare;
+                    $fare_per_sit = $km * $checkServicRate->fare_per_share;
+                    $serviceRate = $checkServicRate->id;
+
+                    $newTime = date("Y-m-d H:i:s", strtotime($boarding_datetime . " +30 minutes"));
+
+                    $from_add = $this->getAddressFromLatLng($origin_lat, $origin_lng);
+                    $to_add = $this->getAddressFromLatLng($destination_lat, $destination_lng);
+
+                    $data = [
+                        'boarding_date' => $boarding_datetime,
+                        'start_datetime' => $newTime,
+                        'from_city' => $from_add,
+                        'to_city' => $to_add,
+                        'origin_lat' => $origin_lat,
+                        'origin_lng' => $origin_lng,
+                        'destination_lat' => $destination_lat,
+                        'destination_lng' => $destination_lng,
+                        'service_rate' => $serviceRate,
+                        'full_fare' => $full_fare,
+                        'fare_per_sit' => $fare_per_sit
+                    ];
+                    $this->AdminModel->UpdateRecordById('service_details', $service_id, $data);
+                    $serviceDetails = $this->AdminModel->getSingleData('service_details', $service_id);
+                    $response = [
+                        'status'   => 201,
+                        'error'    => null,
+                        'response' => [
+                            'message' => 'Service added successfully!',
+                            'data' => $serviceDetails
+                        ],
+                    ];
+                } else {
+                    $response = [
+                        'status'   => 200,
+                        'error'    => 1,
+                        'response' => [
+                            'message' => $data['error_message']
+                        ]
+                    ];
+                }
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => "you can't edit service at this time"
+                    ]
+                ];
+            }
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function onGoingRide()
+    {
+        $rules = [
+            'driver_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $driver_id = $this->request->getVar('driver_id');
+            $allService = $this->AdminModel->getOngoingDriverService($driver_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'ongoing service',
+                    'userDetails' => $allService
                 ],
             ];
         }

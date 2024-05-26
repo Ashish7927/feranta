@@ -742,9 +742,22 @@ class AdminModel extends Model
 
 	function getAllDriverNotification($user_id)
 	{
-		$builder = $this->db->table('service_details');
+		$builder = $this->db->table('notifications');
 		$builder->select('*');
 		$builder->where('user_id',$user_id);
 		return $builder->get()->getResult();
 	}
+
+	function getOngoingDriverService($driver_id)
+	{
+		$builder = $this->db->table('service_details');
+		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name,booking.from_location,booking.to_location,booking.booking_type,booking.id as bookingid');
+		$builder->join('vehicle_details vehicle', 'vehicle.id = service_details.vehicle_id');
+		$builder->join('user', 'user.id = service_details.driver_id');
+		$builder->join('service_bookings booking', 'booking.service_id = service_details.id','left');
+		$builder->where('service_details.driver_id',$driver_id);
+		$builder->where('service_details.status',1);
+		return $builder->get()->getResult();
+	}
+	
 }
