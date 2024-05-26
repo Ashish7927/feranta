@@ -31,7 +31,7 @@
               <!-- Sidebar Navigation -->
               <ul class="sidebar-nav">
                   <li><a href="<?php echo base_url(); ?>admin/dashboard"><i class="gi gi-stopwatch sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Dashboard</span></a></li>
-                  <li> <a href="<?php echo base_url(); ?>admin/Vendor"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Users Management</span></a></li>
+                  <li> <a href="<?php echo base_url(); ?>admin/Vendor"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Owner & Driver Management</span></a></li>
 
                   <li> <a href="<?php echo base_url(); ?>vehicle"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Vehicle Management</span></a></li>
 
@@ -40,7 +40,7 @@
 
                   <li> <a href="<?php echo base_url(); ?>service-rate"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Service Price</span></a></li>
 
-                  <li> <a href="<?php echo base_url(); ?>service"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Scedule Service</span></a></li>
+                  <li> <a href="<?php echo base_url(); ?>service"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Driver scedule service </span></a></li>
 
                   <li> <a href="<?php echo base_url(); ?>service-booking"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Service Booking</span></a></li>
 

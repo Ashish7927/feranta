@@ -55,16 +55,16 @@
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('altcontact'); ?></span><?php } ?>
                                     </div>
                                 </div>
-                                
-                                 <div class="col-sm-6">
+
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Select State</label>
                                         <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id">
                                             <option value="">Select State</option>
                                             <?php foreach ($allstate as $state) { ?>
-                                                <option value="<?= $state->state_id ?>"<?php if ($state->state_id == $vendor->state_id) {
-                                                            echo 'selected';
-                                                        } ?> ><?= $state->state_name ?></option>
+                                                <option value="<?= $state->state_id ?>" <?php if ($state->state_id == $vendor->state_id) {
+                                                                                            echo 'selected';
+                                                                                        } ?>><?= $state->state_name ?></option>
                                             <?php } ?>
                                         </select>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('state'); ?></span><?php } ?>
@@ -76,15 +76,15 @@
                                         <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)">
                                             <option value="">Select City</option>
                                             <?php foreach ($allcity as $city) { ?>
-                                                <option value="<?= $city->city_id ?>"<?php if ($city->city_id == $vendor->city_id) {
-                                                            echo 'selected';
-                                                        } ?> ><?= $city->city_name ?></option>
+                                                <option value="<?= $city->city_id ?>" <?php if ($city->city_id == $vendor->city_id) {
+                                                                                            echo 'selected';
+                                                                                        } ?>><?= $city->city_name ?></option>
                                             <?php } ?>
                                         </select>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('city'); ?></span><?php } ?>
                                     </div>
                                 </div>
-                         
+
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
@@ -100,15 +100,15 @@
                                     </div>
                                 </div>
 
-                                 <div class="col-sm-12">
+                                <div class="col-sm-12">
                                     <div class="form-group">
                                         <label>PIN</label>
                                         <select class="form-control" name="pincode" id="pincode">
                                             <option value="">Select Pin</option>
                                             <?php foreach ($pincode as $pin) { ?>
-                                                <option value="<?= $pin->pin_id ?>"<?php if ($pin->pin_id == $vendor->pin) {
-                                                            echo 'selected';
-                                                        } ?>><?= $pin->pincode ?></option>
+                                                <option value="<?= $pin->pin_id ?>" <?php if ($pin->pin_id == $vendor->pin) {
+                                                                                        echo 'selected';
+                                                                                    } ?>><?= $pin->pincode ?></option>
                                             <?php } ?>
                                         </select>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('pincode'); ?></span><?php } ?>
@@ -127,33 +127,67 @@
                                         </div>
                                     </div>
                                 </div>
-                              
-                                 <div class="col-sm-6">
+
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Adharno</label>
                                         <input type="text" class="form-control" id="adharno" name="adharno" placeholder="Enter Adharno" value="<?= $vendor->adhar_no; ?>">
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('adharno'); ?></span><?php } ?>
                                     </div>
                                 </div>
-                                 <div class="col-sm-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Adhar Front Image</label>
                                         <input type="file" name="frontimg" class="form-control">
                                     </div>
                                 </div>
-                                 <div class="col-sm-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Adhar Back Image</label>
                                         <input type="file" name="backimg" class="form-control">
                                     </div>
                                 </div>
-                                   <div class="col-sm-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Upload Image</label>
                                         <input type="file" name="img" class="form-control">
                                     </div>
                                 </div>
-                                   <div class="col-sm-6">
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Ac Holder Name</label>
+                                        <input type="text" class="form-control" id="ac_name" name="ac_name" placeholder="Enter account holder name" value="<?= $vendor->ac_name; ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('ac_name'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Bank Name</label>
+                                        <input type="text" class="form-control" id="bank_name" name="bank_name" placeholder="Enter Bank name" value="<?= $vendor->bank_name; ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('bank_name'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Account Number</label>
+                                        <input type="text" class="form-control" id="acc_no" name="acc_no" placeholder="Enter Account Number" value="<?= $vendor->acc_no; ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('acc_no'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>IFSC Code</label>
+                                        <input type="text" class="form-control" id="ifsc" name="ifsc" placeholder="Enter IFSC" value="<?= $vendor->ifsc; ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('ifsc'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Username</label>
                                         <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" value="<?= $vendor->user_name; ?>">
@@ -177,47 +211,69 @@
                                         <label>Select Role</label>
                                         <select class="form-control" name="role" onchange="CheckRole(this.value)" id="role_id">
                                             <option value="">Select Role</option>
-                                            <option value="3" <?php if($vendor->user_type == 3){ echo 'selected'; } ?> >Owner</option>
-                                            <option value="4" <?php if($vendor->user_type == 4){ echo 'selected'; } ?> >Driver</option>
+                                            <option value="3" <?php if ($vendor->user_type == 3) {
+                                                                    echo 'selected';
+                                                                } ?>>Owner</option>
+                                            <option value="4" <?php if ($vendor->user_type == 4) {
+                                                                    echo 'selected';
+                                                                } ?>>Driver</option>
                                         </select>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('role'); ?></span><?php } ?>
                                     </div>
                                 </div>
 
-                                <div class="col-sm-6 is_driver" <?php if($vendor->user_type != 3){ echo 'style="display: none;"'; } ?> >
+                                <div class="col-sm-6 is_driver" <?php if ($vendor->user_type != 3) {
+                                                                    echo 'style="display: none;"';
+                                                                } ?>>
                                     <div class="form-group ">
                                         <label>Are you a Driver?</label>
-                                        <select class="form-control" name="is_driver" onchange="IsDriver(this.value)" id="is_driver" <?php if($vendor->user_type == 3){ echo 'required'; } ?> >
+                                        <select class="form-control" name="is_driver" onchange="IsDriver(this.value)" id="is_driver" <?php if ($vendor->user_type == 3) {
+                                                                                                                                            echo 'required';
+                                                                                                                                        } ?>>
                                             <option value="">Select option</option>
-                                            <option value="1" <?php if($vendor->is_driver == 1){ echo 'selected'; } ?> >Yes</option>
-                                            <option value="0" <?php if($vendor->is_driver == 0){ echo 'selected'; } ?> >No</option>
+                                            <option value="1" <?php if ($vendor->is_driver == 1) {
+                                                                    echo 'selected';
+                                                                } ?>>Yes</option>
+                                            <option value="0" <?php if ($vendor->is_driver == 0) {
+                                                                    echo 'selected';
+                                                                } ?>>No</option>
                                         </select>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('is_driver'); ?></span><?php } ?>
                                     </div>
                                 </div>
 
-                                <div class="col-sm-6 driver_div" <?php if($vendor->user_type != 4 && $vendor->is_driver != 1 ){ echo 'style="display: none;"'; } ?>>
+                                <div class="col-sm-6 driver_div" <?php if ($vendor->user_type != 4 && $vendor->is_driver != 1) {
+                                                                        echo 'style="display: none;"';
+                                                                    } ?>>
                                     <div class="form-group">
-                                    <label>License No.</label>
+                                        <label>License No.</label>
                                         <input type="text" class="form-control driver_input" id="license_no" name="license_no" placeholder="Enter your License N0." value="<?= $vendor->license_no; ?>">
-                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('password'); ?></span><?php } ?>
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('license_no'); ?></span><?php } ?>
                                     </div>
                                 </div>
 
-                                <div class="col-sm-6 driver_div" <?php if($vendor->user_type != 4 && $vendor->is_driver != 1){ echo 'style="display: none;"'; } ?>>
+                                <div class="col-sm-6 driver_div" <?php if ($vendor->user_type != 4 && $vendor->is_driver != 1) {
+                                                                        echo 'style="display: none;"';
+                                                                    } ?>>
                                     <div class="form-group">
-                                    <label>License Image</label>
-                                        <input type="file" class="form-control driver_input" id="license_img" name="license_img" >
+                                        <label>License Image</label>
+                                        <input type="file" class="form-control driver_input" id="license_img" name="license_img">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Year of Experience </label>
+                                        <input type="number" class="form-control driver_input" id="exp_year" name="exp_year" placeholder="Enter your Year of Experience" value="<?= $vendor->exp_year; ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('exp_year'); ?></span><?php } ?>
                                     </div>
                                 </div>
                             </div>
-                        <div class="uk-width-1-1">
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                            <div class="uk-width-1-1">
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
                             </div>
-                        </div>
 
-                    </div>
+                        </div>
                 </form>
 
             </div>
@@ -249,12 +305,12 @@
 
 
     <script>
-        <?php 
-        if($vendor->user_type == 4 || $vendor->is_driver == 1)
-        {
+        <?php
+        if ($vendor->user_type == 4 || $vendor->is_driver == 1) {
             echo `$('.driver_input').prop('required',true);`;
         }
         ?>
+
         function CheckstateId(arg) {
             //alert($('#state_id').val()); 
 
@@ -277,41 +333,39 @@
 
         }
 
-        function CheckRole(val)
-        {
-            $('#is_driver').val(''); 
-            if(val == 3){
-                $('.driver_input').prop('required',false);
+        function CheckRole(val) {
+            $('#is_driver').val('');
+            if (val == 3) {
+                $('.driver_input').prop('required', false);
                 $(".driver_div").css("display", "none");
                 $('.is_driver').css("display", "block");
-                $('#is_driver').prop('required',true); 
-            }else if(val == 4){
-                $('#is_driver').prop('required',false);
+                $('#is_driver').prop('required', true);
+            } else if (val == 4) {
+                $('#is_driver').prop('required', false);
                 $('.is_driver').css("display", "none");
                 $(".driver_div").css("display", "block");
-                $('.driver_input').prop('required',true);
-            }else{
-                $('.driver_input').prop('required',false);
+                $('.driver_input').prop('required', true);
+            } else {
+                $('.driver_input').prop('required', false);
                 $(".driver_div").css("display", "none");
-                $('#is_driver').prop('required',false);
-                $('.is_driver').css("display", "none"); 
+                $('#is_driver').prop('required', false);
+                $('.is_driver').css("display", "none");
             }
             return false;
         }
 
-        function IsDriver(val)
-        {
-            if(val == 1){
+        function IsDriver(val) {
+            if (val == 1) {
                 $(".driver_div").css("display", "block");
-                $('.driver_input').prop('required',true);
-            }else{
-                $('.driver_input').prop('required',false);
+                $('.driver_input').prop('required', true);
+            } else {
+                $('.driver_input').prop('required', false);
                 $(".driver_div").css("display", "none");
             }
             return false;
         }
     </script>
-     <script>
+    <script>
         function CheckcityId(arg) {
             //alert($('#cityDiv').val()); 
 

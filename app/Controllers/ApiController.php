@@ -5,9 +5,40 @@ namespace App\Controllers;
 use CodeIgniter\RESTful\ResourceController;
 use App\Models\AdminModel;
 use CodeIgniter\Files\File;
+use Google\Client;
 
 class ApiController extends ResourceController
 {
+
+    function haversineGreatCircleDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000)
+    {
+        // convert from degrees to radians
+        $latFrom = deg2rad($latitudeFrom);
+        $lonFrom = deg2rad($longitudeFrom);
+        $latTo = deg2rad($latitudeTo);
+        $lonTo = deg2rad($longitudeTo);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+        return $angle * $earthRadius;
+    }
+
+    function getAddressFromLatLng($lat, $lng)
+    {
+        $url = "https://maps.googleapis.com/maps/api/geocode/json?latlng={$lat},{$lng}&key=AIzaSyAX9w0uT7e_Ohjm_FHv7dHNOjvoFdeDe04";
+        $response = file_get_contents($url);
+        $data = json_decode($response, true);
+
+        if ($data['status'] == 'OK') {
+            $address = $data['results'][0]['formatted_address'];
+            return $address;
+        } else {
+            return "N/A";
+        }
+    }
 
     public function __construct()
     {
@@ -17,6 +48,79 @@ class ApiController extends ResourceController
         $this->AdminModel = new AdminModel($db);
         $this->session = session();
         helper(['form', 'url', 'validation']);
+    }
+
+
+    public function authenticate()
+    {
+        // Path to your JSON key file
+        $jsonKeyFilePath = ROOTPATH . 'assets/google/fernata-48950-bfeed489576a.json';
+
+        // Load Google Client Library
+        require_once ROOTPATH . 'vendor/autoload.php';
+
+        // Create a new Google Client instance
+        $client = new Client();
+        $client->setAuthConfig($jsonKeyFilePath);
+
+        // Set the scopes
+        $client->setScopes(['https://www.googleapis.com/auth/firebase.messaging']);
+
+        // Get access token
+        $accessToken = $client->fetchAccessTokenWithAssertion();
+
+        // Access token
+        return $token = $accessToken['access_token'];
+
+        // Use this $token in your HTTP requests to authenticate
+    }
+
+    public function sendPushNotification($title, $message, $sender_id)
+    {
+        $projectId = 'fernata-48950';
+        $messageData = [
+            'message' => [
+                'token' =>$sender_id,
+                'notification' => [
+                    'title' => $title,
+                    'body' => $message
+                ]
+            ]
+        ];
+        $jsonMessage = json_encode($messageData);
+
+        // Set the URL for the FCM API endpoint
+        $url = 'https://fcm.googleapis.com/v1/projects/' . $projectId . '/messages:send';
+
+        // get OAuth 2.0 access token
+        $serverKey = $this->authenticate();
+
+
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $serverKey,
+            'Content-Type: application/json'
+        ]);
+
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonMessage);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+
+
+        if ($response === false) {
+            $echo = 'cURL error: ' . curl_error($ch);
+        } else {
+            $responseData = json_decode($response, true);
+
+            if (isset($responseData['error'])) {
+                $echo = 'FCM error: ' . $responseData['error']['message'];
+            } else {
+                $echo = 'Message sent successfully!';
+            }
+        }
+        curl_close($ch);
     }
 
     public function vehcileTypeMaster()
@@ -37,7 +141,8 @@ class ApiController extends ResourceController
     public function sendOtpForLogin()
     {
         $rules = [
-            'phone' => 'required|numeric|exact_length[10]'
+            'phone' => 'required|numeric|exact_length[10]',
+            'device_token' => 'required'
         ];
 
         if (!$this->validate($rules)) {
@@ -50,6 +155,7 @@ class ApiController extends ResourceController
             ];
         } else {
             $phone = $this->request->getVar('phone');
+            $device_token = $this->request->getVar('device_token');
             $data = $this->AdminModel->checkUserPahone($phone);
             if (empty($data) || $data == null) {
                 $data_array = [
@@ -68,7 +174,8 @@ class ApiController extends ResourceController
                 //Send otp
                 $otp = rand(100000, 999999);
                 $updateotp = [
-                    'otp' => $otp
+                    'otp' => $otp,
+                    'device_token' => $device_token
                 ];
 
                 $data = $this->AdminModel->UpdateProfile($updateotp, $data[0]->id);
@@ -99,7 +206,8 @@ class ApiController extends ResourceController
     public function sendOtpForLoginDriver()
     {
         $rules = [
-            'phone' => 'required|numeric|exact_length[10]'
+            'phone' => 'required|numeric|exact_length[10]',
+            'device_token' => 'required'
         ];
 
         if (!$this->validate($rules)) {
@@ -112,6 +220,7 @@ class ApiController extends ResourceController
             ];
         } else {
             $phone = $this->request->getVar('phone');
+            $device_token = $this->request->getVar('device_token');
             $data = $this->AdminModel->checkUserPahoneDriver($phone);
             if (!empty($data) && $data != null) {
 
@@ -120,7 +229,8 @@ class ApiController extends ResourceController
                     //Send otp
                     $otp = rand(100000, 999999);
                     $updateotp = [
-                        'otp' => $otp
+                        'otp' => $otp,
+                        'device_token' => $device_token
                     ];
 
                     $data = $this->AdminModel->UpdateProfile($updateotp, $data[0]->id);
@@ -368,11 +478,16 @@ class ApiController extends ResourceController
 
                         $newTime = date("Y-m-d H:i:s", strtotime($boarding_datetime . " +30 minutes"));
 
+                        $from_add = $this->getAddressFromLatLng($origin_lat,$origin_lng);
+                        $to_add = $this->getAddressFromLatLng($destination_lat,$destination_lng);
+
                         $data = [
                             'vehicle_id' => $getVehicleId->vehicle_id,
                             'vehicle_type' => $getVehicleId->type_id,
                             'boarding_date' => $boarding_datetime,
                             'start_datetime' => $newTime,
+                            'from_city' => $from_add,
+                            'to_city' => $to_add,
                             'origin_lat' => $origin_lat,
                             'origin_lng' => $origin_lng,
                             'destination_lat' => $destination_lat,
@@ -422,7 +537,9 @@ class ApiController extends ResourceController
     public function startService()
     {
         $rules = [
-            'service_id' => 'required'
+            'service_id' => 'required',
+            'lat' => 'required',
+            'lng' => 'required'
         ];
 
         if (!$this->validate($rules)) {
@@ -436,18 +553,33 @@ class ApiController extends ResourceController
         } else {
 
             $service_id = $this->request->getVar('service_id');
-            $data = [
-                'status' => 1
-            ];
+            $lat = $this->request->getVar('lat');
+            $lng = $this->request->getVar('lng');
+            $serviceDetails = $this->AdminModel->getSingleData('service_details', $service_id);
+            $distance = $this->haversineGreatCircleDistance($serviceDetails->origin_lat, $serviceDetails->origin_lng, $lat, $lng);
+            if ($distance <= 500) {
 
-            $this->AdminModel->UpdateRecordById('service_details', $service_id, $data);
-            $response = [
-                'status'   => 200,
-                'error'    => null,
-                'response' => [
-                    'success' => 'Service updated Successfully'
-                ],
-            ];
+                $data = [
+                    'status' => 1
+                ];
+
+                $this->AdminModel->UpdateRecordById('service_details', $service_id, $data);
+                $response = [
+                    'status'   => 200,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Service updated Successfully'
+                    ],
+                ];
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => "You can only start within 500 meter distance to pickup location."
+                    ]
+                ];
+            }
         }
         return $this->respondCreated($response);
     }
@@ -584,10 +716,14 @@ class ApiController extends ResourceController
             }
 
             if ($success == 1) {
+                $from_add = $this->getAddressFromLatLng($origin_lat,$origin_lng);
+                $to_add = $this->getAddressFromLatLng($destination_lat,$destination_lng);
                 $data = [
                     'user_id' => $cutomer_id,
                     'booking_type' => $booking_type,
                     'vehicle_type' => $vehicle_type,
+                    'from_location' => $from_add,
+                    'to_location' => $to_add,
                     'origin_lat' => $origin_lat,
                     'origin_lng' => $origin_lng,
                     'destination_lat' => $destination_lat,
@@ -688,7 +824,7 @@ class ApiController extends ResourceController
                     'status'   => 200,
                     'error'    => 1,
                     'response' => [
-                        'message' => 'Booking alredy assigned!'
+                        'message' => 'Booking alredy closed!'
                     ]
                 ];
             } else {
@@ -702,6 +838,7 @@ class ApiController extends ResourceController
                 $data = [
                     'vehicle_id'  => $serviceDetails->vehicle_id,
                     'driver_id'  => $requestDetails->driver_id,
+                    'service_id'  => $serviceDetails->id,
                     'otp' => $otp,
                     'status'  => 1
                 ];
@@ -710,7 +847,7 @@ class ApiController extends ResourceController
                     'status'  => 2,
                 ];
                 $this->db->query("UPDATE service_request SET status = 2 WHERE booking_id = $requestDetails->booking_id AND status = 0 ");
-
+                $this->db->query("UPDATE service_details SET status = 1 WHERE id = $serviceDetails->id");
                 $response = [
                     'status'   => 200,
                     'error'    => null,
@@ -741,26 +878,37 @@ class ApiController extends ResourceController
         } else {
             $request_id  = $this->request->getPost('request_id');
             $requestDetails = $this->AdminModel->getSingleData('service_request', $request_id);
-            $data = [
-                'status'  => 3,
-            ];
-            $this->AdminModel->UpdateRecordById('service_request', $request_id, $data);
+            if ($requestDetails->status != 2) {
 
-            $resuestall = $this->AdminModel->getAllrequestStatuswise($requestDetails->booking_id, 0);
-            if (empty($resuestall) || count($resuestall) == 0) {
-                $data = [
-                    'status'  => 3
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Booking alredy closed!'
+                    ]
                 ];
-                $this->AdminModel->UpdateRecordById('service_bookings', $requestDetails->booking_id, $data);
-            }
+            } else {
+                $data = [
+                    'status'  => 3,
+                ];
+                $this->AdminModel->UpdateRecordById('service_request', $request_id, $data);
 
-            $response = [
-                'status'   => 200,
-                'error'    => null,
-                'response' => [
-                    'success' => 'Booking rejected successfully!'
-                ],
-            ];
+                $resuestall = $this->AdminModel->getAllrequestStatuswise($requestDetails->booking_id, 0);
+                if (empty($resuestall) || count($resuestall) == 0) {
+                    $data = [
+                        'status'  => 3
+                    ];
+                    $this->AdminModel->UpdateRecordById('service_bookings', $requestDetails->booking_id, $data);
+                }
+
+                $response = [
+                    'status'   => 200,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Booking rejected successfully!'
+                    ],
+                ];
+            }
         }
 
         return $this->respondCreated($response);
@@ -769,7 +917,9 @@ class ApiController extends ResourceController
     public function endBooking()
     {
         $rules = [
-            'service_id' => 'required'
+            'service_id' => 'required',
+            'lat' => 'required',
+            'lng' => 'required'
         ];
 
         if (!$this->validate($rules)) {
@@ -784,35 +934,46 @@ class ApiController extends ResourceController
 
             $service_id = $this->request->getVar('service_id');
             $serviceDetails = $this->AdminModel->getSingleData('service_details', $service_id);
-            if ($serviceDetails->booking_status == 1) {
 
-                $this->db->query("UPDATE service_bookings SET status = 3 WHERE service_id = $service_id ");
+            $lat = $this->request->getVar('lat');
+            $lng = $this->request->getVar('lng');
+            $distance = $this->haversineGreatCircleDistance($serviceDetails->destination_lat, $serviceDetails->destination_lng, $lat, $lng);
+            if ($distance <= 500) {
+
+                if ($serviceDetails->booking_status == 1) {
+
+                    $this->db->query("UPDATE service_bookings SET status = 3 WHERE service_id = $service_id ");
+                }
+                $data = [
+                    'status' => 3
+                ];
+                $this->AdminModel->UpdateRecordById('service_details', $service_id, $data);
+                $response = [
+                    'status'   => 200,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Service updated Successfully'
+                    ],
+                ];
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => "You can only end Booking within 500 meter distance to drop location."
+                    ]
+                ];
             }
-            $data = [
-                'status' => 3
-            ];
-            $this->AdminModel->UpdateRecordById('service_details', $service_id, $data);
-            $response = [
-                'status'   => 200,
-                'error'    => null,
-                'response' => [
-                    'success' => 'Service updated Successfully'
-                ],
-            ];
         }
         return $this->respondCreated($response);
     }
 
-    // customer cancel
-    //driver cancel (cancel service or cancel booking only)
+    // cancel Booking
     public function cancelBooking()
     {
         $rules = [
-            'origin_lat' => 'required',
-            'origin_lng' => 'required',
-            'destination_lat' => 'required',
-            'destination_lng' => 'required',
-            'type' => 'required'
+            'booking_id' => 'required',
+            'user_id' => 'required'
         ];
 
         if (!$this->validate($rules)) {
@@ -824,10 +985,36 @@ class ApiController extends ResourceController
                 ]
             ];
         } else {
+            $user_id = $this->request->getVar('user_id');
+            $booking_id = $this->request->getVar('booking_id');
+            $bookingDetails = $this->AdminModel->getSingleData('service_bookings', $booking_id);
+            $data = [
+                'status'  => 2,
+                'updated_by' => $user_id
+            ];
+            $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $data);
+
+
+            $this->db->query("UPDATE service_request SET status = 2 WHERE booking_id = $booking_id");
+
+
+            if ($bookingDetails->service_id != '') {
+                $this->db->query("UPDATE service_details SET status = 0 WHERE id = $bookingDetails->service_id");
+            }
+
+            $response = [
+                'status'   => 200,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Booking canceled successfully!'
+                ],
+            ];
         }
 
         return $this->respondCreated($response);
     }
+
+
 
     public function checkBookingService()
     {
@@ -942,23 +1129,49 @@ class ApiController extends ResourceController
             $name = $this->request->getVar('name');
             $email = $this->request->getVar('email');
             $contact_no = $this->request->getVar('contact_no');
-            // $userDetails = $this->AdminModel->getSingleData('user', $customer_id);
 
-            // $CountEmail = $this->db->query("SELECT * FROM user  where email=$email and id!=$customer_id ")->getResult();
-            // $CountContact = $this->db->query("SELECT * FROM user  where contact_no=$contact_no and id!=$customer_id ")->getResult();
-            // if(){
 
-            // }else{
+            $CountEmail = $this->db->query("SELECT * FROM user  where email= '" . $email . "' and id!= $customer_id ")->getResult();
+            $CountContact = $this->db->query("SELECT * FROM user  where contact_no=" . $contact_no . " and id!=$customer_id ")->getResult();
+            if ($CountEmail >= 0) {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Email id already exist!'
+                    ]
+                ];
+                return $this->respondCreated($response);
+            }
+            if ($CountContact >= 0) {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Contact no is already exist!'
+                    ]
+                ];
+                return $this->respondCreated($response);
+            }
 
-            // }
             $data = [
                 'full_name' => $name,
                 'email' => $email,
                 'contact_no' => $contact_no
             ];
 
-            $id = $this->AdminModel->InsertServiceDetails($data);
-            $serviceDetails = $this->AdminModel->getSingleData('service_details', $id);
+            $file = $this->request->getFile('image');
+
+            if ($file->isValid() && !$file->hasMoved()) {
+                $imagename = $file->getRandomName();
+                $file->move('uploads/', $imagename);
+                $data['profile_image'] = $imagename;
+            } else {
+                $imagename = "";
+            }
+            $this->AdminModel->updateUser($data, $customer_id);
+
+            $serviceDetails = $this->AdminModel->getSingleData('user', $customer_id);
             $response = [
                 'status'   => 201,
                 'error'    => null,
@@ -989,7 +1202,7 @@ class ApiController extends ResourceController
         } else {
             $user_id = $this->request->getVar('user_id');
             $userDetails = $this->AdminModel->getSingleData('user', $user_id);
-            if(!empty($userDetails)){
+            if (!empty($userDetails)) {
 
                 $response = [
                     'status'   => 201,
@@ -999,7 +1212,6 @@ class ApiController extends ResourceController
                         'userDetails' => $userDetails
                     ],
                 ];
-
             } else {
                 $response = [
                     'status'   => 200,
@@ -1009,7 +1221,217 @@ class ApiController extends ResourceController
                     ]
                 ];
             }
+        }
 
+        return $this->respondCreated($response);
+    }
+
+    public function sceduleList()
+    {
+        $rules = [
+            'driver_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $driver_id = $this->request->getVar('driver_id');
+            $allService = $this->AdminModel->getAllDriverService($driver_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Scedule Service List',
+                    'userDetails' => $allService
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function bookingHistoryCustomer()
+    {
+        $rules = [
+            'customer_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $customer_id = $this->request->getVar('customer_id');
+            $allService = $this->AdminModel->getAllCustomerBookingData($customer_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Booking Service List',
+                    'userDetails' => $allService
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function driverRegister()
+    {
+        $rules = [
+            'full_name' => 'required',
+            'email' => 'required',
+            'contact_no' => 'required',
+            'city' => 'required',
+            'type' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $data = [
+                'full_name' => $this->request->getVar('name'),
+                'email'  => $this->request->getVar('email'),
+                'user_name'  => $this->request->getVar('name'),
+                'contact_no'  => $this->request->getVar('contact'),
+                'state_id'  => $this->request->getVar('state'),
+                'city_id'  => $this->request->getVar('city'),
+                'pin'  => $this->request->getVar('pincode'),
+                'address1'  => $this->request->getVar('address1'),
+                'address2'  => $this->request->getVar('address2'),
+                'adhar_no'  => $this->request->getVar('adharno'),
+
+                'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
+                'profile_image'  => $imagename,
+
+                'adhar_font'  => $imagename1,
+                'adhar_back'  => $imagename2,
+
+                'user_type'  => $this->request->getVar('role'),
+                'license_no'  => $this->request->getVar('license_no'),
+                'license_img'  => $license_img1,
+                'status' => 1,
+                'ac_name'  => $this->request->getVar('ac_name'),
+                'bank_name'  => $this->request->getVar('bank_name'),
+                'acc_no'  => $this->request->getVar('acc_no'),
+                'ifsc'  => $this->request->getVar('ifsc'),
+                'exp_year'  => $this->request->getVar('exp_year')
+
+            ];
+
+            if ($this->request->getVar('is_driver') == 1) {
+                $data['is_driver']  = $this->request->getVar('is_driver');
+            }
+            //print_r($data);exit;
+
+            $this->AdminModel->adduser($data);
+
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Booking Service List',
+                    'userDetails' => $allService
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function driverUpdateProfile()
+    {
+        $rules = [
+            'customer_id' => 'required',
+            'name' => 'required',
+            'email' => 'required',
+            'contact_no' => 'required'
+
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $customer_id = $this->request->getVar('customer_id');
+            $name = $this->request->getVar('name');
+            $email = $this->request->getVar('email');
+            $contact_no = $this->request->getVar('contact_no');
+
+
+            $CountEmail = $this->db->query("SELECT * FROM user  where email= '" . $email . "' and id!= $customer_id ")->getResult();
+            $CountContact = $this->db->query("SELECT * FROM user  where contact_no=" . $contact_no . " and id!=$customer_id ")->getResult();
+            if ($CountEmail >= 0) {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Email id already exist!'
+                    ]
+                ];
+                return $this->respondCreated($response);
+            }
+            if ($CountContact >= 0) {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Contact no is already exist!'
+                    ]
+                ];
+                return $this->respondCreated($response);
+            }
+
+            $data = [
+                'full_name' => $name,
+                'email' => $email,
+                'contact_no' => $contact_no
+            ];
+
+            $file = $this->request->getFile('image');
+
+            if ($file->isValid() && !$file->hasMoved()) {
+                $imagename = $file->getRandomName();
+                $file->move('uploads/', $imagename);
+                $data['profile_image'] = $imagename;
+            } else {
+                $imagename = "";
+            }
+            $this->AdminModel->updateUser($data, $customer_id);
+
+            $serviceDetails = $this->AdminModel->getSingleData('user', $customer_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'message' => 'Profile updated successfully!',
+                    'data' => $serviceDetails
+                ],
+            ];
         }
 
         return $this->respondCreated($response);

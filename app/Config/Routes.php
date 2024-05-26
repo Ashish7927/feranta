@@ -34,8 +34,10 @@ $routes->post('/vehicle-type/status', 'VehicleType::status');
 $routes->post('/vehicle-type/delete', 'VehicleType::delete');
 
 $routes->get('/vehicle', 'Vehicle::index');
+$routes->post('/vehicle/create', 'Vehicle::create');
 $routes->post('/vehicle/add', 'Vehicle::add');
 $routes->post('/vehicle/edit/(:num)', 'Vehicle::edit/$1');
+$routes->post('/vehicle/update/(:num)', 'Vehicle::update/$1');
 $routes->post('/vehicle/status', 'Vehicle::status');
 $routes->post('/vehicle/delete', 'Vehicle::delete');
 $routes->post('/vehicle/update-driver', 'Vehicle::updateDriver');
@@ -87,3 +89,13 @@ $routes->post('api/end-booking', 'ApiController::endBooking');
 $routes->post('api/check-booking-status', 'ApiController::checkBookingService');
 $routes->post('api/verify-booking-otp', 'ApiController::verifyBookingOtp');
 $routes->post('api/get-profile-details', 'ApiController::profileDetails');
+$routes->post('api/get-service-list', 'ApiController::sceduleList');
+$routes->post('api/get-customer-booking-history', 'ApiController::bookingHistoryCustomer');
+$routes->post('api/cancel-booking', 'ApiController::cancelBooking');
+
+$routes->post('api/register-driver', 'ApiController::driverRegister');
+$routes->post('api/driver-update-profile', 'ApiController::driverUpdateProfile');
+
+
+
+

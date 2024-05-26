@@ -146,6 +146,41 @@
                                         <input type="file" name="img" class="form-control">
                                     </div>
                                 </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Ac Holder Name</label>
+                                        <input type="text" class="form-control" id="ac_name" name="ac_name" placeholder="Enter account holder name" value="<?= set_value('ac_name'); ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('ac_name'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Bank Name</label>
+                                        <input type="text" class="form-control" id="bank_name" name="bank_name" placeholder="Enter Bank name" value="<?= set_value('bank_name'); ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('bank_name'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Account Number</label>
+                                        <input type="text" class="form-control" id="acc_no" name="acc_no" placeholder="Enter Account Number" value="<?= set_value('acc_no'); ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('acc_no'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>IFSC Code</label>
+                                        <input type="text" class="form-control" id="ifsc" name="ifsc" placeholder="Enter IFSC" value="<?= set_value('ifsc'); ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('ifsc'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+
+
                                
                                 <div class="col-sm-6">
                                     <div class="form-group">
@@ -191,9 +226,10 @@
                                     <div class="form-group">
                                     <label>License No.</label>
                                         <input type="text" class="form-control driver_input" id="license_no" name="license_no" placeholder="Enter your License N0." value="<?= set_value('license_no'); ?>">
-                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('password'); ?></span><?php } ?>
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('license_no'); ?></span><?php } ?>
                                     </div>
                                 </div>
+                                
 
                                 <div class="col-sm-6 driver_div" style="display: none;">
                                     <div class="form-group">
@@ -202,7 +238,13 @@
                                     </div>
                                 </div>
 
-
+                                <div class="col-sm-6 driver_div" style="display: none;">
+                                    <div class="form-group">
+                                    <label>Year of Experience</label>
+                                        <input type="number" class="form-control driver_input" id="exp_year" name="exp_year" placeholder="Enter Year of experience" value="<?= set_value('exp_year'); ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('exp_year'); ?></span><?php } ?>
+                                    </div>
+                                </div>
 
                             </div>
 

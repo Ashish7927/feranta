@@ -639,8 +639,8 @@ class AdminModel extends Model
 		$builder = $this->db->table('service_bookings');
 		$builder->select('service_bookings.*,type.type_name,from_city.city_name,to_city.city_name as tocity,vehicle.regd_no,vehicle.model_name,user.full_name,user.contact_no');
 		$builder->join('vehicle_types type', 'type.id = service_bookings.vehicle_type');
-		$builder->join('city from_city', 'from_city.city_id = service_bookings.from_location');
-		$builder->join('city to_city', 'to_city.city_id = service_bookings.to_location');
+		$builder->join('city from_city', 'from_city.city_id = service_bookings.from_location', 'left');
+		$builder->join('city to_city', 'to_city.city_id = service_bookings.to_location', 'left');
 		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id', 'left');
 		$builder->join('user user', 'user.id = service_bookings.driver_id', 'left');
 		return $builder->get()->getResult();
@@ -721,6 +721,27 @@ class AdminModel extends Model
 		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id', 'left');
 		$builder->join('user user', 'user.id = service_bookings.driver_id', 'left');
 		$builder->where('service_bookings.id',$booking_id);
+		return $builder->get()->getResult();
+	}
+
+	function getAllDriverService($driver_id)
+	{
+		$builder = $this->db->table('service_details');
+		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name');
+		$builder->join('vehicle_details vehicle', 'vehicle.id = service_details.vehicle_id');
+		$builder->join('user', 'user.id = service_details.driver_id');
+		$builder->where('service_details.driver_id',$driver_id);
+		return $builder->get()->getResult();
+	}
+
+	function getAllCustomerBookingData($customer_id)
+	{
+		$builder = $this->db->table('service_bookings');
+		$builder->select('service_bookings.*,type.type_name,vehicle.regd_no,vehicle.model_name,user.full_name,user.contact_no');
+		$builder->join('vehicle_types type', 'type.id = service_bookings.vehicle_type');
+		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id', 'left');
+		$builder->join('user user', 'user.id = service_bookings.driver_id', 'left');
+		$builder->where('service_bookings.user_id',$customer_id);
 		return $builder->get()->getResult();
 	}
 }

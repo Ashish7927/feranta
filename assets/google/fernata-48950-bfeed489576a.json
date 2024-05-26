@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "fernata-48950",
+  "private_key_id": "bfeed489576a570fbd2930a76db65247b6f1825c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCoiqLvMtzhPMmf\nUv3fVtaaDwBBQTf+YpyRpFa21owZH19Z3XB3SKvy9X6WBNfthEOj4uvtC8RcN0RI\nr5yH0ktWfuBquG3s5sSbVSaLlh/tM8fUqqOku8MFquOq0OQDB0zdPOIascSny/pz\ny4O0KsndLjMmVDfDWpWp6ISrBG/ZnfGj2w27p9pF85fh5YaBHhjpTxvQa+SvuZyv\nTqGyPwviRJVxtt3wybdwJQr4asd9u3k3G9S07Kbwk0s2zx0HLL3y71X3ARi+KBg7\nc5nIBzzNsXpvNGMPA2D6isDD1cT5KAJ9VeD63Rtn0ovv1KHgWi7tKCm+oZv3xbA+\n3KaNJH8dAgMBAAECggEANFaE/XHWjK1jUTIk+zeMwd+ZrSnzGPCHfWTCttmOPPj0\nk8QDuk8bcoHQ0wZjBXOWy6xapkyKqDZTYp0CJ11jHtOcnhdyr2gEMtZw91ThyjfT\nvNNWqP/Tso1cUL24qMYaFPPkpPSCRLc/qbjPx+GnuSMxKBxsCqK1KkO1+yOQFkwI\nXbjz6lV6Ai6lAnBNoyc6w9xxRRLBfloZhU27qGR+Bl1tUj+cWU7WKtnuZ0fYyz/v\nbpRm8A4+CR0uL504CaOZqa6c7xibOVRAtAWrbqqMeDroRW0RjeNVNu28tTEpYIYW\nXQZQHEIj6sl2xwYNVkkle9wgQRPw9tyzPg5MBuzr8wKBgQDWJkoKWmzEuuFraBMT\ndLRgr/ESZkjdR9FCBkJMitb+xsy4BI9+1G9sBi9h4MbiSUMRrUzkmTZeBVvJQ6N8\n2wYeTOol8UiPS96D7BiALHx2AYF50FstxO25X+jxTOziK0PAUAd8sbM6uRn1FhDU\nSo5fWX4sY9FF2n5/GFY/K8dT6wKBgQDJep51VcD+vfAweZRCHFiJr+1o43D+BUml\nvsMzAcF+o+MkWBqT2VLV6Wut2DH8ZjeToJQLDYbsjbcHa9DqyUDtvCSjxV9y7Lfo\nn4ELgJxhCXEvt9UNEzq0YyDP0unilo0U6QnFohmHdgq6lMv38lu950GB9yrakqs5\nfk56FRefFwKBgHyT56ygL/g+MxaVg8tkr+4zTA2FHUxFFDHRjE4U0r+CDOPcG1IP\n6QWxj2zkIy7Oqcqlwz6U9rC5c0zhIUFn9OY5nlkWRTy/SSH7fcFKn9jSRW0EzZYR\noq2dYtjFBGUKAC7nH4PlqDs4JSaTgJTPDoXffOv74Wk+kyoCkWHMaPejAoGAfjh8\nRuPHOZAChkvUbqpVaUS2xcwfAHSNk/FzVmQWNWE0rpMna1Jty6clF07m2cmrraee\nt2HtEgsiC9smkcAtFgKVLag7yMK14Fz0uiEDVuNUbmGLblqKn3Gun6PxdEt+7Qel\nYJPRzIRN6l/HfHjvsoPLDUGsLixOaoFPZroKB1cCgYB0O5UmW7iIo+QEFcd8xPRY\nGv78suy0BR41ujckePSiW2FTWUW6Wj9QksogtIuHWeOFIz+HzUwwgYGMN4sl33pz\nepW3bcQG8E6t0nZAEO0bmnN6SAYa9a/FeDTVL1RubncP5cQuBAAEeTKvnc/vVr9J\nCL7oN8usRTPgZyfJ1nE09w==\n-----END PRIVATE KEY-----\n",
+  "client_email": "cloud-message-service@fernata-48950.iam.gserviceaccount.com",
+  "client_id": "110973307283295366959",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cloud-message-service%40fernata-48950.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

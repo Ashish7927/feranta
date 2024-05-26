@@ -35,6 +35,21 @@ class Vehicle extends BaseController
         }
     }
 
+    function create()
+    {
+        if ($this->session->get('user_id')) {
+
+            $user_id = $this->session->get('user_id');
+
+            $data['vehicleType'] = $this->AdminModel->getAllActiveRecord('vehicle_types');
+            $data['AllVendor'] = $this->AdminModel->getAllVendor();
+
+            return view('admin/add_vehicle_vw', $data);
+        } else {
+            return redirect()->to('admin/');
+        }
+    }
+
     function add()
     {
         if ($this->session->get('user_id')) {
@@ -61,6 +76,21 @@ class Vehicle extends BaseController
     }
 
     function edit($id)
+    {
+        if ($this->session->get('user_id')) {
+
+            $data['vehicleType'] = $this->AdminModel->getAllActiveRecord('vehicle_types');
+            $data['AllVendor'] = $this->AdminModel->getAllVendor();
+            $data['vehicle'] = $this->AdminModel->getSingleData('vehicle_details', $id);
+
+            return view('admin/add_vehicle_vw', $data);
+        } else {
+            return redirect()->to('admin/');
+        }
+    }
+
+
+    function update($id)
     {
         if ($this->session->get('user_id')) {
 
@@ -110,8 +140,8 @@ class Vehicle extends BaseController
             $details = $this->AdminModel->getSingleData('vehicle_details', $id);
             $driverStatus = $this->AdminModel->getSingleLastData('driver_vehicle_mapping', $id);
 
-            if((($state_status == 1 || $state_status == '1') && $details->driver_id == '') || (!empty($driverStatus) && $driverStatus->status == 0)){
-                
+            if ((($state_status == 1 || $state_status == '1') && $details->driver_id == '') || (!empty($driverStatus) && $driverStatus->status == 0)) {
+
                 return redirect()->to('vehicle')->with('message', "You can't active your vehicle untill a driver assigned!");
             }
 
@@ -129,7 +159,7 @@ class Vehicle extends BaseController
     function updateDriver()
     {
         if ($this->session->get('user_id')) {
-            $user_id=$this->session->get('user_id');
+            $user_id = $this->session->get('user_id');
             $vehicleId = $this->request->getPost('vehicleId');
             $driver_id = $this->request->getPost('driver_id');
             $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicleId);
@@ -154,14 +184,13 @@ class Vehicle extends BaseController
                     if ($vehicleDetails->driver_id != '' && $vehicleDetails->driver_id != $driver_id) {
                         $data = [
                             'status'  => 3,
-                            'updated_by'=>$user_id
+                            'updated_by' => $user_id
                         ];
-                        $this->AdminModel->updateDriverRemoved($vehicleDetails->driver_id,$vehicleId, $data);
-                        
+                        $this->AdminModel->updateDriverRemoved($vehicleDetails->driver_id, $vehicleId, $data);
                     }
                     $data = [
                         'status'  => 2,
-                        'updated_by'=>$user_id
+                        'updated_by' => $user_id
                     ];
                     $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $user_id WHERE vehicle_id = $vehicleId and driver_id = $driver_id; ");
                     $data = [
@@ -217,13 +246,13 @@ class Vehicle extends BaseController
             $details = $this->AdminModel->getSingleData('driver_vehicle_mapping', $id);
             $data = [
                 'status'  => 1,
-                'updated_by'=>$user_id
+                'updated_by' => $user_id
             ];
             $this->AdminModel->UpdateRecordById('driver_vehicle_mapping', $id, $data);
             $data = [
                 'status' => 1
             ];
-            $this->AdminModel->UpdateRecordById('vehicle_details',$details->vehicle_id, $data);
+            $this->AdminModel->UpdateRecordById('vehicle_details', $details->vehicle_id, $data);
 
             $message = 'Request Accepted successfully!';
             return redirect()->to('vehicle/driver-vehicle')->with('message', $message);
@@ -239,12 +268,11 @@ class Vehicle extends BaseController
             $user_id = $this->session->get('user_id');
             $data = [
                 'status'  => 2,
-                'updated_by'=>$user_id
+                'updated_by' => $user_id
             ];
             $this->AdminModel->UpdateRecordById('driver_vehicle_mapping', $id, $data);
             $message = 'Request Rejected successfully!';
             return redirect()->to('vehicle/driver-vehicle')->with('message', $message);
-
         } else {
             return redirect()->to('admin/');
         }
@@ -257,7 +285,7 @@ class Vehicle extends BaseController
             $details = $this->AdminModel->getSingleData('driver_vehicle_mapping', $id);
             $data = [
                 'status'  => 3,
-                'updated_by'=>$user_id
+                'updated_by' => $user_id
             ];
             $this->AdminModel->UpdateRecordById('driver_vehicle_mapping', $id, $data);
 
@@ -265,7 +293,7 @@ class Vehicle extends BaseController
                 'driver_id'  => '',
                 'status' => 0
             ];
-            $this->AdminModel->UpdateRecordById('vehicle_details',$details->vehicle_id, $data);
+            $this->AdminModel->UpdateRecordById('vehicle_details', $details->vehicle_id, $data);
 
             $message = 'Leave the vehice successfully!';
             return redirect()->to('vehicle/driver-vehicle')->with('message', $message);

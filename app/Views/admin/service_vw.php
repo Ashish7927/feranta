@@ -4,7 +4,7 @@
 <div id="page-content">
 
     <div class="uk-grid-small" uk-grid>
-        <div class="uk-width-1-3@m">
+        <div class="uk-width-1-3@m" style="display: none;">
             <div class="uk-card  uk-card-default uk-card-small">
                 <div class="modal-header">
                     <h4 class="modal-title">Add new Service</h4>
@@ -104,7 +104,7 @@
                             <th>From City</th>
                             <th>To City</th>
                             <th>Boearding Datetime</th>
-                            <th>Arrival Datetime</th>
+                            <th>Start Datetime</th>
                             <!-- <th>Full Fare </th>
                             <th>Fare per sit</th> -->
                             <th>Owner </th>
@@ -123,7 +123,7 @@
                                 <td><?= $state->from_city_name; ?></td>
                                 <td><?= $state->to_city_name; ?></td>
                                 <td><?= $state->boarding_date; ?></td>
-                                <td><?= $state->arrival_datetime; ?></td>
+                                <td><?= $state->start_datetime; ?></td>
                                 <!-- <td><?= $state->full_fare; ?></td>
                                 <td><?= $state->fare_per_sit; ?></td> -->
                                 <td><?= $state->full_name; ?></td>
@@ -195,7 +195,7 @@
 
                                     <div class="form-group">
                                         <label>Choose Expected Arrival Time</label>
-                                        <input type="datetime-local" name="arrival_datetime" id="arrival_datetime<?= $state->id ?>" class="form-control" required value="<?= $state->arrival_datetime; ?>">
+                                        <input type="datetime-local" name="arrival_datetime" id="arrival_datetime<?= $state->id ?>" class="form-control" required value="<?= $state->start_datetime ; ?>">
                                     </div>
 
 

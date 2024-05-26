@@ -235,7 +235,7 @@ class Admin extends BaseController
 
 			$data['setting'] = $this->AdminModel->Settingdata();
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-			$data['customer'] = $this->AdminModel->GetAllCustomer(4);
+			$data['customer'] = $this->AdminModel->GetAllCustomer(5);
 
 			return view('admin/customer_vw', $data);
 		} else {
@@ -1722,7 +1722,12 @@ class Admin extends BaseController
 					'user_type'  => $this->request->getVar('role'),
 					'license_no'  => $this->request->getVar('license_no'),
 					'license_img'  => $license_img1,
-					'status'=>1
+					'status'=>1,
+					'ac_name'  => $this->request->getVar('ac_name'),
+					'bank_name'  => $this->request->getVar('bank_name'),
+					'acc_no'  => $this->request->getVar('acc_no'),
+					'ifsc'  => $this->request->getVar('ifsc'),
+					'exp_year'  => $this->request->getVar('exp_year')
 
 				];
 
@@ -1823,7 +1828,12 @@ class Admin extends BaseController
 							'status'  => 1,
 							'user_type'  => $this->request->getVar('role'),
 							'license_no'  => $this->request->getVar('license_no'),
-							'is_driver' => $this->request->getVar('is_driver')
+							'is_driver' => $this->request->getVar('is_driver'),
+							'ac_name'  => $this->request->getVar('ac_name'),
+							'bank_name'  => $this->request->getVar('bank_name'),
+							'acc_no'  => $this->request->getVar('acc_no'),
+							'ifsc'  => $this->request->getVar('ifsc'),
+							'exp_year'  => $this->request->getVar('exp_year')
 						];
 
 						if ($imagename != "") {

@@ -9,11 +9,11 @@
   <div class="uk-card uk-card-body uk-card-default uk-card-small">
     <div>
       <div class="col-sm-6">
-        <a href="<?php echo base_url(); ?>/Admin/Addvendor"><button type="submit" class="btn btn-primary">Add User</button></a>
+        <a href="<?php echo base_url(); ?>/Admin/Addvendor"><button type="submit" class="btn btn-primary">Add</button></a>
       </div>
 
     </div>
-    <h3>All Users</h3>
+    <h3>All Owner & Driver</h3>
     <div class="table-responsive">
       <table id="example-datatable" class="table table-vcenter table-condensed table-bordered">
         <thead>
@@ -21,7 +21,7 @@
             <th class="text-center">Sl No</th>
             <th class="text-center">Image</th>
             <th class="text-center">User Name</th>
-
+            <th class="text-center">Role Name</th>
             <th class="text-center">Email</th>
             <th class="text-center">Contact No</th>
             
@@ -42,6 +42,7 @@
                 <td class="text-center"><img src="img/placeholders/avatars/avatar11.jpg" alt="avatar" class="img-circle"></td>
               <?php } ?>
               <td class="text-center"><?= $vendor->full_name; ?></td>
+              <td class="text-center"><?php  if($vendor->user_type == 3 ){ echo 'Owner'; }else{ echo 'Driver'; } ?></td>
               <td class="text-center"><?= $vendor->email; ?></td>
               <td class="text-center"><?= $vendor->contact_no; ?></td>
              

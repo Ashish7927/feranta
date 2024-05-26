@@ -2,64 +2,15 @@
 <?php include("mainsidebar.php") ?>
 <!-- Page content -->
 <div id="page-content">
-
-    <div class="uk-grid-small" uk-grid>
-        <div class="uk-width-1-3@m">
-            <div class="uk-card  uk-card-default uk-card-small">
-                <div class="modal-header">
-                    <h4 class="modal-title">Add Vehicle</h4>
-                </div>
-
-
-                <form action="<?php echo base_url(); ?>/vehicle/add" method="post">
-                    <div class="modal-body">
-
-                        <div class="form-group">
-                            <label>Select Vehicle Owner</label>
-                            <select name="vendor_id" id="vendor_id" class="form-control" required>
-                                <option value="">-- Select Owner --</option>
-                                <?php foreach ($AllVendor as $vendor) { ?>
-                                    <option value="<?= $vendor->id; ?>"><?= $vendor->full_name ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Select Vehicle Type</label>
-                            <select name="vehicle_type" id="vehicle_type" class="form-control" required>
-                                <option value="">-- Select Vehicle Type --</option>
-                                <?php foreach ($vehicleType as $type) { ?>
-                                    <option value="<?= $type->id; ?>"><?= $type->type_name ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Enter Vehicle Model</label>
-                            <input type="text" name="model_name" class="form-control" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Enter Vehicle Redg. No</label>
-                            <input type="text" name="redg_no" class="form-control" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>No. of passanger sit</label>
-                            <input type="number" min='0' name="no_of_sit" class="form-control" required>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-
-                        </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
     <div class="uk-width-expand@m">
         <div class="uk-card uk-card-body uk-card-default uk-card-small">
+
+            <div>
+                <div class="col-sm-6">
+                    <a href="<?php echo base_url(); ?>/vehicle/create"><button type="submit" class="btn btn-primary">Add</button></a>
+                </div>
+
+            </div>
 
             <h3>Vehicle Details</h3>
             <?php if (session('message') !== null) : ?>
@@ -103,7 +54,7 @@
                                 <td class="text-center">
                                     <div class="btn-group">
 
-                                        <a href="#modal-center<?= $state->id; ?>" uk-toggle title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
+                                        <a href="<?php echo base_url(); ?>vehicle/edit/<?= $state->id; ?>" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
                                         <a href="javascript:void(0);" onClick="deleteRecord('<?= $state->id; ?>');" title="Delete" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
                                     </div>
                                 </td>
@@ -113,59 +64,6 @@
 
                     </tbody>
                 </table>
-
-
-                <?php foreach ($Allstate as $state) { ?>
-
-                    <div id="modal-center<?= $state->id; ?>" class="uk-flex-top" uk-modal>
-                        <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
-
-                            <button class="uk-modal-close-default" type="button" uk-close></button>
-                            <?php if (session()->getFlashdata('uid') == $state->id) : ?>
-                                <div class="alert alert-warning">
-                                    <?= session()->getFlashdata('msg') ?>
-                                </div>
-                            <?php endif; ?>
-
-
-                            <form action="<?php echo base_url(); ?>vehicle/edit/<?= $state->id; ?>" method="post">
-                                <div class="modal-body uk-text-left">
-                                    <div class="form-group">
-                                        <label>Select Vehicle Type</label>
-                                        <select name="vehicle_type" id="vehicle_type" class="form-control" required>
-                                            <option value="">-- Select Vehicle Type --</option>
-                                            <?php foreach ($vehicleType as $type) { ?>
-                                                <option value="<?= $type->id; ?>" <?php if ($state->type_id == $type->id) {
-                                                                                        echo 'selected';
-                                                                                    } ?>><?= $type->type_name ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Enter Vehicle Model</label>
-                                        <input type="text" name="model_name" class="form-control" required value="<?= $state->model_name; ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Enter Vehicle Redg. No</label>
-                                        <input type="text" name="redg_no" class="form-control" required value="<?= $state->regd_no; ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>No. of passanger sit</label>
-                                        <input type="number" min='0' name="no_of_sit" class="form-control" required value="<?= $state->no_of_sit; ?>">
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                <?php } ?>
             </div>
         </div>
     </div>
@@ -281,12 +179,11 @@
                 $('#licenseNo').val(data.userdata.license_no);
                 $('#emailId').val(data.userdata.email);
                 $('#phoneNo').val(data.userdata.contact_no);
-                if(data.status == 0 || data.status == "0")
-                {
+                if (data.status == 0 || data.status == "0") {
                     $('#driverStatus').val('Requested');
-                }else if(data.status == 1 || data.status == "1"){
+                } else if (data.status == 1 || data.status == "1") {
                     $('#driverStatus').val('Accepted');
-                }else{
+                } else {
                     $('#driverStatus').val('--');
                 }
             }
@@ -295,10 +192,6 @@
         // event.preventDefault();
         // return false; 
     }
-</script>
-
-<script>
-    UIkit.modal('#modal-center<?= session()->getFlashdata('uid') ?>').show();
 </script>
 
 <?php include('footer.php') ?>

@@ -4,7 +4,7 @@
 <div id="page-content">
 
     <div class="uk-grid-small" uk-grid>
-        <div class="uk-width-1-3@m">
+        <div class="uk-width-1-3@m" style="display: none;">
             <div class="uk-card  uk-card-default uk-card-small">
                 <div class="modal-header">
                     <h4 class="modal-title">Book a Service</h4>
