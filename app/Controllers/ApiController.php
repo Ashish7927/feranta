@@ -132,6 +132,7 @@ class ApiController extends ResourceController
             }
         }
         curl_close($ch);
+        return $echo;
     }
 
     public function vehcileTypeMaster()
@@ -680,23 +681,7 @@ class ApiController extends ResourceController
 
             if ($booking_type == 'cab') {
                 $getAvailableServiceId = $this->db->query("SELECT id, ( 6371 * acos( cos( radians($destination_lat) ) * cos( radians( destination_lat ) ) * cos( radians( destination_lng ) - radians($destination_lng) ) + sin( radians($destination_lat) ) * sin( radians( destination_lat ) ) ) ) AS distance FROM service_details WHERE booking_status != 1 AND  share_status = 0 AND vehicle_type = $vehicle_type HAVING distance < $radius ORDER BY distance")->getResultArray();
-
-                $arr = array_map(function ($value) {
-                    return $value['id'];
-                }, $getAvailableServiceId);
-                $getAvailableServiceId = implode(',', $arr);
-                $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( lat ) ) ) ) AS distance FROM vehicle_location_status WHERE service_id IN($getAvailableServiceId) HAVING distance < $radius ORDER BY distance")->getResult();
-
-                if (empty($checkAvailbility) || count($checkAvailbility) == 0) {
-                    $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( origin_lat ) ) * cos( radians( origin_lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( origin_lat ) ) ) ) AS distance FROM service_details WHERE id IN($getAvailableServiceId) AND start_datetime BETWEEN DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AND DATE_FORMAT(NOW() + INTERVAL 30 MINUTE, '%Y-%m-%d %H:%i:%s') HAVING distance < $radius ORDER BY distance")->getResult();
-                }
-
-                if (!empty($checkAvailbility) && count($checkAvailbility) > 0) {
-
-                    $success = 1;
-                    $service_rate = $checkAvailbility[0]->service_rate;
-                    $totalfare = $checkAvailbility[0]->full_fare;
-                } else {
+                if (empty($getAvailableServiceId)) {
                     $response = [
                         'status'   => 200,
                         'error'    => 1,
@@ -704,6 +689,31 @@ class ApiController extends ResourceController
                             'message' => 'Sorry! No service availble on this root'
                         ]
                     ];
+                } else {
+                    $arr = array_map(function ($value) {
+                        return $value['id'];
+                    }, $getAvailableServiceId);
+                    $getAvailableServiceId = implode(',', $arr);
+                    $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( lat ) ) ) ) AS distance FROM vehicle_location_status WHERE service_id IN($getAvailableServiceId) HAVING distance < $radius ORDER BY distance")->getResult();
+
+                    if (empty($checkAvailbility) || count($checkAvailbility) == 0) {
+                        $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( origin_lat ) ) * cos( radians( origin_lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( origin_lat ) ) ) ) AS distance FROM service_details WHERE id IN($getAvailableServiceId) AND start_datetime BETWEEN DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AND DATE_FORMAT(NOW() + INTERVAL 30 MINUTE, '%Y-%m-%d %H:%i:%s') HAVING distance < $radius ORDER BY distance")->getResult();
+                    }
+
+                    if (!empty($checkAvailbility) && count($checkAvailbility) > 0) {
+
+                        $success = 1;
+                        $service_rate = $checkAvailbility[0]->service_rate;
+                        $totalfare = $checkAvailbility[0]->full_fare;
+                    } else {
+                        $response = [
+                            'status'   => 200,
+                            'error'    => 1,
+                            'response' => [
+                                'message' => 'Sorry! No service availble on this root'
+                            ]
+                        ];
+                    }
                 }
             } elseif ($booking_type == 'sharing') {
 
@@ -883,21 +893,19 @@ class ApiController extends ResourceController
                 if ($bookingDetails->booking_type == 'cab' || $bookingDetails->booking_type == 'cab') {
                     $this->db->query("UPDATE service_details SET booking_status = 1 WHERE id = $serviceDetails->id");
                 } else {
-                    
-                    if($serviceDetails->share_booking_ids != ''){
-                        $allBookingids = explode(',',$serviceDetails->share_booking_ids);
-                        array_push($allBookingids,$requestDetails->booking_id);
-                        $booking_ids = implode(',',$allBookingids);
+
+                    if ($serviceDetails->share_booking_ids != '') {
+                        $allBookingids = explode(',', $serviceDetails->share_booking_ids);
+                        array_push($allBookingids, $requestDetails->booking_id);
+                        $booking_ids = implode(',', $allBookingids);
                         $totelBooking = count($allBookingids);
                         $serviceRate = $this->AdminModel->getSingleData('service_rate', $requestDetails->service_rate);
-                        if($totelBooking >= $serviceRate->max_no_share)
-                        {
+                        if ($totelBooking >= $serviceRate->max_no_share) {
                             $this->db->query("UPDATE service_details SET status =1, share_status = 1,share_booking_ids = $booking_ids WHERE id = $serviceDetails->id");
-                        }else{
+                        } else {
                             $this->db->query("UPDATE service_details SET share_status = 1,share_booking_ids = $booking_ids WHERE id = $serviceDetails->id");
                         }
-                        
-                    }else{
+                    } else {
                         $this->db->query("UPDATE service_details SET share_status = 1,share_booking_ids = $requestDetails->booking_id WHERE id = $serviceDetails->id");
                     }
                 }
@@ -1352,8 +1360,7 @@ class ApiController extends ResourceController
             'full_name' => 'required',
             'email' => 'required',
             'contact_no' => 'required',
-            'city' => 'required',
-            'type' => 'required'
+            'city' => 'required'
         ];
 
         if (!$this->validate($rules)) {
@@ -1366,11 +1373,47 @@ class ApiController extends ResourceController
             ];
         } else {
 
+            $file = $this->request->getFile('img');
+
+            if ($file->isValid() && !$file->hasMoved()) {
+                $imagename = $file->getRandomName();
+                $file->move('uploads/', $imagename);
+            } else {
+                $imagename = "";
+            }
+
+            $file1 = $this->request->getFile('frontimg');
+
+            if ($file1->isValid() && !$file1->hasMoved()) {
+                $imagename1 = $file1->getRandomName();
+                $file1->move('uploads/', $imagename1);
+            } else {
+                $imagename1 = "";
+            }
+            $file2 = $this->request->getFile('backimg');
+
+            if ($file2->isValid() && !$file2->hasMoved()) {
+                $imagename2 = $file2->getRandomName();
+                $file2->move('uploads/', $imagename2);
+            } else {
+                $imagename2 = "";
+            }
+
+            $license_img = $this->request->getFile('license_img');
+
+            if ($license_img->isValid() && !$license_img->hasMoved()) {
+                $license_img1 = $license_img->getRandomName();
+                $license_img->move('uploads/', $license_img1);
+            } else {
+                $license_img1 = "";
+            }
+
             $data = [
                 'full_name' => $this->request->getVar('name'),
                 'email'  => $this->request->getVar('email'),
-                'user_name'  => $this->request->getVar('name'),
+                'user_name'  => $this->request->getVar('username'),
                 'contact_no'  => $this->request->getVar('contact'),
+                'alter_cnum'  => $this->request->getVar('altcontact'),
                 'state_id'  => $this->request->getVar('state'),
                 'city_id'  => $this->request->getVar('city'),
                 'pin'  => $this->request->getVar('pincode'),
@@ -1384,10 +1427,10 @@ class ApiController extends ResourceController
                 'adhar_font'  => $imagename1,
                 'adhar_back'  => $imagename2,
 
-                'user_type'  => $this->request->getVar('role'),
+                'user_type'  =>4,
                 'license_no'  => $this->request->getVar('license_no'),
                 'license_img'  => $license_img1,
-                'status' => 1,
+                'status'=>1,
                 'ac_name'  => $this->request->getVar('ac_name'),
                 'bank_name'  => $this->request->getVar('bank_name'),
                 'acc_no'  => $this->request->getVar('acc_no'),
@@ -1396,10 +1439,6 @@ class ApiController extends ResourceController
 
             ];
 
-            if ($this->request->getVar('is_driver') == 1) {
-                $data['is_driver']  = $this->request->getVar('is_driver');
-            }
-            //print_r($data);exit;
 
             $this->AdminModel->adduser($data);
 
@@ -1407,8 +1446,8 @@ class ApiController extends ResourceController
                 'status'   => 201,
                 'error'    => null,
                 'response' => [
-                    'success' => 'Booking Service List',
-                    'userDetails' => $allService
+                    'success' => 'Driver added successfully!',
+                    'userDetails' => $data
                 ],
             ];
         }
@@ -1775,5 +1814,60 @@ class ApiController extends ResourceController
         }
 
         return $this->respondCreated($response);
+    }
+
+    public function sendPushNotificationTemp()
+    {
+        $token = $this->request->getVar('token');
+        $title = $this->request->getVar('title');
+        $message = $this->request->getVar('message');
+
+
+
+        $projectId = 'fernata-48950';
+        $messageData = [
+            'message' => [
+                'token' => $token,
+                'notification' => [
+                    'title' => $title,
+                    'body' => $message
+                ]
+            ]
+        ];
+        $jsonMessage = json_encode($messageData);
+
+        // Set the URL for the FCM API endpoint
+        $url = 'https://fcm.googleapis.com/v1/projects/' . $projectId . '/messages:send';
+
+        // get OAuth 2.0 access token
+        $serverKey = $this->authenticate();
+
+
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $serverKey,
+            'Content-Type: application/json'
+        ]);
+
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonMessage);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+
+
+        if ($response === false) {
+            $echo = 'cURL error: ' . curl_error($ch);
+        } else {
+            $responseData = json_decode($response, true);
+
+            if (isset($responseData['error'])) {
+                $echo = 'FCM error: ' . $responseData['error']['message'];
+            } else {
+                $echo = 'Message sent successfully!';
+            }
+        }
+        curl_close($ch);
+        return $this->respondCreated($echo);
     }
 }

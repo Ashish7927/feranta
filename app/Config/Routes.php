@@ -103,4 +103,6 @@ $routes->post('api/get-booking-ratting-review', 'ApiController::getBookingRattin
 $routes->post('api/edit-scedule-service', 'ApiController::editSceduleService');
 $routes->post('api/get-current-service', 'ApiController::onGoingRide');
 
+$routes->post('api/send-notification-temp', 'ApiController::sendPushNotificationTemp');
+
 
