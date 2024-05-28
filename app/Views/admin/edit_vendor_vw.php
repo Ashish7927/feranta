@@ -217,6 +217,9 @@
                                             <option value="4" <?php if ($vendor->user_type == 4) {
                                                                     echo 'selected';
                                                                 } ?>>Driver</option>
+                                                                <option value="2" <?php if ($vendor->user_type == 2) {
+                                                                    echo 'selected';
+                                                                } ?> >Franchise Member</option>
                                         </select>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('role'); ?></span><?php } ?>
                                     </div>

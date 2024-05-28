@@ -46,6 +46,8 @@
 
                   <li> <a href="<?php echo base_url(); ?>service-request"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Service Request</span></a></li>
 
+                  <li> <a href="<?php echo base_url(); ?>franchises"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Franchises</span></a></li>
+
                   <li>
                       <a href="" class="sidebar-nav-menu">
                           <i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="gi gi-sweater sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Manage Master</span></a>

@@ -70,9 +70,14 @@ $routes->post('/service-booking/status', 'ServiceBooking::status');
 $routes->get('/service-request', 'ServiceRequest::index');
 $routes->post('/service-request/status', 'ServiceRequest::status');
 
+$routes->get('/franchises', 'Franchises::index');
+$routes->post('/franchises/add', 'Franchises::add');
+$routes->post('/franchises/edit/(:num)', 'Franchises::edit/$1');
+$routes->post('/franchises/status', 'Franchises::status');
+$routes->post('/franchises/delete', 'Franchises::delete');
 
 // API Routes 
-$routes->get('api/get-vehcle-type', 'ApiController::vehcileTypeMaster');
+$routes->get('api/get-all-master', 'ApiController::getMasterData');
 $routes->post('api/sendOtpForLogin', 'ApiController::sendOtpForLogin');
 $routes->post('api/verifyOtpForLogin', 'ApiController::verifyOtpForLogin');
 $routes->post('api/updateProfile', 'ApiController::updateProfile');
@@ -104,5 +109,5 @@ $routes->post('api/edit-scedule-service', 'ApiController::editSceduleService');
 $routes->post('api/get-current-service', 'ApiController::onGoingRide');
 
 $routes->post('api/send-notification-temp', 'ApiController::sendPushNotificationTemp');
-
+$routes->post('api/member-login', 'ApiController::memberLogin');
 

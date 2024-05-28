@@ -135,15 +135,21 @@ class ApiController extends ResourceController
         return $echo;
     }
 
-    public function vehcileTypeMaster()
+    public function getMasterData()
     {
         $alltytpes = $this->AdminModel->GetAllRecord('vehicle_types');
+        $state = $this->AdminModel->GetAllRecord('state');
+        $city = $this->AdminModel->GetAllRecord('city');
+        $pincode = $this->AdminModel->GetAllRecord('pincode');
         $response = [
             'status'   => 200,
             'error'    => null,
             'response' => [
-                'message' => 'All Vehcile date!',
-                'data' => $alltytpes,
+                'message' => 'Here all master data!',
+                'vehicle_type' => $alltytpes,
+                'state' => $state,
+                'city' => $city,
+                'pincode' => $pincode
             ],
         ];
         return $this->respondCreated($response);
@@ -1372,7 +1378,7 @@ class ApiController extends ResourceController
                 ]
             ];
         } else {
-
+            $created_by= $this->request->getVar('member_id');
             $file = $this->request->getFile('img');
 
             if ($file->isValid() && !$file->hasMoved()) {
@@ -1409,10 +1415,10 @@ class ApiController extends ResourceController
             }
 
             $data = [
-                'full_name' => $this->request->getVar('name'),
+                'full_name' => $this->request->getVar('full_name'),
                 'email'  => $this->request->getVar('email'),
                 'user_name'  => $this->request->getVar('username'),
-                'contact_no'  => $this->request->getVar('contact'),
+                'contact_no'  => $this->request->getVar('contact_no'),
                 'alter_cnum'  => $this->request->getVar('altcontact'),
                 'state_id'  => $this->request->getVar('state'),
                 'city_id'  => $this->request->getVar('city'),
@@ -1435,7 +1441,8 @@ class ApiController extends ResourceController
                 'bank_name'  => $this->request->getVar('bank_name'),
                 'acc_no'  => $this->request->getVar('acc_no'),
                 'ifsc'  => $this->request->getVar('ifsc'),
-                'exp_year'  => $this->request->getVar('exp_year')
+                'exp_year'  => $this->request->getVar('exp_year'),
+                'created_by'=>$created_by
 
             ];
 
@@ -1869,5 +1876,60 @@ class ApiController extends ResourceController
         }
         curl_close($ch);
         return $this->respondCreated($echo);
+    }
+
+
+    public function memberLogin()
+    {
+        $rules = [
+            'phone' =>  'required|numeric|exact_length[10]',
+            'password' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $phone = $this->request->getVar('phone');
+            $password = $this->request->getVar('password');
+            $data = $this->AdminModel->checkUserPahone($phone);
+            if (!empty($data) && $data != null) {
+                $password=base64_encode(base64_encode($password));
+                if ($data[0]->password == $password) {
+
+                    $response = [
+                        'status'   => 200,
+                        'error'    => null,
+                        'response' => [
+                            'message' => 'Login success!',
+                            'profileDetails' => $data[0]
+                        ],
+                    ];
+                } else {
+                    $response = [
+                        'status'   => 200,
+                        'error'    => 1,
+                        'response' => [
+                            'message' => 'Invalid password!'
+                        ]
+                    ];
+                }
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Enter Phone number is not registered'
+                    ]
+                ];
+            }
+        }
+
+        return $this->respondCreated($response);
     }
 }

@@ -59,14 +59,71 @@ class Vehicle extends BaseController
             $model_name = $this->request->getPost('model_name');
             $vehicle_type = $this->request->getPost('vehicle_type');
 
+
+            $file = $this->request->getFile('insurance_img');
+            if ($file->isValid() && !$file->hasMoved()) {
+                $insurance_img = $file->getRandomName();
+                $file->move('uploads/', $insurance_img);
+            } else {
+                $insurance_img = "";
+            }
+
+            $file1 = $this->request->getFile('fit_doc');
+            if ($file1->isValid() && !$file1->hasMoved()) {
+                $fit_doc = $file1->getRandomName();
+                $file1->move('uploads/', $fit_doc);
+            } else {
+                $fit_doc = "";
+            }
+
+            $pollurion_doc = $this->request->getFile('pollurion_doc');
+            if ($pollurion_doc->isValid() && !$pollurion_doc->hasMoved()) {
+                $pollurion_doc1 = $pollurion_doc->getRandomName();
+                $pollurion_doc->move('uploads/', $pollurion_doc1);
+            } else {
+                $pollurion_doc1 = "";
+            }
+
+            $file3 = $this->request->getFile('permit_doc');
+            if ($file3->isValid() && !$file3->hasMoved()) {
+                $permit_doc = $file3->getRandomName();
+                $file3->move('uploads/', $permit_doc);
+            } else {
+                $permit_doc = "";
+            }
+
+
             $data = [
                 'type_id' => $vehicle_type,
                 'model_name' => $model_name,
                 'regd_no' => $redg_no,
                 'no_of_sit' => $no_of_sit,
                 'vendor_id' => $vendor_id,
+
+                'vehicle_make' => $this->request->getPost('vehicle_make'),
+                'vehicle_body' => $this->request->getPost('vehicle_body'),
+                'engine_no' => $this->request->getPost('engine_no'),
+                'chassis_no' => $this->request->getPost('chassis_no'),
+                'manufacture_yr' => $this->request->getPost('manufacture_yr'),
+                'vehicle_cc' => $this->request->getPost('vehicle_cc'),
+                'insurance_date_from' => $this->request->getPost('insurance_date_from'),
+                'insurance_date_to' => $this->request->getPost('insurance_date_to'),
+                'insurance_img' => $insurance_img,
+                'fit_expr' => $this->request->getPost('fit_expr'),
+                'fit_doc' => $fit_doc,
+                'polution_exp_date' => $this->request->getPost('polution_exp_date'),
+                'pollurion_doc' => $pollurion_doc1,
+                'permit_expr_date' => $this->request->getPost('permit_expr_date'),
+                'permit_doc' => $permit_doc,
+
                 'status' => 0
             ];
+
+
+
+
+
+
 
             $this->AdminModel->InsertRecord('vehicle_details', $data);
             return redirect()->to('vehicle');
@@ -83,7 +140,7 @@ class Vehicle extends BaseController
             $data['AllVendor'] = $this->AdminModel->getAllVendor();
             $data['vehicle'] = $this->AdminModel->getSingleData('vehicle_details', $id);
 
-            return view('admin/add_vehicle_vw', $data);
+            return view('admin/edit_vehicle_vw', $data);
         } else {
             return redirect()->to('admin/');
         }
@@ -108,8 +165,48 @@ class Vehicle extends BaseController
                     'type_id' => $vehicle_type,
                     'model_name' => $model_name,
                     'regd_no' => $redg_no,
-                    'no_of_sit' => $no_of_sit
+                    'no_of_sit' => $no_of_sit,
+                    'vehicle_make' => $this->request->getPost('vehicle_make'),
+                    'vehicle_body' => $this->request->getPost('vehicle_body'),
+                    'engine_no' => $this->request->getPost('engine_no'),
+                    'chassis_no' => $this->request->getPost('chassis_no'),
+                    'manufacture_yr' => $this->request->getPost('manufacture_yr'),
+                    'vehicle_cc' => $this->request->getPost('vehicle_cc'),
+                    'insurance_date_from' => $this->request->getPost('insurance_date_from'),
+                    'insurance_date_to' => $this->request->getPost('insurance_date_to'),
+                    'fit_expr' => $this->request->getPost('fit_expr'),
+                    'polution_exp_date' => $this->request->getPost('polution_exp_date'),
+                    'permit_expr_date' => $this->request->getPost('permit_expr_date')
                 ];
+
+                $file = $this->request->getFile('insurance_img');
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $insurance_img = $file->getRandomName();
+                    $file->move('uploads/', $insurance_img);
+                    $data['insurance_img'] = $insurance_img;
+                } 
+
+                $file1 = $this->request->getFile('fit_doc');
+                if ($file1->isValid() && !$file1->hasMoved()) {
+                    $fit_doc = $file1->getRandomName();
+                    $file1->move('uploads/', $fit_doc);
+                    $data['fit_doc'] = $fit_doc;
+                }
+
+                $pollurion_doc = $this->request->getFile('pollurion_doc');
+                if ($pollurion_doc->isValid() && !$pollurion_doc->hasMoved()) {
+                    $pollurion_doc1 = $pollurion_doc->getRandomName();
+                    $pollurion_doc->move('uploads/', $pollurion_doc1);
+                    $data['pollurion_doc'] = $pollurion_doc1;
+                } 
+
+                $file3 = $this->request->getFile('permit_doc');
+                if ($file3->isValid() && !$file3->hasMoved()) {
+                    $permit_doc = $file3->getRandomName();
+                    $file3->move('uploads/', $permit_doc);
+                    $data['permit_doc'] = $permit_doc;
+                } 
+
                 $this->AdminModel->UpdateRecordById('vehicle_details', $id, $data);
             } else {
                 $this->session->setFlashdata('msg', 'Vehicle Type Already  exist.');

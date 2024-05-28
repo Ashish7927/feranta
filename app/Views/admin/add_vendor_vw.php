@@ -205,6 +205,7 @@
                                             <option value="">Select Role</option>
                                             <option value="3">Owner</option>
                                             <option value="4">Driver</option>
+                                            <option value="2">Franchise Member</option>
                                         </select>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('role'); ?></span><?php } ?>
                                     </div>
