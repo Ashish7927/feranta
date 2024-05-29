@@ -211,6 +211,20 @@
                                     </div>
                                 </div>
 
+                                <div class="col-sm-6" id="franchises" style="display: none;">
+                                    <div class="form-group ">
+                                        <label>Select Franchise</label>
+                                        <select class="form-control" name="franchise_id"  id="franchise_id">
+                                            <option value="">Select option</option>
+                                            <?php foreach($franchises as $franchise){?>
+                                            <option value="<?= $franchise->id; ?>"><?= $franchise->franchise_name; ?></option>
+
+                                            <?php } ?>
+                                        </select>
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('is_driver'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
                                 <div class="col-sm-6 is_driver" style="display: none;">
                                     <div class="form-group ">
                                         <label>Are you a Driver?</label>
@@ -288,7 +302,9 @@
         }
         function CheckRole(val)
         {
-            $('#is_driver').val(''); 
+            $('#is_driver').val('');
+            $("#franchises").css("display", "none");
+            $('#franchise_id').prop('required',false); 
             if(val == 3){
                 $('.driver_input').prop('required',false);
                 $(".driver_div").css("display", "none");
@@ -299,6 +315,13 @@
                 $('.is_driver').css("display", "none");
                 $(".driver_div").css("display", "block");
                 $('.driver_input').prop('required',true);
+            }else if(val == 2){
+                $('.driver_input').prop('required',false);
+                $(".driver_div").css("display", "none");
+                $('#is_driver').prop('required',false);
+                $('.is_driver').css("display", "none"); 
+                $("#franchises").css("display", "block");
+                $('#franchise_id').prop('required',true);
             }else{
                 $('.driver_input').prop('required',false);
                 $(".driver_div").css("display", "none");

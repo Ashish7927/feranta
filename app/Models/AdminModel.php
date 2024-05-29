@@ -531,6 +531,7 @@ class AdminModel extends Model
 		$builder->select('*');
 		$builder->where('user_type', 3);
 		$builder->orWhere('user_type', 4);
+		$builder->orWhere('user_type', 2);
 		return $builder->get()->getResult();
 	}
 
@@ -757,6 +758,15 @@ class AdminModel extends Model
 		$builder->join('service_bookings booking', 'booking.service_id = service_details.id','left');
 		$builder->where('service_details.driver_id',$driver_id);
 		$builder->where('service_details.status',1);
+		return $builder->get()->getResult();
+	}
+
+
+	function getAllUserList($member_id)
+	{
+		$builder = $this->db->table('user');
+		$builder->select('*');
+		$builder->where('created_by',$member_id);
 		return $builder->get()->getResult();
 	}
 	

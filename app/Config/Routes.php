@@ -111,3 +111,18 @@ $routes->post('api/get-current-service', 'ApiController::onGoingRide');
 $routes->post('api/send-notification-temp', 'ApiController::sendPushNotificationTemp');
 $routes->post('api/member-login', 'ApiController::memberLogin');
 
+
+$routes->post('api/add-customer', 'ApiController::addCustomer');
+
+
+$routes->post('api/add-customer', 'ApiController::addCustomer');
+$routes->post('api/get-list', 'ApiController::getList');
+$routes->post('api/add-customer', 'ApiController::addCustomer');
+
+
+
+
+
+
+
+

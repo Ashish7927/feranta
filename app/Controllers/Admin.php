@@ -1602,7 +1602,7 @@ class Admin extends BaseController
 
 			$data['setting'] = $this->AdminModel->Settingdata();
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-
+			$data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
 			$data['allstate'] = $this->AdminModel->GetAllstate();
 			$data['allcity'] = $this->AdminModel->GetAllcity();
 			$data['pincode'] = $this->AdminModel->GetAllpincode();
@@ -1622,7 +1622,7 @@ class Admin extends BaseController
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);
 
 			$vendor_id = $this->request->uri->getSegment(3);
-
+			$data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
 			$data['Singlevendor'] = $this->AdminModel->Singlevendor($vendor_id);
 
 			$data['allstate'] = $this->AdminModel->GetAllstate();
@@ -1718,7 +1718,7 @@ class Admin extends BaseController
 
 					'adhar_font'  => $imagename1,
 					'adhar_back'  => $imagename2,
-
+					'franchise_id' => $this->request->getVar('franchise_id'),
 					'user_type'  => $this->request->getVar('role'),
 					'license_no'  => $this->request->getVar('license_no'),
 					'license_img'  => $license_img1,
@@ -1833,7 +1833,8 @@ class Admin extends BaseController
 							'bank_name'  => $this->request->getVar('bank_name'),
 							'acc_no'  => $this->request->getVar('acc_no'),
 							'ifsc'  => $this->request->getVar('ifsc'),
-							'exp_year'  => $this->request->getVar('exp_year')
+							'exp_year'  => $this->request->getVar('exp_year'),
+							'franchise_id' => $this->request->getVar('franchise_id')
 						];
 
 						if ($imagename != "") {

@@ -1364,8 +1364,8 @@ class ApiController extends ResourceController
     {
         $rules = [
             'full_name' => 'required',
-            'email' => 'required',
-            'contact_no' => 'required',
+            'contact_no' => 'required|numeric|exact_length[10]|is_unique[user.contact_no]',
+            'email' => 'required|is_unique[user.email]',
             'city' => 'required'
         ];
 
@@ -1378,7 +1378,7 @@ class ApiController extends ResourceController
                 ]
             ];
         } else {
-            $created_by= $this->request->getVar('member_id');
+            $created_by = $this->request->getVar('member_id');
             $file = $this->request->getFile('img');
 
             if ($file->isValid() && !$file->hasMoved()) {
@@ -1433,16 +1433,16 @@ class ApiController extends ResourceController
                 'adhar_font'  => $imagename1,
                 'adhar_back'  => $imagename2,
 
-                'user_type'  =>4,
+                'user_type'  => 4,
                 'license_no'  => $this->request->getVar('license_no'),
                 'license_img'  => $license_img1,
-                'status'=>1,
+                'status' => 1,
                 'ac_name'  => $this->request->getVar('ac_name'),
                 'bank_name'  => $this->request->getVar('bank_name'),
                 'acc_no'  => $this->request->getVar('acc_no'),
                 'ifsc'  => $this->request->getVar('ifsc'),
                 'exp_year'  => $this->request->getVar('exp_year'),
-                'created_by'=>$created_by
+                'created_by' => $created_by
 
             ];
 
@@ -1899,7 +1899,7 @@ class ApiController extends ResourceController
             $password = $this->request->getVar('password');
             $data = $this->AdminModel->checkUserPahone($phone);
             if (!empty($data) && $data != null) {
-                $password=base64_encode(base64_encode($password));
+                $password = base64_encode(base64_encode($password));
                 if ($data[0]->password == $password) {
 
                     $response = [
@@ -1928,6 +1928,210 @@ class ApiController extends ResourceController
                     ]
                 ];
             }
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function addCustomer()
+    {
+        $rules = [
+            'name' => 'required|min_length[3]',
+            'phone' => 'required|numeric|exact_length[10]|is_unique[user.contact_no]',
+            'email' => 'required|is_unique[user.email]',
+            'member_id' => 'required|numeric'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $email = $this->request->getVar('email');
+            $name = $this->request->getVar('name');
+            $member_id = $this->request->getVar('member_id');
+            $phone = $this->request->getVar('phone');
+
+            // $img = $this->request->getPost('profile_image');
+            $filename = '';
+            // if ($img) {
+            //     $img = str_replace('data:image/png;base64,', '', $img);
+            //     $img = str_replace('data:image/jpeg;base64,', '', $img);
+            //     $img = str_replace(' ', '+', $img);
+            //     $file_data = base64_decode($img);
+            //     $image_name = md5(uniqid(rand(), true));
+            //     $filename = $image_name . '.' . 'png';
+            //     $path = 'uploads/';
+            //     file_put_contents($path . $filename, $file_data);
+            // }
+
+            $data_array = [
+                'full_name' => $name,
+                'email' => $email,
+                'contact_no' => $phone,
+                'status' => 1,
+                'profile_image' => $filename,
+                'user_type' => 5,
+                'created_by' => $member_id
+            ];
+
+            $result = $this->AdminModel->adduser($data_array);
+            if ($result) {
+                $response = [
+                    'status'   => 201,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Customer registered Successfully'
+                    ],
+                ];
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Registration failed!, Something went wrong.'
+                    ]
+                ];
+            }
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function getList()
+    {
+        $rules = [
+            'member_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $member_id = $this->request->getVar('member_id');
+            $memberList = $this->AdminModel->getAllUserList($member_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => ' list',
+                    'userList' => $memberList
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+
+    public function addOwner()
+    {
+        $rules = [
+            'full_name' => 'required',
+            'contact_no' => 'required|numeric|exact_length[10]|is_unique[user.contact_no]',
+            'email' => 'required|is_unique[user.email]',
+            'city' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $created_by = $this->request->getVar('member_id');
+            $file = $this->request->getFile('img');
+
+            if ($file->isValid() && !$file->hasMoved()) {
+                $imagename = $file->getRandomName();
+                $file->move('uploads/', $imagename);
+            } else {
+                $imagename = "";
+            }
+
+            $file1 = $this->request->getFile('frontimg');
+
+            if ($file1->isValid() && !$file1->hasMoved()) {
+                $imagename1 = $file1->getRandomName();
+                $file1->move('uploads/', $imagename1);
+            } else {
+                $imagename1 = "";
+            }
+            $file2 = $this->request->getFile('backimg');
+
+            if ($file2->isValid() && !$file2->hasMoved()) {
+                $imagename2 = $file2->getRandomName();
+                $file2->move('uploads/', $imagename2);
+            } else {
+                $imagename2 = "";
+            }
+
+            $license_img = $this->request->getFile('license_img');
+
+            if ($license_img->isValid() && !$license_img->hasMoved()) {
+                $license_img1 = $license_img->getRandomName();
+                $license_img->move('uploads/', $license_img1);
+            } else {
+                $license_img1 = "";
+            }
+
+            $data = [
+                'full_name' => $this->request->getVar('full_name'),
+                'email'  => $this->request->getVar('email'),
+                'user_name'  => $this->request->getVar('full_name'),
+                'contact_no'  => $this->request->getVar('contact_no'),
+                'alter_cnum'  => $this->request->getVar('altcontact'),
+                'state_id'  => $this->request->getVar('state'),
+                'city_id'  => $this->request->getVar('city'),
+                'pin'  => $this->request->getVar('pincode'),
+                'address1'  => $this->request->getVar('address1'),
+                'address2'  => $this->request->getVar('address2'),
+                'adhar_no'  => $this->request->getVar('adharno'),
+
+                'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
+                'profile_image'  => $imagename,
+
+                'adhar_font'  => $imagename1,
+                'adhar_back'  => $imagename2,
+
+                'user_type'  => 4,
+                'license_no'  => $this->request->getVar('license_no'),
+                'license_img'  => $license_img1,
+                'status' => 1,
+                'ac_name'  => $this->request->getVar('ac_name'),
+                'bank_name'  => $this->request->getVar('bank_name'),
+                'acc_no'  => $this->request->getVar('acc_no'),
+                'ifsc'  => $this->request->getVar('ifsc'),
+                'created_by' => $created_by,
+                'is_driver'  => $this->request->getVar('is_driver')
+
+
+            ];
+
+
+            $this->AdminModel->adduser($data);
+
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Owner added successfully!',
+                    'userDetails' => $data
+                ],
+            ];
         }
 
         return $this->respondCreated($response);
