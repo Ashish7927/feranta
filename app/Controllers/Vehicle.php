@@ -115,7 +115,7 @@ class Vehicle extends BaseController
                 'pollurion_doc' => $pollurion_doc1,
                 'permit_expr_date' => $this->request->getPost('permit_expr_date'),
                 'permit_doc' => $permit_doc,
-
+                'booking_type' => $this->request->getPost('booking_type'),
                 'status' => 0
             ];
 
@@ -176,7 +176,8 @@ class Vehicle extends BaseController
                     'insurance_date_to' => $this->request->getPost('insurance_date_to'),
                     'fit_expr' => $this->request->getPost('fit_expr'),
                     'polution_exp_date' => $this->request->getPost('polution_exp_date'),
-                    'permit_expr_date' => $this->request->getPost('permit_expr_date')
+                    'permit_expr_date' => $this->request->getPost('permit_expr_date'),
+                    'booking_type' => $this->request->getPost('booking_type')
                 ];
 
                 $file = $this->request->getFile('insurance_img');

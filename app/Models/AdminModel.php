@@ -769,5 +769,25 @@ class AdminModel extends Model
 		$builder->where('created_by',$member_id);
 		return $builder->get()->getResult();
 	}
+
+	function getDriverwiseLiftRequest($driver_id)
+	{
+		$builder = $this->db->table('lift_request');
+		$builder->select('lift_request.*,booking.user_id,booking.booking_type,booking.from_location,user.full_name,booking.to_location');
+		$builder->join('service_bookings booking', 'booking.id = lift_request.booking_id');
+		$builder->join('user user', 'user.id = booking.user_id');
+		$builder->where('lift_request.driver_id', $driver_id);
+		return $builder->get()->getResult();
+	}
+
+	function getBookingwiseLiftRequest($booking_id)
+	{
+		$builder = $this->db->table('lift_request');
+		$builder->select('lift_request.*,user.full_name,user.email,user.contact_no,user.profile_image,vehicle.model_name,vehicle.regd_no,vehicle.vehicle_make,vehicle.no_of_sit');
+		$builder->join('user user', 'user.id = lift_request.driver_id');
+		$builder->join('vehicle_details vehicle', 'vehicle.id = lift_request.vehicle_id');
+		$builder->where('lift_request.booking_id', $booking_id);
+		return $builder->get()->getResult();
+	}
 	
 }

@@ -48,6 +48,16 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
+                                        <label>Select Booking Type</label>
+                                        <select name="booking_type" id="booking_type" class="form-control" required>
+                                            <option value="">-- Select Booking Type --</option>
+                                                <option value="1">Cab Booking</option>
+                                                <option value="2">Lift Booking</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
                                         <label>Enter Vehicle Redg. No</label>
                                         <input type="text" name="redg_no" class="form-control" required>
                                     </div>

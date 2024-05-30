@@ -751,6 +751,67 @@ class ApiController extends ResourceController
                 }
             } elseif ($booking_type == 'future_cab') {
                 $success = 0;
+            } elseif ($booking_type == 'lift') {
+                $success = 0;
+                $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( lat ) ) ) ) AS distance FROM lift_driver_status WHERE status =1 HAVING distance < $radius ORDER BY distance")->getResult();
+                if (empty($checkAvailbility) || count($checkAvailbility) == 0) {
+                    $response = [
+                        'status'   => 200,
+                        'error'    => 1,
+                        'response' => [
+                            'message' => 'Sorry! No active vehicle nearby you!'
+                        ]
+                    ];
+                } else {
+                    $from_add = $this->getAddressFromLatLng($origin_lat, $origin_lng);
+                    $to_add = $this->getAddressFromLatLng($destination_lat, $destination_lng);
+                    $data = [
+                        'user_id' => $cutomer_id,
+                        'booking_type' => $booking_type,
+                        'vehicle_type' => $vehicle_type,
+                        'from_location' => $from_add,
+                        'to_location' => $to_add,
+                        'origin_lat' => $origin_lat,
+                        'origin_lng' => $origin_lng,
+                        'destination_lat' => $destination_lat,
+                        'destination_lng' => $destination_lng,
+                        'boarding_date' => date('Y-m-d H:i:s'),
+                        'vehicle_id' => '',
+                        'driver_id' => '',
+                        'status' => 0,
+                        'created_by' => 0,
+                        'updated_by' => 0,
+                        'updated_at' => date('Y-m-d H:i:s')
+
+                    ];
+
+                    $booking_id = $this->AdminModel->InsertService($data);
+
+                    foreach ($checkAvailbility as $service) {
+
+                        $this->sendPushNotification($service->driver_id, 'A new booking request', 'Here is a booking request from ' . $from_add . 'to ' . $to_add);
+                        $getVehicleId = $this->AdminModel->getSingleData('vehicle_details', $service->driver_id, 'driver_id');
+                        $data = [
+                            'booking_id' => $booking_id,
+                            'vehicle_id' => $getVehicleId->id,
+                            'driver_id' => $service->driver_id,
+                            'status' => 0
+                        ];
+                        $this->AdminModel->InsertRecord('lift_request', $data);
+                    }
+
+                    $BookingData = $this->AdminModel->getBookingData($booking_id);
+                    $vehicleList = $this->AdminModel->getBookingwiseLiftRequest($booking_id);
+                    $response = [
+                        'status'   => 200,
+                        'error'    => null,
+                        'response' => [
+                            'success' => 'Booking register successfully!',
+                            'bookingDetails' => $BookingData,
+                            'availbleVehicleList' => $vehicleList
+                        ],
+                    ];
+                }
             } else {
                 $response = [
                     'status'   => 200,
@@ -1974,6 +2035,7 @@ class ApiController extends ResourceController
                 'full_name' => $name,
                 'email' => $email,
                 'contact_no' => $phone,
+                'alter_cnum' => $this->request->getVar('wp_contact'),
                 'status' => 1,
                 'profile_image' => $filename,
                 'user_type' => 5,
@@ -2130,6 +2192,288 @@ class ApiController extends ResourceController
                 'response' => [
                     'success' => 'Owner added successfully!',
                     'userDetails' => $data
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+
+    public function changeDriverStatus()
+    {
+        $rules = [
+            'driver_id' => 'required',
+            'lat' => 'required',
+            'lng' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $driver_id = $this->request->getVar('driver_id');
+            $driverDetails = $this->AdminModel->getSingleData('user', $driver_id);
+            if (!$driverDetails) {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Not a valid driver!'
+                    ]
+                ];
+            } else {
+
+                $checkStatus = $this->AdminModel->getSingleData('lift_driver_status', $driver_id, 'driver_id');
+
+                $data = [
+                    'driver_id' => $driver_id,
+                    'lat'  => $this->request->getVar('lat'),
+                    'lng'  => $this->request->getVar('lng'),
+                    'status'  => $this->request->getVar('status'),
+                    'updated_at'  => date('Y-m-d H:i:s')
+                ];
+                if (!empty($checkStatus) && isset($checkStatus->id)) {
+
+                    $this->AdminModel->UpdateRecordById('vehicle_details', $checkStatus->id, $data);
+                } else {
+                    $this->AdminModel->InsertRecord('lift_driver_status', $data);
+                }
+
+                $response = [
+                    'status'   => 201,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Status updated successfully!'
+                    ],
+                ];
+            }
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function startLiftBooking()
+    {
+        $rules = [
+            'booking_id' => 'required',
+            'lat' => 'required',
+            'lng' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $booking_id = $this->request->getVar('booking_id');
+            $lat = $this->request->getVar('lat');
+            $lng = $this->request->getVar('lng');
+            $bookingDetails = $this->AdminModel->getSingleData('service_bookings', $booking_id);
+            $distance = $this->haversineGreatCircleDistance($bookingDetails->origin_lat, $bookingDetails->origin_lng, $lat, $lng);
+            if ($distance <= 500) {
+
+                $data = [
+                    'status' => 1
+                ];
+
+                $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $data);
+                $response = [
+                    'status'   => 200,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Booking updated Successfully'
+                    ],
+                ];
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => "You can only start within 500 meter distance to pickup location."
+                    ]
+                ];
+            }
+        }
+        return $this->respondCreated($response);
+    }
+
+    public function endLiftBooking()
+    {
+        $rules = [
+            'booking_id' => 'required',
+            'lat' => 'required',
+            'lng' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $booking_id = $this->request->getVar('booking_id');
+            $bookingDetails = $this->AdminModel->getSingleData('service_bookings', $booking_id);
+
+            $lat = $this->request->getVar('lat');
+            $lng = $this->request->getVar('lng');
+            $distance = $this->haversineGreatCircleDistance($bookingDetails->destination_lat, $bookingDetails->destination_lng, $lat, $lng);
+            if ($distance <= 500) {
+
+                $data = [
+                    'status' => 3
+                ];
+                $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $data);
+                $response = [
+                    'status'   => 200,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Booking updated Successfully'
+                    ],
+                ];
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => "You can only end Booking within 500 meter distance to drop location."
+                    ]
+                ];
+            }
+        }
+        return $this->respondCreated($response);
+    }
+
+    public function cancelLiftBooking()
+    {
+        $rules = [
+            'booking_id' => 'required',
+            'user_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $user_id = $this->request->getVar('user_id');
+            $booking_id = $this->request->getVar('booking_id');
+            $data = [
+                'status'  => 2,
+                'updated_by' => $user_id
+            ];
+            $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $data);
+
+            $response = [
+                'status'   => 200,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Booking canceled successfully!'
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function accecptLiftBooking()
+    {
+        $rules = [
+            'request_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $request_id  = $this->request->getPost('request_id');
+            $requestDetails = $this->AdminModel->getSingleData('lift_request', $request_id);
+            if ($requestDetails->status != 0) {
+
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Booking alredy closed!'
+                    ]
+                ];
+            } else {
+                $data = [
+                    'status'  => 1,
+                ];
+                $this->AdminModel->UpdateRecordById('lift_request', $request_id, $data);
+                $otp = rand(100000, 999999);
+                $data = [
+                    'vehicle_id'  => $requestDetails->vehicle_id,
+                    'driver_id'  => $requestDetails->driver_id,
+                    'otp' => $otp,
+                    'status'  => 1
+                ];
+                $this->AdminModel->UpdateRecordById('service_bookings', $requestDetails->booking_id, $data);
+
+                $this->db->query("UPDATE lift_request SET status = 2 WHERE booking_id = $requestDetails->booking_id AND status = 0 ");
+
+                $response = [
+                    'status'   => 200,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Booking placed successfully!'
+                    ],
+                ];
+            }
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function getLiftBookingRequest()
+    {
+        $rules = [
+            'driver_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $driver_id = $this->request->getVar('driver_id');
+            $allRequest = $this->AdminModel->getDriverwiseLiftRequest($driver_id);
+
+            $response = [
+                'status'   => 200,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Here is all request',
+                    'data' => $allRequest
                 ],
             ];
         }

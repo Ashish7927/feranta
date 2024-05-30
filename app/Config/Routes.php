@@ -119,10 +119,11 @@ $routes->post('api/add-customer', 'ApiController::addCustomer');
 $routes->post('api/get-list', 'ApiController::getList');
 $routes->post('api/add-customer', 'ApiController::addCustomer');
 
-
-
-
-
-
+$routes->post('api/driver-on-off', 'ApiController::changeDriverStatus');
+$routes->post('api/start-lift-booking', 'ApiController::startLiftBooking');
+$routes->post('api/end-lift-booking', 'ApiController::endLiftBooking');
+$routes->post('api/cancel-lift-booking', 'ApiController::cancelLiftBooking');
+$routes->post('api/confirm-lift-booking', 'ApiController::accecptLiftBooking');
+$routes->post('api/get-lift-booking-request-list', 'ApiController::getLiftBookingRequest');
 
 
