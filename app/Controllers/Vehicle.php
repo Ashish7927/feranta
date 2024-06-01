@@ -290,7 +290,7 @@ class Vehicle extends BaseController
                         'status'  => 2,
                         'updated_by' => $user_id
                     ];
-                    $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $user_id WHERE vehicle_id = $vehicleId and driver_id = $driver_id; ");
+                    $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $user_id WHERE vehicle_id = $vehicleId; ");
                     $data = [
                         'driver_id' => $driver_id,
                         'vehicle_id' => $vehicleId,

@@ -311,21 +311,12 @@ class ApiController extends ResourceController
                 $actuallOtp = $data[0]->otp;
                 if ($otp == $actuallOtp) {
 
-                    $profileStatus = 0;
-                    if ($data[0]->password != NULL || $data[0]->password != '') {
-                        $profileStatus = 1;
-                    }
-
-                    if ($data[0]->adhar_no != NULL || $data[0]->adhar_no != '') {
-                        $profileStatus = 2;
-                    }
                     $response = [
                         'status'   => 201,
                         'error'    => null,
                         'response' => [
                             'success' => 'OTP matched',
-                            'userDetails' => $data,
-                            'profile_status' => $profileStatus
+                            'userDetails' => $data
                         ],
                     ];
                 } else {
@@ -2115,6 +2106,9 @@ class ApiController extends ResourceController
             ];
         } else {
             $created_by = $this->request->getVar('member_id');
+            if ($created_by == '' || !$this->request->getVar('member_id')) {
+                $created_by = 0;
+            }
             $file = $this->request->getFile('img');
 
             if ($file->isValid() && !$file->hasMoved()) {
@@ -2205,7 +2199,8 @@ class ApiController extends ResourceController
         $rules = [
             'driver_id' => 'required',
             'lat' => 'required',
-            'lng' => 'required'
+            'lng' => 'required',
+            'status' => 'required'
         ];
 
         if (!$this->validate($rules)) {
@@ -2240,7 +2235,7 @@ class ApiController extends ResourceController
                 ];
                 if (!empty($checkStatus) && isset($checkStatus->id)) {
 
-                    $this->AdminModel->UpdateRecordById('vehicle_details', $checkStatus->id, $data);
+                    $this->AdminModel->UpdateRecordById('lift_driver_status', $checkStatus->id, $data);
                 } else {
                     $this->AdminModel->InsertRecord('lift_driver_status', $data);
                 }
@@ -2474,6 +2469,424 @@ class ApiController extends ResourceController
                 'response' => [
                     'success' => 'Here is all request',
                     'data' => $allRequest
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    // Owner APIs Start
+
+    public function ownerLogin()
+    {
+        $rules = [
+            'phone' => 'required|numeric|exact_length[10]'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $phone = $this->request->getVar('phone');
+            $data = $this->AdminModel->checkUserPahoneOwner($phone);
+            if (!empty($data) && $data != null) {
+
+
+                if ($data[0]->status == 1) {
+                    //Send otp
+                    $otp = rand(100000, 999999);
+                    $updateotp = [
+                        'otp' => $otp
+                    ];
+
+                    $data = $this->AdminModel->UpdateProfile($updateotp, $data[0]->id);
+
+
+                    $response = [
+                        'status'   => 200,
+                        'error'    => null,
+                        'response' => [
+                            'message' => 'Otp send successfully!',
+                            'otp' => $otp,
+                        ],
+                    ];
+                } else {
+                    $response = [
+                        'status'   => 200,
+                        'error'    => 1,
+                        'response' => [
+                            'message' => 'Your account is not Active, Please contact to Admin!'
+                        ]
+                    ];
+                }
+            } else {
+
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Phone no not registreted as Owner!'
+                    ]
+                ];
+            }
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function addVehicle()
+    {
+        $rules = [
+            'owner_id' => 'required',
+            'redg_no' => 'required',
+            'model_name' => 'required',
+            'vehicle_type' => 'required',
+            'booking_type' => 'required',
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $vendor_id = $this->request->getPost('owner_id');
+            $no_of_sit = $this->request->getPost('no_of_sit');
+            $redg_no = $this->request->getPost('redg_no');
+            $model_name = $this->request->getPost('model_name');
+            $vehicle_type = $this->request->getPost('vehicle_type');
+
+
+            $file = $this->request->getFile('insurance_img');
+            if ($file->isValid() && !$file->hasMoved()) {
+                $insurance_img = $file->getRandomName();
+                $file->move('uploads/', $insurance_img);
+            } else {
+                $insurance_img = "";
+            }
+
+            $file1 = $this->request->getFile('fit_doc');
+            if ($file1->isValid() && !$file1->hasMoved()) {
+                $fit_doc = $file1->getRandomName();
+                $file1->move('uploads/', $fit_doc);
+            } else {
+                $fit_doc = "";
+            }
+
+            $pollurion_doc = $this->request->getFile('pollurion_doc');
+            if ($pollurion_doc->isValid() && !$pollurion_doc->hasMoved()) {
+                $pollurion_doc1 = $pollurion_doc->getRandomName();
+                $pollurion_doc->move('uploads/', $pollurion_doc1);
+            } else {
+                $pollurion_doc1 = "";
+            }
+
+            $file3 = $this->request->getFile('permit_doc');
+            if ($file3->isValid() && !$file3->hasMoved()) {
+                $permit_doc = $file3->getRandomName();
+                $file3->move('uploads/', $permit_doc);
+            } else {
+                $permit_doc = "";
+            }
+
+
+            $data = [
+                'type_id' => $vehicle_type,
+                'model_name' => $model_name,
+                'regd_no' => $redg_no,
+                'no_of_sit' => $no_of_sit,
+                'vendor_id' => $vendor_id,
+                'vehicle_make' => $this->request->getPost('vehicle_make'),
+                'vehicle_body' => $this->request->getPost('vehicle_body'),
+                'engine_no' => $this->request->getPost('engine_no'),
+                'chassis_no' => $this->request->getPost('chassis_no'),
+                'manufacture_yr' => $this->request->getPost('manufacture_yr'),
+                'vehicle_cc' => $this->request->getPost('vehicle_cc'),
+                'insurance_date_from' => $this->request->getPost('insurance_date_from'),
+                'insurance_date_to' => $this->request->getPost('insurance_date_to'),
+                'insurance_img' => $insurance_img,
+                'fit_expr' => $this->request->getPost('fit_expr'),
+                'fit_doc' => $fit_doc,
+                'polution_exp_date' => $this->request->getPost('polution_exp_date'),
+                'pollurion_doc' => $pollurion_doc1,
+                'permit_expr_date' => $this->request->getPost('permit_expr_date'),
+                'permit_doc' => $permit_doc,
+                'booking_type' => $this->request->getPost('booking_type'),
+                'status' => 0
+            ];
+
+            $this->AdminModel->InsertRecord('vehicle_details', $data);
+
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Vehicle added successfully!',
+                    'userDetails' => $data
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function editVehicle()
+    {
+        $rules = [
+            'vehicle_id' => 'required',
+            'redg_no' => 'required',
+            'model_name' => 'required',
+            'vehicle_type' => 'required',
+            'booking_type' => 'required',
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $vehicle_id = $this->request->getPost('vehicle_id');
+            $no_of_sit = $this->request->getPost('no_of_sit');
+            $redg_no = $this->request->getPost('redg_no');
+            $model_name = $this->request->getPost('model_name');
+            $vehicle_type = $this->request->getPost('vehicle_type');
+
+            $data = [
+                'type_id' => $vehicle_type,
+                'model_name' => $model_name,
+                'regd_no' => $redg_no,
+                'no_of_sit' => $no_of_sit,
+                'vehicle_make' => $this->request->getPost('vehicle_make'),
+                'vehicle_body' => $this->request->getPost('vehicle_body'),
+                'engine_no' => $this->request->getPost('engine_no'),
+                'chassis_no' => $this->request->getPost('chassis_no'),
+                'manufacture_yr' => $this->request->getPost('manufacture_yr'),
+                'vehicle_cc' => $this->request->getPost('vehicle_cc'),
+                'insurance_date_from' => $this->request->getPost('insurance_date_from'),
+                'insurance_date_to' => $this->request->getPost('insurance_date_to'),
+                'fit_expr' => $this->request->getPost('fit_expr'),
+                'polution_exp_date' => $this->request->getPost('polution_exp_date'),
+                'permit_expr_date' => $this->request->getPost('permit_expr_date'),
+                'booking_type' => $this->request->getPost('booking_type')
+            ];
+
+            $file = $this->request->getFile('insurance_img');
+            if ($file->isValid() && !$file->hasMoved()) {
+                $insurance_img = $file->getRandomName();
+                $file->move('uploads/', $insurance_img);
+                $data['insurance_img'] = $insurance_img;
+            }
+
+            $file1 = $this->request->getFile('fit_doc');
+            if ($file1->isValid() && !$file1->hasMoved()) {
+                $fit_doc = $file1->getRandomName();
+                $file1->move('uploads/', $fit_doc);
+                $data['fit_doc'] = $fit_doc;
+            }
+
+            $pollurion_doc = $this->request->getFile('pollurion_doc');
+            if ($pollurion_doc->isValid() && !$pollurion_doc->hasMoved()) {
+                $pollurion_doc1 = $pollurion_doc->getRandomName();
+                $pollurion_doc->move('uploads/', $pollurion_doc1);
+                $data['pollurion_doc'] = $pollurion_doc1;
+            }
+
+            $file3 = $this->request->getFile('permit_doc');
+            if ($file3->isValid() && !$file3->hasMoved()) {
+                $permit_doc = $file3->getRandomName();
+                $file3->move('uploads/', $permit_doc);
+                $data['permit_doc'] = $permit_doc;
+            }
+
+            $this->AdminModel->UpdateRecordById('vehicle_details', $vehicle_id, $data);
+
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Vehicle updated successfully!'
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    function getDriverList()
+    {
+        $driverList = $this->AdminModel->getAllDriverList();
+        $response = [
+            'status'   => 201,
+            'error'    => null,
+            'response' => [
+                'success' => 'Driver list',
+                'driverList' => $driverList
+            ],
+        ];
+
+        return $this->respondCreated($response);
+    }
+
+    function sendOtpToAssignDriver()
+    {
+        $rules = [
+            'driver_id' => 'required',
+            'vehicle_id' => 'required',
+            'owner_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $driver_id = $this->request->getVar('driver_id');
+            $vehicle_id = $this->request->getVar('vehicle_id');
+            $owner_id = $this->request->getVar('owner_id');
+            $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicle_id);
+
+            if ($vehicleDetails->driver_id != '' && $vehicleDetails->driver_id != $driver_id) {
+                $data = [
+                    'status'  => 3,
+                    'updated_by' => $owner_id
+                ];
+                $this->AdminModel->updateDriverRemoved($vehicleDetails->driver_id, $vehicle_id, $data);
+            }
+
+            $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $owner_id WHERE vehicle_id = $vehicle_id AND status = 0; ");
+
+            $otp = rand(100000, 999999);
+            $data = [
+                'driver_id' => $driver_id,
+                'vehicle_id' => $vehicle_id,
+                'owner_id' => $owner_id,
+                'updated_by' => $owner_id,
+                'status' => 0,
+                'otp' => $otp
+            ];
+
+            $this->AdminModel->InsertRecord('driver_vehicle_mapping', $data);
+
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Otp send to driver!',
+                    'otp' => $otp
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    function verifyDriverAssignOtp()
+    {
+        $rules = [
+            'driver_id' => 'required',
+            'vehicle_id' => 'required',
+            'owner_id' => 'required',
+            'otp' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $driver_id = $this->request->getVar('driver_id');
+            $vehicle_id = $this->request->getVar('vehicle_id');
+            $owner_id = $this->request->getVar('owner_id');
+            $otp = $this->request->getVar('otp');
+            $getRequestId = $this->db->query("SELECT * FROM driver_vehicle_mapping WHERE driver_id = $driver_id AND vehicle_id = $vehicle_id AND status = 0;");
+            if (!empty($getRequestId) && count($getRequestId) >= 0) {
+
+                if ($getRequestId[0]->otp == $otp) {
+                    $data = [
+                        'status' => 1,
+                        'updated_by' => $owner_id
+                    ];
+                    $this->AdminModel->UpdateRecordById('driver_vehicle_mapping', $vehicle_id, $data);
+
+                    $data = [
+                        'status' => 1,
+                        'driver_id' => $driver_id
+                    ];
+                    $this->AdminModel->UpdateRecordById('vehicle_details', $vehicle_id, $data);
+                    $response = [
+                        'status'   => 201,
+                        'error'    => null,
+                        'response' => [
+                            'success' => 'Otp matched & vehicle assign to driver successfully!'
+                        ],
+                    ];
+                } else {
+                    $response = [
+                        'status'   => 200,
+                        'error'    => 1,
+                        'response' => [
+                            'message' => 'Invalid OTP!!'
+                        ]
+                    ];
+                }
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Invalid Request!'
+                    ]
+                ];
+            }
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    function getOwnerwiseVehicleList()
+    {
+        $rules = [
+            'owner_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $owner_id = $this->request->getVar('owner_id');
+            $vehicleList = $this->AdminModel->getOwnerwiseVehicleList($owner_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Vehicle list',
+                    'vehicleList' => $vehicleList
                 ],
             ];
         }

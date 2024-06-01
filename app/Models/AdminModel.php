@@ -789,5 +789,30 @@ class AdminModel extends Model
 		$builder->where('lift_request.booking_id', $booking_id);
 		return $builder->get()->getResult();
 	}
+
+	function checkUserPahoneOwner($phone)
+	{
+		$builder = $this->db->table('user');
+		$builder->select('*');
+		$builder->where('contact_no', $phone);
+		$builder->where('user_type', 3);
+		return $builder->get()->getResult();
+	}
+
+	function getOwnerwiseVehicleList($owner_id)
+	{
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('*');
+		$builder->where('vendor_id', $owner_id);
+		return $builder->get()->getResult();
+	}
+
+	function getAllDriverList()
+	{
+		$builder = $this->db->table('user');
+		$builder->select('*');
+		$builder->where('user_type', 4);
+		return $builder->get()->getResult();
+	}
 	
 }

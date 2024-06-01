@@ -125,5 +125,11 @@ $routes->post('api/end-lift-booking', 'ApiController::endLiftBooking');
 $routes->post('api/cancel-lift-booking', 'ApiController::cancelLiftBooking');
 $routes->post('api/confirm-lift-booking', 'ApiController::accecptLiftBooking');
 $routes->post('api/get-lift-booking-request-list', 'ApiController::getLiftBookingRequest');
-
+$routes->post('api/login-for-owner', 'ApiController::ownerLogin');
+$routes->post('api/get-vehicle-list-onwer-wise', 'ApiController::getOwnerwiseVehicleList');
+$routes->get('api/get-all-driver', 'ApiController::getDriverList');
+$routes->post('api/add-vehicle', 'ApiController::addVehicle');
+$routes->post('api/edit-vehicle', 'ApiController::editVehicle');
+$routes->post('api/send-otp-to-assign-driver', 'ApiController::sendOtpToAssignDriver');
+$routes->post('api/verify-otp-for-driver-assign', 'ApiController::verifyDriverAssignOtp');
 
