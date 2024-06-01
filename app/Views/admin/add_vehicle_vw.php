@@ -37,8 +37,30 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
+                                        <label>Select Booking Type</label>
+                                        <select name="booking_type" id="booking_type" class="form-control" onclick="checkBookingType(this.value);" required>
+                                            <option value="">-- Select Booking Type --</option>
+                                            <option value="1">Cab Booking</option>
+                                            <option value="2">Lift Booking</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 lift_vehicle_type" style="display: none;">
+                                    <div class="form-group">
                                         <label>Select Vehicle Type</label>
-                                        <select name="vehicle_type" id="vehicle_type" class="form-control" required>
+                                        <select name="lift_vehicle_type" id="lift_vehicle_type" class="form-control">
+                                            <option value="">-- Select Vehicle Type --</option>
+                                            <option value="1">Car</option>
+                                            <option value="2">Bike</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 vehicle_type">
+                                    <div class="form-group">
+                                        <label>Select Vehicle Type</label>
+                                        <select name="vehicle_type" id="vehicle_type" class="form-control">
                                             <option value="">-- Select Vehicle Type --</option>
                                             <?php foreach ($vehicleType as $type) { ?>
                                                 <option value="<?= $type->id; ?>"><?= $type->type_name ?></option>
@@ -46,16 +68,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label>Select Booking Type</label>
-                                        <select name="booking_type" id="booking_type" class="form-control" required>
-                                            <option value="">-- Select Booking Type --</option>
-                                                <option value="1">Cab Booking</option>
-                                                <option value="2">Lift Booking</option>
-                                        </select>
-                                    </div>
-                                </div>
+
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Enter Vehicle Redg. No</label>
@@ -196,5 +209,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function checkBookingType(val)
+        {
+            if (val == 2 || val == "2")
+            {
+                $('#vehicle_type').prop('required',false);
+                $(".vehicle_type").css("display", "none");
+                $('#lift_vehicle_type').prop('required',true);
+                $(".lift_vehicle_type").css("display", "block");
+            }else{
+                $('#lift_vehicle_type').prop('required',false);
+                $(".lift_vehicle_type").css("display", "none");
+                $('#vehicle_type').prop('required',true);
+                $(".vehicle_type").css("display", "block");
+            }
+        }
+    </script>
 
     <?php include('footer.php') ?>

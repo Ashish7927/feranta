@@ -399,7 +399,7 @@ class ApiController extends ResourceController
                         $price = $rate * $km;
                     }
 
-                    $result[] = array('type_name' => $type_name, 'fare_price' => $price, 'rate' => $rate);
+                    $result[] = array('type_id' => $rate->type_id, 'type_name' => $type_name, 'fare_price' => $price, 'rate' => $rate);
                 }
 
                 $response = [
@@ -744,7 +744,7 @@ class ApiController extends ResourceController
                 $success = 0;
             } elseif ($booking_type == 'lift') {
                 $success = 0;
-                $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( lat ) ) ) ) AS distance FROM lift_driver_status WHERE status =1 HAVING distance < $radius ORDER BY distance")->getResult();
+                $checkAvailbility = $this->db->query("SELECT *, ( 6371 * acos( cos( radians($origin_lat) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians($origin_lng) ) + sin( radians($origin_lat) ) * sin( radians( lat ) ) ) ) AS distance FROM lift_driver_status WHERE status =1 AND vehicle_type = $vehicle_type HAVING distance < $radius ORDER BY distance")->getResult();
                 if (empty($checkAvailbility) || count($checkAvailbility) == 0) {
                     $response = [
                         'status'   => 200,
@@ -2214,15 +2214,8 @@ class ApiController extends ResourceController
         } else {
             $driver_id = $this->request->getVar('driver_id');
             $driverDetails = $this->AdminModel->getSingleData('user', $driver_id);
-            if (!$driverDetails) {
-                $response = [
-                    'status'   => 200,
-                    'error'    => 1,
-                    'response' => [
-                        'message' => 'Not a valid driver!'
-                    ]
-                ];
-            } else {
+            $vehcileDetails = $this->AdminModel->getSingleData('vehicle_details', $driver_id, 'driver_id');
+            if (isset($vehcileDetails->booking_type) && $vehcileDetails->booking_type == 2) {
 
                 $checkStatus = $this->AdminModel->getSingleData('lift_driver_status', $driver_id, 'driver_id');
 
@@ -2231,6 +2224,7 @@ class ApiController extends ResourceController
                     'lat'  => $this->request->getVar('lat'),
                     'lng'  => $this->request->getVar('lng'),
                     'status'  => $this->request->getVar('status'),
+                    'vehicle_type' => $vehcileDetails->lift_vehicle_type,
                     'updated_at'  => date('Y-m-d H:i:s')
                 ];
                 if (!empty($checkStatus) && isset($checkStatus->id)) {
@@ -2246,6 +2240,14 @@ class ApiController extends ResourceController
                     'response' => [
                         'success' => 'Status updated successfully!'
                     ],
+                ];
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Not a valid driver!'
+                    ]
                 ];
             }
         }

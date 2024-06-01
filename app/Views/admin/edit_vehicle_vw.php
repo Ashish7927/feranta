@@ -29,29 +29,52 @@
                                         <select name="vendor_id" id="vendor_id" class="form-control" required>
                                             <option value="">-- Select Owner --</option>
                                             <?php foreach ($AllVendor as $vendor) { ?>
-                                                <option value="<?= $vendor->id; ?>" <?php if($vendor->id == $vehicle->vendor_id){ echo 'selected'; }?> ><?= $vendor->full_name ?></option>
+                                                <option value="<?= $vendor->id; ?>" <?php if ($vendor->id == $vehicle->vendor_id) {
+                                                                                        echo 'selected';
+                                                                                    } ?>><?= $vendor->full_name ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label>Select Vehicle Type</label>
-                                        <select name="vehicle_type" id="vehicle_type" class="form-control" required>
-                                            <option value="">-- Select Vehicle Type --</option>
-                                            <?php foreach ($vehicleType as $type) { ?>
-                                                <option value="<?= $type->id; ?>" <?php if($type->id == $vehicle->type_id){ echo 'selected'; }?> ><?= $type->type_name ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                </div>
+
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Select Booking Type</label>
-                                        <select name="booking_type" id="booking_type" class="form-control" required>
+                                        <select name="booking_type" id="booking_type" class="form-control" onclick="checkBookingType(this.value);" required>
                                             <option value="">-- Select Booking Type --</option>
-                                                <option value="1" <?php if(1 == $vehicle->booking_type){ echo 'selected'; }?> >Cab Booking</option>
-                                                <option value="2" <?php if(2 == $vehicle->booking_type){ echo 'selected'; }?> >Lift Booking</option>
+                                            <option value="1" <?php if (1 == $vehicle->booking_type) {
+                                                                    echo 'selected';
+                                                                } ?>>Cab Booking</option>
+                                            <option value="2" <?php if (2 == $vehicle->booking_type) {
+                                                                    echo 'selected';
+                                                                } ?>>Lift Booking</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 vehicle_type">
+                                    <div class="form-group">
+                                        <label>Select Vehicle Type</label>
+                                        <select name="vehicle_type" id="vehicle_type" class="form-control">
+                                            <option value="">-- Select Vehicle Type --</option>
+                                            <?php foreach ($vehicleType as $type) { ?>
+                                                <option value="<?= $type->id; ?>" <?php if ($type->id == $vehicle->type_id) {
+                                                                                        echo 'selected';
+                                                                                    } ?>><?= $type->type_name ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 lift_vehicle_type" style="display:none;">
+                                    <div class="form-group">
+                                        <label>Select Vehicle Type</label>
+                                        <select name="lift_vehicle_type" id="lift_vehicle_type" class="form-control">
+                                            <option value="">-- Select Vehicle Type --</option>
+                                            <option value="1" <?php if (1 == $vehicle->lift_vehicle_type) {
+                                                                    echo 'selected';
+                                                                } ?>>Car</option>
+                                            <option value="2" <?php if (2 == $vehicle->lift_vehicle_type) {
+                                                                    echo 'selected';
+                                                                } ?>>Bike</option>
                                         </select>
                                     </div>
                                 </div>
@@ -125,7 +148,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Insurance Date To</label>
-                                        <input type="date" name="insurance_date_to" class="form-control" required value="<?= $vehicle->insurance_date_to ?>" >
+                                        <input type="date" name="insurance_date_to" class="form-control" required value="<?= $vehicle->insurance_date_to ?>">
                                     </div>
                                 </div>
 
@@ -139,7 +162,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Fitness expr. Date</label>
-                                        <input type="date" class="form-control" id="fit_expr" name="fit_expr" value="<?= $vehicle->fit_expr ?>" >
+                                        <input type="date" class="form-control" id="fit_expr" name="fit_expr" value="<?= $vehicle->fit_expr ?>">
                                     </div>
                                 </div>
 
@@ -153,7 +176,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Pollution expiary date</label>
-                                        <input type="date" class="form-control" id="polution_exp_date" name="polution_exp_date" value="<?= $vehicle->polution_exp_date ?>" >
+                                        <input type="date" class="form-control" id="polution_exp_date" name="polution_exp_date" value="<?= $vehicle->polution_exp_date ?>">
                                     </div>
                                 </div>
 
@@ -167,7 +190,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Permit Expiry Document </label>
-                                        <input type="date" class="form-control" id="permit_expr_date" name="permit_expr_date" value="<?= $vehicle->permit_expr_date ?>" >
+                                        <input type="date" class="form-control" id="permit_expr_date" name="permit_expr_date" value="<?= $vehicle->permit_expr_date ?>">
                                     </div>
                                 </div>
 
@@ -195,5 +218,27 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function checkBookingType(val) {
+            if (val == 2 || val == "2") {
+                $('#vehicle_type').prop('required', false);
+                $(".vehicle_type").css("display", "none");
+                $('#lift_vehicle_type').prop('required', true);
+                $(".lift_vehicle_type").css("display", "block");
+            } else {
+                $('#lift_vehicle_type').prop('required', false);
+                $(".lift_vehicle_type").css("display", "none");
+                $('#vehicle_type').prop('required', true);
+                $(".vehicle_type").css("display", "block");
+            }
+        }
+
+        $(document).ready(function() {
+            checkBookingType(<?= $vehicle->booking_type; ?>);
+        });
+
+        
+    </script>
 
     <?php include('footer.php') ?>
