@@ -75,6 +75,13 @@ $routes->post('/franchises/add', 'Franchises::add');
 $routes->post('/franchises/edit/(:num)', 'Franchises::edit/$1');
 $routes->post('/franchises/status', 'Franchises::status');
 $routes->post('/franchises/delete', 'Franchises::delete');
+$routes->get('/member-tracking', 'Franchises::memberTracking');
+
+$routes->get('/delete-request', 'DeleteRequest::index');
+$routes->post('/delete-request/add', 'DeleteRequest::add');
+$routes->post('/delete-request/edit/(:num)', 'DeleteRequest::edit/$1');
+$routes->post('/delete-request/delete', 'DeleteRequest::delete');
+
 
 // API Routes 
 $routes->get('api/get-all-master', 'ApiController::getMasterData');
@@ -118,7 +125,7 @@ $routes->post('api/add-customer', 'ApiController::addCustomer');
 $routes->post('api/add-customer', 'ApiController::addCustomer');
 $routes->post('api/get-list', 'ApiController::getList');
 $routes->post('api/add-customer', 'ApiController::addCustomer');
-
+$routes->post('api/add-owner', 'ApiController::addOwner');
 $routes->post('api/driver-on-off', 'ApiController::changeDriverStatus');
 $routes->post('api/start-lift-booking', 'ApiController::startLiftBooking');
 $routes->post('api/end-lift-booking', 'ApiController::endLiftBooking');
@@ -132,4 +139,4 @@ $routes->post('api/add-vehicle', 'ApiController::addVehicle');
 $routes->post('api/edit-vehicle', 'ApiController::editVehicle');
 $routes->post('api/send-otp-to-assign-driver', 'ApiController::sendOtpToAssignDriver');
 $routes->post('api/verify-otp-for-driver-assign', 'ApiController::verifyDriverAssignOtp');
-
+$routes->post('api/member-checkin-checkout', 'ApiController::employeeCheckInCheckOut');

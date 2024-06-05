@@ -116,7 +116,8 @@ class Vehicle extends BaseController
                 'permit_expr_date' => $this->request->getPost('permit_expr_date'),
                 'permit_doc' => $permit_doc,
                 'booking_type' => $this->request->getPost('booking_type'),
-                'status' => 0
+                'status' => 0,
+                'lift_vehicle_type'=>$this->request->getPost('lift_vehicle_type')
             ];
 
 
@@ -177,7 +178,8 @@ class Vehicle extends BaseController
                     'fit_expr' => $this->request->getPost('fit_expr'),
                     'polution_exp_date' => $this->request->getPost('polution_exp_date'),
                     'permit_expr_date' => $this->request->getPost('permit_expr_date'),
-                    'booking_type' => $this->request->getPost('booking_type')
+                    'booking_type' => $this->request->getPost('booking_type'),
+                    'lift_vehicle_type'=>$this->request->getPost('lift_vehicle_type')
                 ];
 
                 $file = $this->request->getFile('insurance_img');

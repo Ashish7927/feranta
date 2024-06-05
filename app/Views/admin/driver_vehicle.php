@@ -54,7 +54,7 @@
                                 <?php } elseif($single->status == 2){ ?>
                                     <a href="#" class="btn btn-default"> Declied </a>
                                     <?php }else{  ?>
-                                        <a href="#" class="btn btn-default"> Deactivated </a>
+                                        <a href="#" class="btn btn-default"> Closed </a>
                                     <?php } ?>
                                 </td>
                             </tr>

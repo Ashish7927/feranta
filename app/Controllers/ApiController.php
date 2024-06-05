@@ -388,18 +388,18 @@ class ApiController extends ResourceController
                 $state_id = 1;
                 $serviceRateStatewise = $this->AdminModel->getRateStatewise($state_id);
                 $result = array();
-                foreach ($serviceRateStatewise as $rate) {
-                    $type_name = $rate->type_name;
+                foreach ($serviceRateStatewise as $ratee) {
+                    $type_name = $ratee->type_name;
 
                     if ($type == 1) {
-                        $rate = $rate->full_fare;
+                        $rate = $ratee->full_fare;
                         $price = $rate * $km;
                     } else {
-                        $rate = $rate->fare_per_share;
+                        $rate = $ratee->fare_per_share;
                         $price = $rate * $km;
                     }
 
-                    $result[] = array('type_id' => $rate->type_id, 'type_name' => $type_name, 'fare_price' => $price, 'rate' => $rate);
+                    $result[] = array('type_id' => $ratee->type_id, 'type_name' => $type_name, 'fare_price' => $price, 'rate' => $rate);
                 }
 
                 $response = [
@@ -2163,7 +2163,7 @@ class ApiController extends ResourceController
                 'adhar_font'  => $imagename1,
                 'adhar_back'  => $imagename2,
 
-                'user_type'  => 4,
+                'user_type'  => 3,
                 'license_no'  => $this->request->getVar('license_no'),
                 'license_img'  => $license_img1,
                 'status' => 1,
@@ -2889,6 +2889,56 @@ class ApiController extends ResourceController
                 'response' => [
                     'success' => 'Vehicle list',
                     'vehicleList' => $vehicleList
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    function employeeCheckInCheckOut()
+    {
+        $rules = [
+            'member_id' => 'required',
+            'image' => 'required',
+            'type' => 'required',
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $member_id = $this->request->getVar('member_id');
+            $type = $this->request->getVar('type');
+            $imgfile = $this->request->getVar('image');
+
+            $file = $this->request->getFile('image');
+            if ($file->isValid() && !$file->hasMoved()) {
+                $imgfile = $file->getRandomName();
+                $file->move('uploads/', $imgfile);
+            } else {
+                $imgfile = "";
+            }
+
+            $data=[
+                'member_id'=>$member_id ,
+                'type'=>$type,
+                'image'=>$imgfile,
+                'date'=> date('Y-m-d'),
+                'time'=> date('H:i')
+            ];
+
+            $this->AdminModel->InsertRecord('members_checkin', $data);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Data added successfully!'
                 ],
             ];
         }

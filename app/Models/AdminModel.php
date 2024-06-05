@@ -440,7 +440,7 @@ class AdminModel extends Model
 	{
 		$builder = $this->db->table('vehicle_details');
 		$builder->select('vehicle_details.*,vehicle_types.type_name,user.full_name');
-		$builder->join('vehicle_types', 'vehicle_types.id = vehicle_details.type_id');
+		$builder->join('vehicle_types', 'vehicle_types.id = vehicle_details.type_id','left');
 		$builder->join('user', 'user.id = vehicle_details.vendor_id');
 		return $builder->get()->getResult();
 	}
@@ -712,7 +712,7 @@ class AdminModel extends Model
 	{
 		$builder = $this->db->table('service_bookings');
 		$builder->select('service_bookings.*,type.type_name,vehicle.regd_no,vehicle.model_name,user.full_name,user.contact_no');
-		$builder->join('vehicle_types type', 'type.id = service_bookings.vehicle_type');
+		$builder->join('vehicle_types type', 'type.id = service_bookings.vehicle_type', 'left');
 		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id', 'left');
 		$builder->join('user user', 'user.id = service_bookings.driver_id', 'left');
 		$builder->where('service_bookings.id',$booking_id);

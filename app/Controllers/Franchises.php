@@ -110,4 +110,17 @@ class Franchises extends BaseController
             return redirect()->to('Admin/');
         }
     }
+
+    function memberTracking()
+    {
+        if ($this->session->get('user_id')) {
+
+            $data['member_track'] = $this->AdminModel->GetAllRecord('members_checkin');
+
+            return view('admin/member_track_vw', $data);
+
+        }else {
+            return redirect()->to('Admin/');
+        }
+    }
 }

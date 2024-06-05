@@ -22,6 +22,7 @@
                         <tr>
                             <th class="text-center">Sl No.</th>
                             <th>Vehicle Model</th>
+                            <th>Vehicle Booking Type</th>
                             <th>Vehicle Type</th>
                             <th>Redg. <Noframes></Noframes>
                             </th>
@@ -39,7 +40,16 @@
                             <tr>
                                 <td class="text-center"><?= $i++; ?></td>
                                 <td><?= $state->model_name; ?></td>
-                                <td><?= $state->type_name; ?></td>
+                                <td><?php if($state->booking_type == 1){
+                                    echo 'Cab Booking';
+                                }else{
+                                    echo 'Lift Booking';
+                                }  ?></td>
+                                <td><?php if($state->booking_type == 2){
+                                    echo $state->lift_vehicle_type == 1 ? 'Car' : 'Bike';
+                                }else{
+                                    echo $state->type_name;
+                                }  ?></td>
                                 <td><?= $state->regd_no; ?></td>
                                 <td><?= $state->full_name; ?></td>
                                 <td><a href="#driver-modal" uk-toggle class="btn btn-success" onclick="GetDriverDetails(<?= $state->id; ?>,'<?= $state->driver_id; ?>');">Details</a></td>
