@@ -57,8 +57,8 @@ class AdminModel extends Model
 	{
 		$builder = $this->db->table('user');
 		$builder->select('user.*, state.state_name, city.city_name');
-		$builder->join('state', 'state.state_id = user.state_id');
-		$builder->join('city', 'city.city_id = user.city_id');
+		$builder->join('state', 'state.state_id = user.state_id','left');
+		$builder->join('city', 'city.city_id = user.city_id','left');
 		$builder->where('user.id', $vendor_id);
 		return $builder->get()->getResult();
 	}
@@ -531,7 +531,6 @@ class AdminModel extends Model
 		$builder->select('*');
 		$builder->where('user_type', 3);
 		$builder->orWhere('user_type', 4);
-		$builder->orWhere('user_type', 2);
 		return $builder->get()->getResult();
 	}
 
@@ -738,6 +737,7 @@ class AdminModel extends Model
 		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id', 'left');
 		$builder->join('user user', 'user.id = service_bookings.driver_id', 'left');
 		$builder->where('service_bookings.user_id',$customer_id);
+		$builder->orderBy('service_bookings.id','DESC');
 		return $builder->get()->getResult();
 	}
 
@@ -812,6 +812,28 @@ class AdminModel extends Model
 		$builder = $this->db->table('user');
 		$builder->select('*');
 		$builder->where('user_type', 4);
+		return $builder->get()->getResult();
+	}
+
+	function getAllCustomerLiftBookingData($customer_id)
+	{
+		$builder = $this->db->table('service_bookings');
+		$builder->select('service_bookings.*,type.type_name,vehicle.regd_no,vehicle.model_name,user.full_name,user.contact_no');
+		$builder->join('vehicle_types type', 'type.id = service_bookings.vehicle_type','left');
+		$builder->Join('vehicle_details vehicle', 'vehicle.id = service_bookings.vehicle_id', 'left');
+		$builder->join('user user', 'user.id = service_bookings.driver_id', 'left');
+		$builder->where('service_bookings.booking_type','lift');
+		$builder->where('service_bookings.user_id',$customer_id);
+		$builder->orderBy('service_bookings.id','DESC');
+		return $builder->get()->getResult();
+	}
+
+	function GetAllMember()
+	{
+		$builder = $this->db->table('user');
+		$builder->select('user.*,franchises.franchise_name');
+		$builder->join('franchises', 'franchises.id = user.franchise_id', 'left');
+		$builder->Where('user_type', 2);
 		return $builder->get()->getResult();
 	}
 	

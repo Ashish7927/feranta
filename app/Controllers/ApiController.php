@@ -998,7 +998,7 @@ class ApiController extends ResourceController
         } else {
             $request_id  = $this->request->getPost('request_id');
             $requestDetails = $this->AdminModel->getSingleData('service_request', $request_id);
-            if ($requestDetails->status != 2) {
+            if ($requestDetails->status == 2) {
 
                 $response = [
                     'status'   => 200,
@@ -1068,6 +1068,13 @@ class ApiController extends ResourceController
                     'status' => 3
                 ];
                 $this->AdminModel->UpdateRecordById('service_details', $service_id, $data);
+                if ($serviceDetails->status == 1) {
+                    $bookingDetails = $this->AdminModel->getSingleData('service_bookings', $service_id, 'service_id');
+                    if ($bookingDetails) {
+                        $this->sendPushNotification($bookingDetails->user_id, 'Booking Complete', 'Your booking from ' . $bookingDetails->from_location . 'to ' . $bookingDetails->to_location . ' has been completed');
+                    }
+                }
+
                 $response = [
                     'status'   => 200,
                     'error'    => null,
@@ -1198,6 +1205,11 @@ class ApiController extends ResourceController
                         'otp_verify_status' => 1
                     ];
                     $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $dataU);
+
+                    $bookingDetails = $this->AdminModel->getSingleData('service_bookings', $booking_id);
+                    if ($bookingDetails) {
+                        $this->sendPushNotification($bookingDetails->user_id, 'Booking Start', 'Your booking from ' . $bookingDetails->from_location . 'to ' . $bookingDetails->to_location . ' has been Start!');
+                    }
 
                     $response = [
                         'status'   => 201,
@@ -1466,6 +1478,15 @@ class ApiController extends ResourceController
                 $license_img1 = "";
             }
 
+            $cheque = $this->request->getFile('cheque');
+
+            if ($cheque->isValid() && !$cheque->hasMoved()) {
+                $cheque_name = $cheque->getRandomName();
+                $cheque->move('uploads/', $cheque_name);
+            } else {
+                $cheque_name = "";
+            }
+
             $data = [
                 'full_name' => $this->request->getVar('full_name'),
                 'email'  => $this->request->getVar('email'),
@@ -1484,7 +1505,12 @@ class ApiController extends ResourceController
 
                 'adhar_font'  => $imagename1,
                 'adhar_back'  => $imagename2,
-
+                'block'  => $this->request->getVar('block'),
+                'ditrict'  => $this->request->getVar('ditrict'),
+                'father_name'  => $this->request->getVar('father_name'),
+                'blood_group'  => $this->request->getVar('blood_group'),
+                'cheque'  => $cheque_name,
+                'branch_name'  => $this->request->getVar('branch_name'),
                 'user_type'  => 4,
                 'license_no'  => $this->request->getVar('license_no'),
                 'license_img'  => $license_img1,
@@ -2144,6 +2170,15 @@ class ApiController extends ResourceController
                 $license_img1 = "";
             }
 
+            $cheque = $this->request->getFile('cheque');
+
+            if ($cheque->isValid() && !$cheque->hasMoved()) {
+                $cheque_name = $cheque->getRandomName();
+                $cheque->move('uploads/', $cheque_name);
+            } else {
+                $cheque_name = "";
+            }
+
             $data = [
                 'full_name' => $this->request->getVar('full_name'),
                 'email'  => $this->request->getVar('email'),
@@ -2156,7 +2191,12 @@ class ApiController extends ResourceController
                 'address1'  => $this->request->getVar('address1'),
                 'address2'  => $this->request->getVar('address2'),
                 'adhar_no'  => $this->request->getVar('adharno'),
-
+                'block'  => $this->request->getVar('block'),
+                'ditrict'  => $this->request->getVar('ditrict'),
+                'father_name'  => $this->request->getVar('father_name'),
+                'blood_group'  => $this->request->getVar('blood_group'),
+                'cheque'  => $cheque_name,
+                'branch_name'  => $this->request->getVar('branch_name'),
                 'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
                 'profile_image'  => $imagename,
 
@@ -2335,6 +2375,7 @@ class ApiController extends ResourceController
                     'status' => 3
                 ];
                 $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $data);
+                $this->sendPushNotification($bookingDetails->user_id, 'Booking Complete', 'Your booking from ' . $bookingDetails->from_location . 'to ' . $bookingDetails->to_location . ' has been completed');
                 $response = [
                     'status'   => 200,
                     'error'    => null,
@@ -2378,6 +2419,8 @@ class ApiController extends ResourceController
                 'updated_by' => $user_id
             ];
             $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $data);
+
+            $this->db->query("UPDATE lift_request SET status = 2 WHERE booking_id = $booking_id ");
 
             $response = [
                 'status'   => 200,
@@ -2925,12 +2968,12 @@ class ApiController extends ResourceController
                 $imgfile = "";
             }
 
-            $data=[
-                'member_id'=>$member_id ,
-                'type'=>$type,
-                'image'=>$imgfile,
-                'date'=> date('Y-m-d'),
-                'time'=> date('H:i')
+            $data = [
+                'member_id' => $member_id,
+                'type' => $type,
+                'image' => $imgfile,
+                'date' => date('Y-m-d'),
+                'time' => date('H:i')
             ];
 
             $this->AdminModel->InsertRecord('members_checkin', $data);
@@ -2939,6 +2982,37 @@ class ApiController extends ResourceController
                 'error'    => null,
                 'response' => [
                     'success' => 'Data added successfully!'
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function liftBookingHistoryCustomer()
+    {
+        $rules = [
+            'customer_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+
+            $customer_id = $this->request->getVar('customer_id');
+            $allService = $this->AdminModel->getAllCustomerLiftBookingData($customer_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Lift Booking List',
+                    'userDetails' => $allService
                 ],
             ];
         }

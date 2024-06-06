@@ -18,23 +18,23 @@
 
                         <div class="form-group">
                             <label>Name</label>
-                            <input type="text" class="form-control" name="franchise_name" placeholder="Enter full name" value="<?= set_value('franchise_name'); ?>">
+                            <input type="text" class="form-control" name="franchise_name" placeholder="Enter full name" value="<?= set_value('franchise_name'); ?>" require>
                         </div>
 
                         <div class="form-group">
                             <label>Email address</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= set_value('email'); ?>">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= set_value('email'); ?>" require>
                         </div>
 
                         <div class="form-group">
                             <label>Contact No</label>
-                            <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= set_value('contact'); ?>">
+                            <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= set_value('contact'); ?>" require>
                         </div>
 
 
                         <div class="form-group">
                             <label>Select State</label>
-                            <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id">
+                            <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id" require>
                                 <option value="">Select State</option>
                                 <?php foreach ($allstate as $state) { ?>
                                     <option value="<?= $state->state_id ?>"><?= $state->state_name ?></option>
@@ -44,7 +44,7 @@
 
                         <div class="form-group">
                             <label>Select City</label>
-                            <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)">
+                            <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)" require>
                                 <option value="">Select City</option>
                                 <?php foreach ($allcity as $city) { ?>
                                     <option value="<?= $city->city_id ?>"><?= $city->city_name ?></option>
@@ -134,23 +134,23 @@
                                 <div class="modal-body uk-text-left">
                                     <div class="form-group">
                                         <label>Name</label>
-                                        <input type="text" class="form-control" name="franchise_name" placeholder="Enter full name" value="<?= $franchise->franchise_name; ?>">
+                                        <input type="text" class="form-control" name="franchise_name" placeholder="Enter full name" value="<?= $franchise->franchise_name; ?>" require>
                                     </div>
 
                                     <div class="form-group">
                                         <label>Email address</label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= $franchise->email;  ?>">
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= $franchise->email;  ?>" require>
                                     </div>
 
                                     <div class="form-group">
                                         <label>Contact No</label>
-                                        <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= $franchise->contact;  ?>">
+                                        <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= $franchise->contact;  ?>" require>
                                     </div>
 
 
                                     <div class="form-group">
                                         <label>Select State</label>
-                                        <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id">
+                                        <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id" require>
                                             <option value="">Select State</option>
                                             <?php foreach ($allstate as $state) { ?>
                                                 <option value="<?= $state->state_id ?>" <?php if( $franchise->state == $state->state_id){ echo 'selected';}?>><?= $state->state_name ?></option>

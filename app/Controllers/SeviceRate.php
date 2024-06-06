@@ -44,6 +44,10 @@ class SeviceRate extends BaseController
             $fare_per_share = $this->request->getPost('fare_per_share');
             $remark = $this->request->getPost('remark');
 
+            $CheckCount = $this->db->query("SELECT * FROM service_rate  where state_id=$state_id and type_id =$type_id")->getResult();
+            if(!empty($CheckCount) && count($CheckCount) > 0){
+                return redirect()->to('service-rate')->with('message', 'Service price already set for this combination!');
+            }
             $data = [
                 'state_id' => $state_id,
                 'type_id' => $type_id,
@@ -73,7 +77,10 @@ class SeviceRate extends BaseController
             $full_fare = $this->request->getPost('full_fare');
             $fare_per_share = $this->request->getPost('fare_per_share');
             $remark = $this->request->getPost('remark');
-
+            $CheckCount = $this->db->query("SELECT * FROM service_rate  where state_id=$state_id and type_id =$type_id and id != $id")->getResult();
+            if(!empty($CheckCount) && count($CheckCount) > 0){
+                return redirect()->to('service-rate')->with('message', 'Service price already set for this combination!');
+            }
             $data = [
                 'state_id' => $state_id,
                 'type_id' => $type_id,

@@ -116,7 +116,7 @@ class Franchises extends BaseController
         if ($this->session->get('user_id')) {
 
             $data['member_track'] = $this->AdminModel->GetAllRecord('members_checkin');
-
+            $data['allvendor'] = $this->AdminModel->GetAllMember();
             return view('admin/member_track_vw', $data);
 
         }else {

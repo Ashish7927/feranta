@@ -8,6 +8,9 @@
             <div class="uk-card  uk-card-default uk-card-small">
                 <div class="modal-header">
                     <h4 class="modal-title">Add new Service Rate</h4>
+                    <?php if (session('message') !== null) : ?>
+                        <p><?= session('message'); ?></p>
+                    <?php endif; ?>
                 </div>
 
 
@@ -134,7 +137,9 @@
                                         <select name="state_id" id="state_id" class="form-control" required>
                                             <option value="">-- Select State --</option>
                                             <?php foreach ($Allstate as $state) { ?>
-                                                <option value="<?= $state->state_id; ?>" <?php if($serviceRate->state_id == $state->state_id){ echo 'selected';}?> ><?= $state->state_name ?></option>
+                                                <option value="<?= $state->state_id; ?>" <?php if ($serviceRate->state_id == $state->state_id) {
+                                                                                                echo 'selected';
+                                                                                            } ?>><?= $state->state_name ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>
@@ -144,7 +149,9 @@
                                         <select name="type_id" id="type_id" class="form-control" required>
                                             <option value="">-- Select Vehicle Type --</option>
                                             <?php foreach ($vehicleTypes as $types) { ?>
-                                                <option value="<?= $types->id; ?>" <?php if($serviceRate->type_id == $types->id){ echo 'selected';}?> ><?= $types->type_name ?></option>
+                                                <option value="<?= $types->id; ?>" <?php if ($serviceRate->type_id == $types->id) {
+                                                                                        echo 'selected';
+                                                                                    } ?>><?= $types->type_name ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>

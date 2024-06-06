@@ -92,6 +92,14 @@ class Vehicle extends BaseController
                 $permit_doc = "";
             }
 
+            $rc_copy = $this->request->getFile('rc_copy');
+            if ($rc_copy->isValid() && !$rc_copy->hasMoved()) {
+                $rc_copy_doc = $rc_copy->getRandomName();
+                $rc_copy->move('uploads/', $rc_copy_doc);
+            } else {
+                $rc_copy_doc = "";
+            }
+
 
             $data = [
                 'type_id' => $vehicle_type,
@@ -115,6 +123,8 @@ class Vehicle extends BaseController
                 'pollurion_doc' => $pollurion_doc1,
                 'permit_expr_date' => $this->request->getPost('permit_expr_date'),
                 'permit_doc' => $permit_doc,
+                'rc_no' => $this->request->getPost('rc_no'),
+                'rc_copy' => $rc_copy_doc,
                 'booking_type' => $this->request->getPost('booking_type'),
                 'status' => 0,
                 'lift_vehicle_type'=>$this->request->getPost('lift_vehicle_type')
@@ -179,7 +189,8 @@ class Vehicle extends BaseController
                     'polution_exp_date' => $this->request->getPost('polution_exp_date'),
                     'permit_expr_date' => $this->request->getPost('permit_expr_date'),
                     'booking_type' => $this->request->getPost('booking_type'),
-                    'lift_vehicle_type'=>$this->request->getPost('lift_vehicle_type')
+                    'lift_vehicle_type'=>$this->request->getPost('lift_vehicle_type'),
+                    'rc_no' => $this->request->getPost('rc_no')
                 ];
 
                 $file = $this->request->getFile('insurance_img');
@@ -209,6 +220,13 @@ class Vehicle extends BaseController
                     $file3->move('uploads/', $permit_doc);
                     $data['permit_doc'] = $permit_doc;
                 } 
+
+                $rc_copy = $this->request->getFile('rc_copy');
+                if ($rc_copy->isValid() && !$rc_copy->hasMoved()) {
+                    $rc_copy_doc = $rc_copy->getRandomName();
+                    $rc_copy->move('uploads/', $rc_copy_doc);
+                    $data['rc_copy'] = $rc_copy_doc;
+                }
 
                 $this->AdminModel->UpdateRecordById('vehicle_details', $id, $data);
             } else {

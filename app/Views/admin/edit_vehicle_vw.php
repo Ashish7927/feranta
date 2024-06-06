@@ -3,6 +3,8 @@
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>
 <div id="loader" class="uk-overlay-primary uk-position-cover" style="display:none; z-index:1000000000;">
     <div class="uk-position-center">
         <span uk-spinner="ratio: 2"></span>
@@ -26,7 +28,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Select Vehicle Owner</label>
-                                        <select name="vendor_id" id="vendor_id" class="form-control" required>
+                                        <select name="vendor_id" id="vendor_id" class="form-control select2" required>
                                             <option value="">-- Select Owner --</option>
                                             <?php foreach ($AllVendor as $vendor) { ?>
                                                 <option value="<?= $vendor->id; ?>" <?php if ($vendor->id == $vehicle->vendor_id) {
@@ -201,6 +203,20 @@
                                     </div>
                                 </div>
 
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>RC Number </label>
+                                        <input type="date" class="form-control" id="rc_no" name="rc_no" value="<?= $vehicle->rc_no ?>">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Upload RC </label>
+                                        <input type="file" class="form-control " id="rc_copy" name="rc_copy">
+                                    </div>
+                                </div>
+
 
                             </div>
 
@@ -237,8 +253,9 @@
         $(document).ready(function() {
             checkBookingType(<?= $vehicle->booking_type; ?>);
         });
-
-        
+        $(document).ready(function() {
+        $(".select2").select2({});
+        });
     </script>
 
     <?php include('footer.php') ?>

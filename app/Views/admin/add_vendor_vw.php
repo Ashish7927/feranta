@@ -1,6 +1,11 @@
 <?php include('header.php') ?>
 <?php include("mainsidebar.php") ?>
 
+<style>
+    .highlight-error {
+  border-color: red;
+}
+</style>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 <div id="loader" class="uk-overlay-primary uk-position-cover" style="display:none; z-index:1000000000;">
@@ -81,7 +86,7 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Address1</label>
+                                        <label>Address</label>
                                         <input type="text" name="address1" class="form-control" value="">
 
                                     </div>
@@ -89,60 +94,70 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Address2</label>
+                                        <label>village</label>
                                         <input type="text" name="address2" class="form-control" value="">
                                     </div>
                                 </div>
 
-                                <div class="col-sm-12">
+                                <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>PIN</label>
-                                        <select class="form-control" name="pincode" id="pincode">
-                                            <option value="">Select Pin</option>
-                                            <?php foreach ($pincode as $pin) { ?>
-                                                <option value="<?= $pin->pin_id ?>"><?= $pin->pincode ?></option>
-                                            <?php } ?>
-                                        </select>
-                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('pincode'); ?></span><?php } ?>
+                                        <label>Block</label>
+                                        <input type="text" name="block" class="form-control" value="">
                                     </div>
                                 </div>
 
-                                <div class="col-sm-12">
+                                <div class="col-sm-6">
                                     <div class="form-group">
-                                        <div class="form-group">
-                                            <label>Details</label>
-                                            <div>
-                                                <textarea id="editor1" name="details" class="form-control" placeholder="Description">
-
-                                                </textarea>
-                                            </div>
-                                        </div>
+                                        <label>Ditrict</label>
+                                        <input type="text" name="ditrict" class="form-control" value="">
                                     </div>
                                 </div>
 
-                                 <div class="col-sm-6">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Father's Name</label>
+                                        <input type="text" name="father_name" class="form-control" value="">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Blood group</label>
+                                        <input type="text" name="blood_group" class="form-control" value="">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Upload cancel cheque</label>
+                                        <input type="file" name="cheque" class="form-control">
+                                    </div>
+                                </div>
+
+
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Adharno</label>
-                                        <input type="text" class="form-control" id="adharno" name="adharno" placeholder="Enter Adharno" value="<?= set_value('adharno'); ?>">
+                                        <input type="text" data-type="adhaar-number" maxLength="14" class="form-control" id="adharno" name="adharno" placeholder="Enter Adharno" value="<?= set_value('adharno'); ?>">
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('adharno'); ?></span><?php } ?>
                                     </div>
                                 </div>
-                                 <div class="col-sm-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Adhar Front Image</label>
                                         <input type="file" name="frontimg" class="form-control">
                                     </div>
                                 </div>
-                                 <div class="col-sm-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Adhar Back Image</label>
                                         <input type="file" name="backimg" class="form-control">
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Upload Image</label>
+                                        <label>Upload Profile Image</label>
                                         <input type="file" name="img" class="form-control">
                                     </div>
                                 </div>
@@ -165,6 +180,14 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
+                                        <label>Branch Name</label>
+                                        <input type="text" class="form-control" id="branch_name" name="branch_name" placeholder="Enter Branch name" value="<?= set_value('branch_name'); ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('branch_name'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
                                         <label>Account Number</label>
                                         <input type="text" class="form-control" id="acc_no" name="acc_no" placeholder="Enter Account Number" value="<?= set_value('acc_no'); ?>">
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('acc_no'); ?></span><?php } ?>
@@ -181,7 +204,7 @@
 
 
 
-                               
+
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Username</label>
@@ -214,10 +237,10 @@
                                 <div class="col-sm-6" id="franchises" style="display: none;">
                                     <div class="form-group ">
                                         <label>Select Franchise</label>
-                                        <select class="form-control" name="franchise_id"  id="franchise_id">
+                                        <select class="form-control" name="franchise_id" id="franchise_id">
                                             <option value="">Select option</option>
-                                            <?php foreach($franchises as $franchise){?>
-                                            <option value="<?= $franchise->id; ?>"><?= $franchise->franchise_name; ?></option>
+                                            <?php foreach ($franchises as $franchise) { ?>
+                                                <option value="<?= $franchise->id; ?>"><?= $franchise->franchise_name; ?></option>
 
                                             <?php } ?>
                                         </select>
@@ -239,23 +262,23 @@
 
                                 <div class="col-sm-6 driver_div" style="display: none;">
                                     <div class="form-group">
-                                    <label>License No.</label>
+                                        <label>License No.</label>
                                         <input type="text" class="form-control driver_input" id="license_no" name="license_no" placeholder="Enter your License N0." value="<?= set_value('license_no'); ?>">
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('license_no'); ?></span><?php } ?>
                                     </div>
                                 </div>
-                                
+
 
                                 <div class="col-sm-6 driver_div" style="display: none;">
                                     <div class="form-group">
-                                    <label>License Image</label>
-                                        <input type="file" class="form-control driver_input" id="license_img" name="license_img" >
+                                        <label>License Image</label>
+                                        <input type="file" class="form-control driver_input" id="license_img" name="license_img">
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6 driver_div" style="display: none;">
                                     <div class="form-group">
-                                    <label>Year of Experience</label>
+                                        <label>Year of Experience</label>
                                         <input type="number" class="form-control driver_input" id="exp_year" name="exp_year" placeholder="Enter Year of experience" value="<?= set_value('exp_year'); ?>">
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('exp_year'); ?></span><?php } ?>
                                     </div>
@@ -300,50 +323,49 @@
             return false; //stop the actual form post !important!
 
         }
-        function CheckRole(val)
-        {
+
+        function CheckRole(val) {
             $('#is_driver').val('');
             $("#franchises").css("display", "none");
-            $('#franchise_id').prop('required',false); 
-            if(val == 3){
-                $('.driver_input').prop('required',false);
+            $('#franchise_id').prop('required', false);
+            if (val == 3) {
+                $('.driver_input').prop('required', false);
                 $(".driver_div").css("display", "none");
                 $('.is_driver').css("display", "block");
-                $('#is_driver').prop('required',true); 
-            }else if(val == 4){
-                $('#is_driver').prop('required',false);
+                $('#is_driver').prop('required', true);
+            } else if (val == 4) {
+                $('#is_driver').prop('required', false);
                 $('.is_driver').css("display", "none");
                 $(".driver_div").css("display", "block");
-                $('.driver_input').prop('required',true);
-            }else if(val == 2){
-                $('.driver_input').prop('required',false);
+                $('.driver_input').prop('required', true);
+            } else if (val == 2) {
+                $('.driver_input').prop('required', false);
                 $(".driver_div").css("display", "none");
-                $('#is_driver').prop('required',false);
-                $('.is_driver').css("display", "none"); 
+                $('#is_driver').prop('required', false);
+                $('.is_driver').css("display", "none");
                 $("#franchises").css("display", "block");
-                $('#franchise_id').prop('required',true);
-            }else{
-                $('.driver_input').prop('required',false);
+                $('#franchise_id').prop('required', true);
+            } else {
+                $('.driver_input').prop('required', false);
                 $(".driver_div").css("display", "none");
-                $('#is_driver').prop('required',false);
-                $('.is_driver').css("display", "none"); 
+                $('#is_driver').prop('required', false);
+                $('.is_driver').css("display", "none");
             }
             return false;
         }
 
-        function IsDriver(val)
-        {
-            if(val == 1){
+        function IsDriver(val) {
+            if (val == 1) {
                 $(".driver_div").css("display", "block");
-                $('.driver_input').prop('required',true);
-            }else{
-                $('.driver_input').prop('required',false);
+                $('.driver_input').prop('required', true);
+            } else {
+                $('.driver_input').prop('required', false);
                 $(".driver_div").css("display", "none");
             }
             return false;
         }
     </script>
-     <script>
+    <script>
         function CheckcityId(arg) {
             //alert($('#cityDiv').val()); 
 
@@ -365,6 +387,23 @@
             return false; //stop the actual form post !important!
 
         }
+
+
+        $('[data-type="adhaar-number"]').keyup(function() {
+            var value = $(this).val();
+            value = value.replace(/\D/g, "").split(/(?:([\d]{4}))/g).filter(s => s.length > 0).join("-");
+            $(this).val(value);
+        });
+
+        $('[data-type="adhaar-number"]').on("change, blur", function() {
+            var value = $(this).val();
+            var maxLength = $(this).attr("maxLength");
+            if (value.length != maxLength) {
+                $(this).addClass("highlight-error");
+            } else {
+                $(this).removeClass("highlight-error");
+            }
+        });
     </script>
 
     <?php include('footer.php') ?>

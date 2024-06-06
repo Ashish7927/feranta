@@ -47,7 +47,7 @@
                   <li> <a href="<?php echo base_url(); ?>service-request"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Service Request</span></a></li>
 
                   <li> <a href="<?php echo base_url(); ?>franchises"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Franchises</span></a></li>
-                  <li> <a href="<?php echo base_url(); ?>member-tracking"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Member Login Details</span></a></li>
+                  <li> <a href="<?php echo base_url(); ?>member-tracking"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Franchise Member</span></a></li>
 
                   <li> <a href="<?php echo base_url(); ?>delete-request"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Delete Request</span></a></li>
 

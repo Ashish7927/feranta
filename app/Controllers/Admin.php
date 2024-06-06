@@ -22,7 +22,6 @@ class Admin extends BaseController
 		if ($this->session->get('user_id')) {
 
 			return redirect()->to('admin/dashboard');
-
 		} else {
 			return view('admin/login');
 		}
@@ -1149,12 +1148,12 @@ class Admin extends BaseController
 	{
 		$driver_id = $this->request->getPost('driver_id');
 		$vehicleId = $this->request->getPost('vehicleId');
-		if($vehicleId != ''){
+		if ($vehicleId != '') {
 			$driverStatus = $this->db->query("SELECT * FROM driver_vehicle_mapping  where vehicle_id = $vehicleId and driver_id = $driver_id  ORDER BY id DESC LIMIT 1")->getRow();
 		}
-		$userdata= $this->AdminModel->userdata($driver_id);
-		$data['userdata']=$userdata[0];
-		$data['status']= isset($driverStatus) && !empty($driverStatus) ? $driverStatus->status : '';
+		$userdata = $this->AdminModel->userdata($driver_id);
+		$data['userdata'] = $userdata[0];
+		$data['status'] = isset($driverStatus) && !empty($driverStatus) ? $driverStatus->status : '';
 		return json_encode($data);
 	}
 
@@ -1651,16 +1650,12 @@ class Admin extends BaseController
 			$rules = [
 				'name' => 'required|min_length[3]',
 				'email' => 'required|valid_email|is_unique[user.email]',
-				'altcontact' => 'numeric|max_length[10]',
 				'contact' => 'required|numeric|max_length[10]|is_unique[user.contact_no]',
 				'username' => 'required|max_length[10]|is_unique[user.user_name]',
 				'password' => 'required|min_length[6]',
 				'state' => 'required',
 				'city' => 'required',
-				'pincode' => 'required',
-				'adharno' => 'required',
-
-
+				'adharno' => 'required'
 			];
 
 			if ($this->validate($rules)) {
@@ -1700,6 +1695,15 @@ class Admin extends BaseController
 					$license_img1 = "";
 				}
 
+				$cheque = $this->request->getFile('cheque');
+
+						if ($cheque->isValid() && !$cheque->hasMoved()) {
+							$cheque_name = $cheque->getRandomName();
+							$cheque->move('uploads/', $cheque_name);
+						} else {
+							$cheque_name = "";
+						}
+
 				$data = [
 					'full_name' => $this->request->getVar('name'),
 					'email'  => $this->request->getVar('email'),
@@ -1708,7 +1712,6 @@ class Admin extends BaseController
 					'alter_cnum'  => $this->request->getVar('altcontact'),
 					'state_id'  => $this->request->getVar('state'),
 					'city_id'  => $this->request->getVar('city'),
-					'pin'  => $this->request->getVar('pincode'),
 					'address1'  => $this->request->getVar('address1'),
 					'address2'  => $this->request->getVar('address2'),
 					'adhar_no'  => $this->request->getVar('adharno'),
@@ -1722,26 +1725,36 @@ class Admin extends BaseController
 					'user_type'  => $this->request->getVar('role'),
 					'license_no'  => $this->request->getVar('license_no'),
 					'license_img'  => $license_img1,
-					'status'=>1,
+					'status' => 1,
 					'ac_name'  => $this->request->getVar('ac_name'),
 					'bank_name'  => $this->request->getVar('bank_name'),
 					'acc_no'  => $this->request->getVar('acc_no'),
 					'ifsc'  => $this->request->getVar('ifsc'),
-					'exp_year'  => $this->request->getVar('exp_year')
+					'exp_year'  => $this->request->getVar('exp_year'),
+					'block'  => $this->request->getVar('block'),
+					'ditrict'  => $this->request->getVar('ditrict'),
+					'father_name'  => $this->request->getVar('father_name'),
+					'blood_group'  => $this->request->getVar('blood_group'),
+					'cheque'  => $cheque_name,
+					'branch_name'  => $this->request->getVar('branch_name')
 
 				];
 
-				if($this->request->getVar('is_driver') == 1)
-				{
+				if ($this->request->getVar('is_driver') == 1) {
 					$data['is_driver']  = $this->request->getVar('is_driver');
 				}
 				//print_r($data);exit;
 
 				$this->AdminModel->adduser($data);
-				return redirect()->to('admin/Vendor');
+				if($this->request->getVar('role') == 2 || $this->request->getVar('role') == '2'){
+					return redirect()->to('member-tracking');
+				}else{
+					return redirect()->to('admin/Vendor');
+				}
+				
 			} else {
 				$data['validation'] = $this->validator;
-				echo view('admin/vendor_vw', $data);
+				echo view('admin/add_vendor_vw', $data);
 			}
 		} else {
 			return redirect()->to('admin/');
@@ -1761,9 +1774,9 @@ class Admin extends BaseController
 
 			$address1 = $this->request->getPost('address1');
 			$address2 = $this->request->getPost('address2');
-			$pin = $this->request->getPost('pin');
+
 			$adharno = $this->request->getPost('adharno');
-			$details = $this->request->getPost('details');
+
 			$username = $this->request->getPost('username');
 			$password = base64_encode(base64_encode($this->request->getVar('password')));
 
@@ -1811,6 +1824,15 @@ class Admin extends BaseController
 							$imagename3 = "";
 						}
 
+						$cheque = $this->request->getFile('cheque');
+
+						if ($cheque->isValid() && !$cheque->hasMoved()) {
+							$cheque_name = $cheque->getRandomName();
+							$cheque->move('uploads/', $cheque_name);
+						} else {
+							$cheque_name = "";
+						}
+
 						$data = [
 							'full_name' => $name,
 							'email'  => $email,
@@ -1823,8 +1845,6 @@ class Admin extends BaseController
 							'adhar_no'  => $adharno,
 							'address1'  => $address1,
 							'address2'  => $address2,
-							'pin'  => $pin,
-							'details'  => $details,
 							'status'  => 1,
 							'user_type'  => $this->request->getVar('role'),
 							'license_no'  => $this->request->getVar('license_no'),
@@ -1833,6 +1853,13 @@ class Admin extends BaseController
 							'bank_name'  => $this->request->getVar('bank_name'),
 							'acc_no'  => $this->request->getVar('acc_no'),
 							'ifsc'  => $this->request->getVar('ifsc'),
+
+							'block'  => $this->request->getVar('block'),
+							'ditrict'  => $this->request->getVar('ditrict'),
+							'father_name'  => $this->request->getVar('father_name'),
+							'blood_group'  => $this->request->getVar('blood_group'),
+							'branch_name'  => $this->request->getVar('branch_name'),
+
 							'exp_year'  => $this->request->getVar('exp_year'),
 							'franchise_id' => $this->request->getVar('franchise_id')
 						];
@@ -1854,11 +1881,20 @@ class Admin extends BaseController
 							$data['license_img']  = $imagename3;
 						}
 
+						if ($cheque_name != "") {
+
+							$data['cheque']  = $cheque_name;
+						}
+
 						$this->AdminModel->updateUser($data, $id);
 
 
-
-						return redirect()->to('admin/Editvendor/' . $id);
+						if($this->request->getVar('role') == 2 || $this->request->getVar('role') == '2'){
+							return redirect()->to('member-tracking');
+						}else{
+							return redirect()->to('admin/Editvendor/' . $id);
+						}
+						
 					} else {
 						$this->session->setFlashdata('msg', 'Username  Already  exist.');
 						$this->session->setFlashdata('uid', $id);
@@ -2162,153 +2198,152 @@ class Admin extends BaseController
 
 		return true;
 	}
-	
-	
+
+
 	function Blog()
 	{
-		if($this->session->get('user_id')){
-			
-		$user_id= $this->session->get('user_id');
-			
-		$data['setting']=$this->AdminModel->Settingdata();
-		$data['singleuser']=$this->AdminModel->userdata($user_id);
-		$data['blog_data']=$this->AdminModel->getAllBlog();
-		
-	
-		
-				return view('admin/blog_vw',$data);          
-			}else{
-				return redirect()->to('admin/');
+		if ($this->session->get('user_id')) {
+
+			$user_id = $this->session->get('user_id');
+
+			$data['setting'] = $this->AdminModel->Settingdata();
+			$data['singleuser'] = $this->AdminModel->userdata($user_id);
+			$data['blog_data'] = $this->AdminModel->getAllBlog();
+
+
+
+			return view('admin/blog_vw', $data);
+		} else {
+			return redirect()->to('admin/');
+		}
+	}
+
+	function Addblog()
+	{
+		if ($this->session->get('user_id')) {
+
+			$fullname = $this->request->getPost('fullname');
+			$author_name = $this->request->getPost('author_name');
+			$date = $this->request->getPost('date');
+			$details = $this->request->getPost('details');
+			$p_cat = $this->request->getPost('p_cat');
+			$file = $this->request->getFile('img');
+			if ($file->isValid() && !$file->hasMoved()) {
+				$imagename = $file->getRandomName();
+				$file->move('uploads/', $imagename);
+			} else {
+				$imagename = "";
 			}
+
+			$data = [
+				'title' => $fullname,
+				'name' => $author_name,
+				'date' => $date,
+				'message' => $details,
+				'category' => $p_cat,
+				'image' => $imagename,
+			];
+
+			$this->AdminModel->AddBlog($data);
+
+			return redirect()->to('/admin/Blog');
+		} else {
+			return redirect()->to('admin/');
+		}
 	}
 
-function Addblog()
+	function deleteblog()
 	{
-		if($this->session->get('user_id')){
-			
-			$fullname=$this->request->getPost('fullname');
-			$author_name=$this->request->getPost('author_name');
-			$date=$this->request->getPost('date');
-            $details=$this->request->getPost('details');
-			$p_cat=$this->request->getPost('p_cat');
-            $file = $this->request->getFile('img');				
-				if ($file->isValid() && ! $file->hasMoved()) {					
-					$imagename = $file->getRandomName();
-					$file->move('uploads/', $imagename);
-				}else
-                { $imagename="";}
+		if ($this->session->get('user_id')) {
 
-                $data = [
-                    'title' => $fullname,
-					'name' => $author_name,
-					'date' => $date,
-					'message' => $details,
-                    'category' => $p_cat,
-                    'image' => $imagename,
-                    ];
-			
-			 $this->AdminModel->AddBlog($data);
-			 
-			return redirect()->to('/admin/Blog'); 
-			}else{
-            return redirect()->to('admin/');
-          }
-	}
+			$blog_id = $this->request->getPost('blog_id');
 
-	function deleteblog ()
-	{
-		if($this->session->get('user_id')){
-			
-			$blog_id=$this->request->getPost('blog_id');
+			$this->AdminModel->DeleteBlog($blog_id);
 
-            		$this->AdminModel->DeleteBlog($blog_id);
-			
 			return redirect()->to('/admin/blog');
-			}else{
-            return redirect()->to('admin/');
-          }
-		
+		} else {
+			return redirect()->to('admin/');
+		}
 	}
 
 	function view_edit()
 	{
-		if($this->session->get('user_id')){
-			$user_id= $this->session->get('user_id');
-			$data['setting']=$this->AdminModel->Settingdata();
-			$data['singleuser']=$this->AdminModel->userdata($user_id);
-			
-			$blog_id = $this->request->uri->getSegment(3);
-			$data['blog_details']=$this->AdminModel->singleBlog($blog_id);
-			
-			
+		if ($this->session->get('user_id')) {
+			$user_id = $this->session->get('user_id');
+			$data['setting'] = $this->AdminModel->Settingdata();
+			$data['singleuser'] = $this->AdminModel->userdata($user_id);
 
-		
-		 return view('admin/editblog_vw',$data); 
-			}else{
-            return redirect()->to('admin/');
-          }
-		
+			$blog_id = $this->request->uri->getSegment(3);
+			$data['blog_details'] = $this->AdminModel->singleBlog($blog_id);
+
+
+
+
+			return view('admin/editblog_vw', $data);
+		} else {
+			return redirect()->to('admin/');
+		}
 	}
-	
+
 	function edit_blog()
 	{
-		if($this->session->get('user_id')){
-			$user_id= $this->session->get('user_id');
-			$data['setting']=$this->AdminModel->Settingdata();
-			$data['singleuser']=$this->AdminModel->userdata($user_id);
-			
+		if ($this->session->get('user_id')) {
+			$user_id = $this->session->get('user_id');
+			$data['setting'] = $this->AdminModel->Settingdata();
+			$data['singleuser'] = $this->AdminModel->userdata($user_id);
+
 			$blog_id = $this->request->uri->getSegment(3);
-			$data['blog_details']=$this->AdminModel->singleBlog($blog_id);
-			
-			
-				
-				
-			$blog_id=$this->request->getPost('blog_id');
-			$title=$this->request->getPost('title');
-			$name=$this->request->getPost('name');
-			$date=$this->request->getPost('date');
-			$p_cat=$this->request->getPost('p_cat');
-            $details=$this->request->getPost('details');
-            $file = $this->request->getFile('img');
+			$data['blog_details'] = $this->AdminModel->singleBlog($blog_id);
 
-				if ($file->isValid() && ! $file->hasMoved()) {					
-					$imagename = $file->getRandomName();
-					$file->move('uploads/', $imagename);
-				}else
-                { $imagename="";}
-				if ($imagename!=''){
-                $data = [
-                    'title' => $title,
-                    'name' => $name,
-                    'date' => $date,
-					'category' => $p_cat,
-                    'message' => $details,
-                    'image' => $imagename
-    
-                 ];
-				}else{
-					
-                $data = [
-                    'title' => $title,
-                    'name' => $name,
-                    'date' => $date,
-					'category' => $p_cat,
-                    'message' => $details
-                  
-    
-                 ];
-					}
-			
-			
-			
-			$this->AdminModel->UpdateBlog($data,$blog_id);
 
-		
-		   return redirect()->to('/admin/view_edit/'.$blog_id);
-		   return view('admin/editblog_vw',$data); 
-			}else{
-            return redirect()->to('admin/');
-          }
-		
+
+
+			$blog_id = $this->request->getPost('blog_id');
+			$title = $this->request->getPost('title');
+			$name = $this->request->getPost('name');
+			$date = $this->request->getPost('date');
+			$p_cat = $this->request->getPost('p_cat');
+			$details = $this->request->getPost('details');
+			$file = $this->request->getFile('img');
+
+			if ($file->isValid() && !$file->hasMoved()) {
+				$imagename = $file->getRandomName();
+				$file->move('uploads/', $imagename);
+			} else {
+				$imagename = "";
+			}
+			if ($imagename != '') {
+				$data = [
+					'title' => $title,
+					'name' => $name,
+					'date' => $date,
+					'category' => $p_cat,
+					'message' => $details,
+					'image' => $imagename
+
+				];
+			} else {
+
+				$data = [
+					'title' => $title,
+					'name' => $name,
+					'date' => $date,
+					'category' => $p_cat,
+					'message' => $details
+
+
+				];
+			}
+
+
+
+			$this->AdminModel->UpdateBlog($data, $blog_id);
+
+
+			return redirect()->to('/admin/view_edit/' . $blog_id);
+			return view('admin/editblog_vw', $data);
+		} else {
+			return redirect()->to('admin/');
+		}
 	}
 }
