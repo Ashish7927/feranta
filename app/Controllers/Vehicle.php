@@ -358,7 +358,7 @@ class Vehicle extends BaseController
     }
 
     function acceptRequest($id)
-    {
+    {se
         if ($this->session->get('user_id')) {
             $user_id = $this->session->get('user_id');
             $details = $this->AdminModel->getSingleData('driver_vehicle_mapping', $id);

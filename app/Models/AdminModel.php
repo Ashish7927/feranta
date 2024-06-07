@@ -449,8 +449,9 @@ class AdminModel extends Model
 	{
 		$builder = $this->db->table('service_details');
 		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name');
-		$builder->join('vehicle_details vehicle', 'vehicle.id = service_details.vehicle_id');
-		$builder->join('user', 'user.id = service_details.vendor_id');
+		$builder->join('vehicle_details vehicle', 'vehicle.id = service_details.vehicle_id','left');
+		$builder->join('user', 'user.id = service_details.vendor_id','left');
+		$builder->join('user', 'user.id = service_details.vendor_id','left');
 		return $builder->get()->getResult();
 	}
 
@@ -767,6 +768,7 @@ class AdminModel extends Model
 		$builder = $this->db->table('user');
 		$builder->select('*');
 		$builder->where('created_by',$member_id);
+		$builder->orderBy('id','DESC');
 		return $builder->get()->getResult();
 	}
 

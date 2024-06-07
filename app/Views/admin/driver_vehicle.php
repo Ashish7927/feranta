@@ -19,7 +19,8 @@
                             <th>Vehicle name</th>
                             <th>Owner</th>
                             <th>Status</th>
-                            <th class="text-center">Actions</th>
+                            
+                            <!-- <th class="text-center">Actions</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -45,7 +46,7 @@
                                     }?>
                                 </td>
 
-                                <td class="text-center">
+                                <!-- <td class="text-center">
                                     <?php if($single->status == 0){?>
                                 <a href="<?php echo base_url(); ?>/vehicle/accept/<?= $single->id; ?>" class="btn btn-success" >Accept</a>
                                 <a href="<?php echo base_url(); ?>/vehicle/reject/<?= $single->id; ?>" class="btn btn-warning">Decline</a>
@@ -56,7 +57,7 @@
                                     <?php }else{  ?>
                                         <a href="#" class="btn btn-default"> Closed </a>
                                     <?php } ?>
-                                </td>
+                                </td> -->
                             </tr>
                         <?php } ?>
 

@@ -1445,7 +1445,7 @@ class ApiController extends ResourceController
             $created_by = $this->request->getVar('member_id');
             $file = $this->request->getFile('img');
 
-            if ($file->isValid() && !$file->hasMoved()) {
+            if ($file != null && $file->isValid() && !$file->hasMoved()) {
                 $imagename = $file->getRandomName();
                 $file->move('uploads/', $imagename);
             } else {
@@ -1454,7 +1454,7 @@ class ApiController extends ResourceController
 
             $file1 = $this->request->getFile('frontimg');
 
-            if ($file1->isValid() && !$file1->hasMoved()) {
+            if ($file1 != null &&$file1->isValid() && !$file1->hasMoved()) {
                 $imagename1 = $file1->getRandomName();
                 $file1->move('uploads/', $imagename1);
             } else {
@@ -1462,7 +1462,7 @@ class ApiController extends ResourceController
             }
             $file2 = $this->request->getFile('backimg');
 
-            if ($file2->isValid() && !$file2->hasMoved()) {
+            if ($file2 != null && $file2->isValid() && !$file2->hasMoved()) {
                 $imagename2 = $file2->getRandomName();
                 $file2->move('uploads/', $imagename2);
             } else {
@@ -1471,7 +1471,7 @@ class ApiController extends ResourceController
 
             $license_img = $this->request->getFile('license_img');
 
-            if ($license_img->isValid() && !$license_img->hasMoved()) {
+            if ($license_img != null && $license_img->isValid() && !$license_img->hasMoved()) {
                 $license_img1 = $license_img->getRandomName();
                 $license_img->move('uploads/', $license_img1);
             } else {
@@ -1480,7 +1480,7 @@ class ApiController extends ResourceController
 
             $cheque = $this->request->getFile('cheque');
 
-            if ($cheque->isValid() && !$cheque->hasMoved()) {
+            if ($cheque != null &&  $cheque->isValid() && !$cheque->hasMoved()) {
                 $cheque_name = $cheque->getRandomName();
                 $cheque->move('uploads/', $cheque_name);
             } else {
@@ -1597,7 +1597,7 @@ class ApiController extends ResourceController
 
             $file = $this->request->getFile('image');
 
-            if ($file->isValid() && !$file->hasMoved()) {
+            if ($file != null && $file->isValid() && !$file->hasMoved()) {
                 $imagename = $file->getRandomName();
                 $file->move('uploads/', $imagename);
                 $data['profile_image'] = $imagename;
@@ -2137,7 +2137,7 @@ class ApiController extends ResourceController
             }
             $file = $this->request->getFile('img');
 
-            if ($file->isValid() && !$file->hasMoved()) {
+            if ($file != null && $file->isValid() && !$file->hasMoved()) {
                 $imagename = $file->getRandomName();
                 $file->move('uploads/', $imagename);
             } else {
@@ -2146,7 +2146,7 @@ class ApiController extends ResourceController
 
             $file1 = $this->request->getFile('frontimg');
 
-            if ($file1->isValid() && !$file1->hasMoved()) {
+            if ($file1 != null && $file1->isValid() && !$file1->hasMoved()) {
                 $imagename1 = $file1->getRandomName();
                 $file1->move('uploads/', $imagename1);
             } else {
@@ -2154,7 +2154,7 @@ class ApiController extends ResourceController
             }
             $file2 = $this->request->getFile('backimg');
 
-            if ($file2->isValid() && !$file2->hasMoved()) {
+            if ($file2 != null &&  $file2->isValid() && !$file2->hasMoved()) {
                 $imagename2 = $file2->getRandomName();
                 $file2->move('uploads/', $imagename2);
             } else {
@@ -2163,7 +2163,7 @@ class ApiController extends ResourceController
 
             $license_img = $this->request->getFile('license_img');
 
-            if ($license_img->isValid() && !$license_img->hasMoved()) {
+            if ($license_img != null && $license_img->isValid() && !$license_img->hasMoved()) {
                 $license_img1 = $license_img->getRandomName();
                 $license_img->move('uploads/', $license_img1);
             } else {
@@ -2172,7 +2172,7 @@ class ApiController extends ResourceController
 
             $cheque = $this->request->getFile('cheque');
 
-            if ($cheque->isValid() && !$cheque->hasMoved()) {
+            if ($cheque != null && $cheque->isValid() && !$cheque->hasMoved()) {
                 $cheque_name = $cheque->getRandomName();
                 $cheque->move('uploads/', $cheque_name);
             } else {
@@ -2612,7 +2612,7 @@ class ApiController extends ResourceController
 
 
             $file = $this->request->getFile('insurance_img');
-            if ($file->isValid() && !$file->hasMoved()) {
+            if ($file != null && $file->isValid() && !$file->hasMoved()) {
                 $insurance_img = $file->getRandomName();
                 $file->move('uploads/', $insurance_img);
             } else {
@@ -2620,7 +2620,7 @@ class ApiController extends ResourceController
             }
 
             $file1 = $this->request->getFile('fit_doc');
-            if ($file1->isValid() && !$file1->hasMoved()) {
+            if ($file1 != null && $file1->isValid() && !$file1->hasMoved()) {
                 $fit_doc = $file1->getRandomName();
                 $file1->move('uploads/', $fit_doc);
             } else {
@@ -2628,7 +2628,7 @@ class ApiController extends ResourceController
             }
 
             $pollurion_doc = $this->request->getFile('pollurion_doc');
-            if ($pollurion_doc->isValid() && !$pollurion_doc->hasMoved()) {
+            if ($pollurion_doc != null && $pollurion_doc->isValid() && !$pollurion_doc->hasMoved()) {
                 $pollurion_doc1 = $pollurion_doc->getRandomName();
                 $pollurion_doc->move('uploads/', $pollurion_doc1);
             } else {
@@ -2636,7 +2636,7 @@ class ApiController extends ResourceController
             }
 
             $file3 = $this->request->getFile('permit_doc');
-            if ($file3->isValid() && !$file3->hasMoved()) {
+            if ($file3 != null && $file3->isValid() && !$file3->hasMoved()) {
                 $permit_doc = $file3->getRandomName();
                 $file3->move('uploads/', $permit_doc);
             } else {
@@ -2729,28 +2729,28 @@ class ApiController extends ResourceController
             ];
 
             $file = $this->request->getFile('insurance_img');
-            if ($file->isValid() && !$file->hasMoved()) {
+            if ($file != null && $file->isValid() && !$file->hasMoved()) {
                 $insurance_img = $file->getRandomName();
                 $file->move('uploads/', $insurance_img);
                 $data['insurance_img'] = $insurance_img;
             }
 
             $file1 = $this->request->getFile('fit_doc');
-            if ($file1->isValid() && !$file1->hasMoved()) {
+            if ($file1 != null && $file1->isValid() && !$file1->hasMoved()) {
                 $fit_doc = $file1->getRandomName();
                 $file1->move('uploads/', $fit_doc);
                 $data['fit_doc'] = $fit_doc;
             }
 
             $pollurion_doc = $this->request->getFile('pollurion_doc');
-            if ($pollurion_doc->isValid() && !$pollurion_doc->hasMoved()) {
+            if ($pollurion_doc != null && $pollurion_doc->isValid() && !$pollurion_doc->hasMoved()) {
                 $pollurion_doc1 = $pollurion_doc->getRandomName();
                 $pollurion_doc->move('uploads/', $pollurion_doc1);
                 $data['pollurion_doc'] = $pollurion_doc1;
             }
 
             $file3 = $this->request->getFile('permit_doc');
-            if ($file3->isValid() && !$file3->hasMoved()) {
+            if ($file3 != null &&  $file3->isValid() && !$file3->hasMoved()) {
                 $permit_doc = $file3->getRandomName();
                 $file3->move('uploads/', $permit_doc);
                 $data['permit_doc'] = $permit_doc;
@@ -2961,7 +2961,7 @@ class ApiController extends ResourceController
             $imgfile = $this->request->getVar('image');
 
             $file = $this->request->getFile('image');
-            if ($file->isValid() && !$file->hasMoved()) {
+            if ($file != null && $file->isValid() && !$file->hasMoved()) {
                 $imgfile = $file->getRandomName();
                 $file->move('uploads/', $imgfile);
             } else {

@@ -1651,7 +1651,6 @@ class Admin extends BaseController
 				'name' => 'required|min_length[3]',
 				'email' => 'required|valid_email|is_unique[user.email]',
 				'contact' => 'required|numeric|max_length[10]|is_unique[user.contact_no]',
-				'username' => 'required|max_length[10]|is_unique[user.user_name]',
 				'password' => 'required|min_length[6]',
 				'state' => 'required',
 				'city' => 'required',
@@ -2346,4 +2345,16 @@ class Admin extends BaseController
 			return redirect()->to('admin/');
 		}
 	}
+
+	function deletevendor()
+    {
+        if ($this->session->get('user_id')) {
+            $id = $this->request->getPost('user_id');
+            $this->AdminModel->DeleteRecordById('user', $id);
+            return redirect()->to('admin/Vendor');
+        } else {
+            return redirect()->to('admin/');
+        }
+    }
+
 }

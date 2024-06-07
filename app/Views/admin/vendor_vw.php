@@ -73,7 +73,7 @@
 </div>
 
 <!-- END Page Content -->
-<form name="frm_deleteBanner" id="frm_deleteBanner" action="<?php echo base_url(); ?>/Admin/deletevendor" method="post">
+<form name="frm_deleteBanner" id="frm_deleteBanner" action="<?php echo base_url(); ?>admin/deletevendor" method="post">
   <input type="hidden" name="user_id" id="user_id" value="">
 </form>
 
