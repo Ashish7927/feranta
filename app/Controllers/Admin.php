@@ -38,17 +38,26 @@ class Admin extends BaseController
 		if ($data) {
 			$pass = $data['password'];
 			$status = $data['status'];
+			$user_type = $data['user_type'];
 			//$authenticatePassword = password_verify($password, $pass);
 
 			if ($pass == $password and $status = 1) {
-				$ses_data = [
-					'user_id' => $data['id'],
-					'fullname' => $data['full_name'],
-					'email' => $data['email'],
-					'isLoggedIn' => TRUE
-				];
-				$session->set($ses_data);
-				return redirect()->to('admin/dashboard');
+
+				if($user_type == 1 || ($user_type == 2 && $data['is_admin'] == 1)){
+					$ses_data = [
+						'user_id' => $data['id'],
+						'fullname' => $data['full_name'],
+						'email' => $data['email'],
+						'user_type' => $data['user_type'],
+						'isLoggedIn' => TRUE
+					];
+					$session->set($ses_data);
+					return redirect()->to('admin/dashboard');
+				}else{
+					$session->setFlashdata('msg', 'Invalid Request');
+				return redirect()->to('admin/');
+				}
+				
 			} else {
 				$session->setFlashdata('msg', 'Password is incorrect.');
 				return redirect()->to('admin/');
@@ -375,7 +384,7 @@ class Admin extends BaseController
 					'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
 					'profile_image'  => $imagename,
 					'status'  => 1,
-					'user_type'  => 2
+					'user_type'  => 1
 				];
 
 				$this->AdminModel->adduser($data);
@@ -452,7 +461,7 @@ class Admin extends BaseController
 								'password'  => $password,
 								'profile_image'  => $imagename,
 								'status'  => 1,
-								'user_type'  => 2
+								'user_type'  => 1
 							];
 						} else {
 
@@ -463,7 +472,7 @@ class Admin extends BaseController
 								'contact_no'  => $contact,
 								'password'  => $password,
 								'status'  => 1,
-								'user_type'  => 2
+								'user_type'  => 1
 							];
 						}
 
@@ -1586,6 +1595,9 @@ class Admin extends BaseController
 
 			$data['setting'] = $this->AdminModel->Settingdata();
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);
+			// if(){
+
+			// }
 			$data['allvendor'] = $this->AdminModel->GetAllUser();
 
 			return view('admin/vendor_vw.php', $data);

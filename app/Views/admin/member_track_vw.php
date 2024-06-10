@@ -33,6 +33,9 @@
           <?php
           $i = 1;
           foreach ($allvendor as $vendor) {
+            if ($vendor->is_admin == 1) {
+              continue;
+          }
           ?>
             <tr>
               <td class="text-center"><?= $i++; ?></td>

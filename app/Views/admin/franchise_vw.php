@@ -56,9 +56,19 @@
                             <label>Address</label>
                             <input type="text" name="address" class="form-control" value="">
                         </div>
+
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username " value="<?= set_value('username'); ?>" require>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" value="<?= set_value('password'); ?>" require>
+                        </div>
+
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">Submit</button>
-
                         </div>
                 </form>
 
@@ -86,7 +96,6 @@
                         <?php
                         $i = 1;
                         foreach ($franchises as $franchise) {
-
                         ?>
                             <tr>
                                 <td class="text-center"><?= $i++; ?></td>
@@ -132,6 +141,7 @@
 
                             <form action="<?php echo base_url(); ?>franchises/edit/<?= $franchise->id; ?>" method="post">
                                 <div class="modal-body uk-text-left">
+                                    <input type="hidden" name="francise_user_id" value="<?= $franchise->user_id; ?>">
                                     <div class="form-group">
                                         <label>Name</label>
                                         <input type="text" class="form-control" name="franchise_name" placeholder="Enter full name" value="<?= $franchise->franchise_name; ?>" require>
@@ -153,7 +163,9 @@
                                         <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id" require>
                                             <option value="">Select State</option>
                                             <?php foreach ($allstate as $state) { ?>
-                                                <option value="<?= $state->state_id ?>" <?php if( $franchise->state == $state->state_id){ echo 'selected';}?>><?= $state->state_name ?></option>
+                                                <option value="<?= $state->state_id ?>" <?php if ($franchise->state == $state->state_id) {
+                                                                                            echo 'selected';
+                                                                                        } ?>><?= $state->state_name ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>
@@ -163,7 +175,9 @@
                                         <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)">
                                             <option value="">Select City</option>
                                             <?php foreach ($allcity as $city) { ?>
-                                                <option value="<?= $city->city_id ?>" <?php if( $franchise->city == $city->city_id){ echo 'selected';}?> ><?= $city->city_name ?></option>
+                                                <option value="<?= $city->city_id ?>" <?php if ($franchise->city == $city->city_id) {
+                                                                                            echo 'selected';
+                                                                                        } ?>><?= $city->city_name ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>
@@ -172,6 +186,17 @@
                                         <label>Address</label>
                                         <input type="text" name="address" class="form-control" value="<?= $franchise->address;  ?>">
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Username</label>
+                                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username " value="<?= $franchise->user_name;  ?>" require>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Password</label>
+                                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" value="<?= base64_decode(base64_decode($franchise->password));  ?>" require>
+                                    </div>
+
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-primary">Submit</button>

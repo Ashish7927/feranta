@@ -25,8 +25,7 @@ class Franchises extends BaseController
             $user_id = $this->session->get('user_id');
             $data['allstate'] = $this->AdminModel->GetAllstate();
             $data['allcity'] = $this->AdminModel->GetAllcity();
-            $data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
-
+            $data['franchises'] = $this->AdminModel->GetAllFranchises();
             return view('admin/franchise_vw', $data);
         } else {
             return redirect()->to('admin/');
@@ -48,7 +47,26 @@ class Franchises extends BaseController
 
             ];
 
-            $this->AdminModel->InsertRecord('franchises', $data);
+            $franchise_id = $this->AdminModel->InsertFranchise($data);
+
+            $data = [
+                'full_name' => $this->request->getPost('franchise_name'),
+                'email' => $this->request->getPost('email'),
+                'contact_no' => $this->request->getPost('contact'),
+                'address1' => $this->request->getPost('address'),
+                'state_id' => $this->request->getPost('state'),
+                'city_id' => $this->request->getPost('city'),
+                'user_name' => $this->request->getPost('username'),
+                'password' => base64_encode(base64_encode($this->request->getVar('password'))),
+                'user_type' => 2,
+                'franchise_id' => $franchise_id,
+                'is_admin' => 1,
+                'status' => 1
+
+            ];
+
+            $this->AdminModel->InsertRecord('user', $data);
+
             return redirect()->to('franchises');
         } else {
             return redirect()->to('admin/');
@@ -73,6 +91,20 @@ class Franchises extends BaseController
 
                 ];
                 $this->AdminModel->UpdateRecordById('franchises', $id, $data);
+
+                $data1 = [
+                    'full_name' => $this->request->getPost('franchise_name'),
+                    'email' => $this->request->getPost('email'),
+                    'contact_no' => $this->request->getPost('contact'),
+                    'address1' => $this->request->getPost('address'),
+                    'state_id' => $this->request->getPost('state'),
+                    'city_id' => $this->request->getPost('city'),
+                    'user_name' => $this->request->getPost('username'),
+                    'password' => base64_encode(base64_encode($this->request->getVar('password')))
+                ];
+                $user_id = $this->request->getPost('francise_user_id');
+                $this->AdminModel->UpdateRecordById('user', $user_id, $data1);
+
             } else {
                 $this->session->setFlashdata('msg', 'Franchise Already  exist.');
                 $this->session->setFlashdata('uid', $id);
@@ -88,6 +120,8 @@ class Franchises extends BaseController
         if ($this->session->get('franchiseid')) {
             $id = $this->request->getPost('id');
             $this->AdminModel->DeleteRecordById('franchises', $id);
+
+            $this->db->query("DELETE FROM `user` WHERE `franchise_id` = $id ");
             return redirect()->to('franchises');
         } else {
             return redirect()->to('admin/');

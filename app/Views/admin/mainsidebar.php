@@ -22,7 +22,9 @@
                   <div class="sidebar-user-name"><?= $user->user_name; ?></div>
                   <div class="sidebar-user-links">
                       <a href="<?php echo base_url(); ?>admin/Profile" data-toggle="tooltip" data-placement="bottom" title="Profile"><i class="gi gi-user"></i></a>
-                      <a href="<?php echo base_url(); ?>admin/Setting" class="enable-tooltip" data-placement="bottom" title="Settings"><i class="gi gi-cogwheel"></i></a>
+                      <?php if ($user->user_type == 1) { ?>
+                          <a href="<?php echo base_url(); ?>admin/Setting" class="enable-tooltip" data-placement="bottom" title="Settings"><i class="gi gi-cogwheel"></i></a>
+                      <?php } ?>
                       <a href="<?php echo base_url(); ?>admin/logout" data-toggle="tooltip" data-placement="bottom" title="Logout"><i class="gi gi-exit"></i></a>
                   </div>
               </div>
@@ -37,7 +39,7 @@
 
                   <li> <a href="<?php echo base_url(); ?>vehicle/driver-vehicle"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Driver-Vehicle</span></a></li>
 
-
+                  <?php if ($user->user_type == 1) { ?>
                   <li> <a href="<?php echo base_url(); ?>service-rate"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Service Price</span></a></li>
 
                   <li> <a href="<?php echo base_url(); ?>service"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Driver scedule service </span></a></li>
@@ -45,12 +47,13 @@
                   <li> <a href="<?php echo base_url(); ?>service-booking"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Service Booking</span></a></li>
 
                   <li> <a href="<?php echo base_url(); ?>service-request"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Service Request</span></a></li>
-
+                  
                   <li> <a href="<?php echo base_url(); ?>franchises"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Franchises</span></a></li>
+                  <?php } ?>
                   <li> <a href="<?php echo base_url(); ?>member-tracking"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Franchise Member</span></a></li>
-
+                  <?php if ($user->user_type == 1) { ?>
                   <li> <a href="<?php echo base_url(); ?>delete-request"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Delete Request</span></a></li>
-
+                  
                   <li>
                       <a href="" class="sidebar-nav-menu">
                           <i class="fa fa-angle-left sidebar-nav-indicator sidebar-nav-mini-hide"></i><i class="gi gi-sweater sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Manage Master</span></a>
@@ -74,9 +77,12 @@
                   </li>
                   <li><a href="<?php echo base_url(); ?>admin/Cms_management"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">CMS Management</span></a></li>
                   <li><a href="<?php echo base_url(); ?>admin/Banner"><i class="gi gi-cargo sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Banner Management</span></a> </li>
+                  <?php } ?>
                   <li><a href="<?php echo base_url(); ?>admin/Customer"><i class="gi gi-cargo sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Manage Customer</span></a> </li>
+                  <?php if ($user->user_type == 1) { ?>
                   <li><a href="<?php echo base_url(); ?>admin/Subadmin"><i class="gi gi-keys sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Manage Subadmin</span></a></li>
                   <li><a href="<?php echo base_url(); ?>admin/Manage_coupon"><i class="gi gi-gift sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Manage Coupon</span></a></li>
+                  <?php } ?>
               </ul>
               <!-- END Sidebar Navigation -->
 
@@ -117,10 +123,12 @@
                               Profile
                           </a>
                           <!-- Opens the user settings modal that can be found at the bottom of each page (page_footer.html in PHP version) -->
+                          <?php if ($user->user_type == 1) { ?>
                           <a href="<?php echo base_url(); ?>admin/Setting">
                               <i class="fa fa-cog fa-fw pull-right"></i>
                               Settings
                           </a>
+                          <?php } ?>
                       </li>
                       <li class="divider"></li>
                       <li>

@@ -2864,10 +2864,11 @@ class ApiController extends ResourceController
             $vehicle_id = $this->request->getVar('vehicle_id');
             $owner_id = $this->request->getVar('owner_id');
             $otp = $this->request->getVar('otp');
-            $getRequestId = $this->db->query("SELECT * FROM driver_vehicle_mapping WHERE driver_id = $driver_id AND vehicle_id = $vehicle_id AND status = 0;");
-            if (!empty($getRequestId) && count($getRequestId) >= 0) {
+            $getRequestId = $this->db->query("SELECT * FROM driver_vehicle_mapping WHERE driver_id = $driver_id AND vehicle_id = $vehicle_id AND status = 0;")->getRow();
+            
+            if (!empty($getRequestId)) {
 
-                if ($getRequestId[0]->otp == $otp) {
+                if ($getRequestId->otp == $otp) {
                     $data = [
                         'status' => 1,
                         'updated_by' => $owner_id

@@ -846,5 +846,22 @@ class AdminModel extends Model
 		$builder->Where('member_id', $member_id);
 		return $builder->get()->getResult();
 	}
+
+	public function InsertFranchise($data)
+	{
+		// Insert data into the 'products' table
+		$this->db->table('franchises')->insert($data);
+
+		// Return the last insert ID
+		return $this->db->insertID();
+	}
+
+	public function GetAllFranchises()
+	{
+		$builder = $this->db->table('franchises');
+		$builder->select('franchises.*,user.id as user_id,user.user_name,user.password');
+		$builder->join('user', 'user.franchise_id = franchises.id AND user.is_admin = 1', 'left');
+		return $builder->get()->getResult();
+	}
 	
 }
