@@ -448,10 +448,10 @@ class AdminModel extends Model
 	function getAllService()
 	{
 		$builder = $this->db->table('service_details');
-		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name');
+		$builder->select('service_details.*,vehicle.type_id,vehicle.model_name,vehicle.regd_no,vehicle.no_of_sit,user.full_name,driver.full_name as driver_name');
 		$builder->join('vehicle_details vehicle', 'vehicle.id = service_details.vehicle_id','left');
 		$builder->join('user', 'user.id = service_details.vendor_id','left');
-		$builder->join('user', 'user.id = service_details.vendor_id','left');
+		$builder->join('user driver', 'driver.id = service_details.driver_id','left');
 		return $builder->get()->getResult();
 	}
 
@@ -775,7 +775,7 @@ class AdminModel extends Model
 	function getDriverwiseLiftRequest($driver_id)
 	{
 		$builder = $this->db->table('lift_request');
-		$builder->select('lift_request.*,booking.user_id,booking.booking_type,booking.from_location,user.full_name,booking.to_location');
+		$builder->select('lift_request.*,booking.user_id,booking.booking_type,booking.from_location,user.full_name,booking.to_location,booking.origin_lat,booking.origin_lng,booking.destination_lat,booking.destination_lng');
 		$builder->join('service_bookings booking', 'booking.id = lift_request.booking_id');
 		$builder->join('user user', 'user.id = booking.user_id');
 		$builder->where('lift_request.driver_id', $driver_id);
@@ -836,6 +836,14 @@ class AdminModel extends Model
 		$builder->select('user.*,franchises.franchise_name');
 		$builder->join('franchises', 'franchises.id = user.franchise_id', 'left');
 		$builder->Where('user_type', 2);
+		return $builder->get()->getResult();
+	}
+
+	function getMemebrCheckinCheckoutList($member_id)
+	{
+		$builder = $this->db->table('members_checkin');
+		$builder->select('*');
+		$builder->Where('member_id', $member_id);
 		return $builder->get()->getResult();
 	}
 	

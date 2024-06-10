@@ -141,3 +141,4 @@ $routes->post('api/send-otp-to-assign-driver', 'ApiController::sendOtpToAssignDr
 $routes->post('api/verify-otp-for-driver-assign', 'ApiController::verifyDriverAssignOtp');
 $routes->post('api/member-checkin-checkout', 'ApiController::employeeCheckInCheckOut');
 $routes->post('api/get-customer-lift-booking-history', 'ApiController::liftBookingHistoryCustomer');
+$routes->post('api/get-member-checkin-data', 'ApiController::getCheckinList');

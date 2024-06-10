@@ -2943,7 +2943,7 @@ class ApiController extends ResourceController
     {
         $rules = [
             'member_id' => 'required',
-            'image' => 'required',
+            // 'image' => 'required',
             'type' => 'required',
         ];
 
@@ -3013,6 +3013,36 @@ class ApiController extends ResourceController
                 'response' => [
                     'success' => 'Lift Booking List',
                     'userDetails' => $allService
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function getCheckinList()
+    {
+        $rules = [
+            'member_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $member_id = $this->request->getVar('member_id');
+            $Listdata = $this->AdminModel->getMemebrCheckinCheckoutList($member_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'All Checkin Checkout list',
+                    'list' => $Listdata
                 ],
             ];
         }
