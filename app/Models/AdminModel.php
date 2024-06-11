@@ -863,5 +863,58 @@ class AdminModel extends Model
 		$builder->join('user', 'user.franchise_id = franchises.id AND user.is_admin = 1', 'left');
 		return $builder->get()->getResult();
 	}
+
+	public function GetFranchiseUser($franchise_id)
+	{
+		$builder = $this->db->table('user');
+		$builder->select('user.*,u.id as uid');
+		$builder->join('user u', "u.id = user.created_by AND u.franchise_id = ".$franchise_id);
+		$builder->where('user.user_type', 3);
+		$builder->orWhere('user.user_type', 4);
+		return $builder->get()->getResult();
+	}
+
+	function GetFranchiseMember($franchise_id)
+	{
+		$builder = $this->db->table('user');
+		$builder->select('user.*,franchises.franchise_name');
+		$builder->join('franchises', 'franchises.id = user.franchise_id', 'left');
+		$builder->Where('user.user_type', 2);
+		$builder->Where('user.franchise_id', $franchise_id);
+		return $builder->get()->getResult();
+	}
+
+	function getFranchiseVehicle($franchise_id)
+	{
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('vehicle_details.*,vehicle_types.type_name,user.full_name,user.created_by');
+		$builder->join('vehicle_types', 'vehicle_types.id = vehicle_details.type_id','left');
+		$builder->join('user', 'user.id = vehicle_details.vendor_id');
+		$builder->join('user u', "u.id = user.created_by AND u.franchise_id = ".$franchise_id);
+
+		return $builder->get()->getResult();
+	}
+
+	function getFranchiseDriverVehicle($franchise_id)
+	{
+		$builder = $this->db->table('driver_vehicle_mapping');
+		$builder->select('driver_vehicle_mapping.*,vehicle.model_name,vehicle.regd_no,driver.full_name as drivername,driver.email,driver.contact_no,owner.full_name,owner.created_by');
+		$builder->join('vehicle_details vehicle', 'vehicle.id = driver_vehicle_mapping.vehicle_id');
+		$builder->join('user driver', 'driver.id = driver_vehicle_mapping.driver_id');
+		$builder->join('user owner', 'owner.id = driver_vehicle_mapping.owner_id');
+		$builder->join('user u', "u.id = owner.created_by AND u.franchise_id = ".$franchise_id);
+		return $builder->get()->getResult();
+	}
+
+	function getFranchiseOwner($franchise_id)
+	{
+		$builder = $this->db->table('user');
+		$builder->select('user.*');
+		$builder->join('user u', "u.id = user.created_by AND u.franchise_id = ".$franchise_id);
+		$builder->where('user.status', 1);
+		$builder->where('user.user_type', 3);
+
+		return $builder->get()->getResult();
+	}
 	
 }

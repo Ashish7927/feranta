@@ -22,8 +22,13 @@ class Vehicle extends BaseController
         if ($this->session->get('user_id')) {
 
             $user_id = $this->session->get('user_id');
+            if ($this->session->get('user_type') == 2) {
 
-            $data['Allstate'] = $this->AdminModel->getAllVehicle();
+                $data['Allstate'] = $this->AdminModel->getFranchiseVehicle($this->session->get('franchise_id'));
+            } else {
+                $data['Allstate'] = $this->AdminModel->getAllVehicle();
+            }
+
             $data['vehicleType'] = $this->AdminModel->getAllActiveRecord('vehicle_types');
             $data['AllVendor'] = $this->AdminModel->getAllVendor();
             $data['AllDriver'] = $this->AdminModel->getAllDriver();
@@ -42,7 +47,11 @@ class Vehicle extends BaseController
             $user_id = $this->session->get('user_id');
 
             $data['vehicleType'] = $this->AdminModel->getAllActiveRecord('vehicle_types');
-            $data['AllVendor'] = $this->AdminModel->getAllVendor();
+            if ($this->session->get('user_type') == 2) {
+                $data['AllVendor'] = $this->AdminModel->getFranchiseOwner($this->session->get('franchise_id'));
+            } else {
+                $data['AllVendor'] = $this->AdminModel->getAllVendor();
+            }
 
             return view('admin/add_vehicle_vw', $data);
         } else {
@@ -127,7 +136,7 @@ class Vehicle extends BaseController
                 'rc_copy' => $rc_copy_doc,
                 'booking_type' => $this->request->getPost('booking_type'),
                 'status' => 0,
-                'lift_vehicle_type'=>$this->request->getPost('lift_vehicle_type')
+                'lift_vehicle_type' => $this->request->getPost('lift_vehicle_type')
             ];
 
 
@@ -148,7 +157,11 @@ class Vehicle extends BaseController
         if ($this->session->get('user_id')) {
 
             $data['vehicleType'] = $this->AdminModel->getAllActiveRecord('vehicle_types');
-            $data['AllVendor'] = $this->AdminModel->getAllVendor();
+            if ($this->session->get('user_type') == 2) {
+                $data['AllVendor'] = $this->AdminModel->getFranchiseOwner($this->session->get('franchise_id'));
+            } else {
+                $data['AllVendor'] = $this->AdminModel->getAllVendor();
+            }
             $data['vehicle'] = $this->AdminModel->getSingleData('vehicle_details', $id);
 
             return view('admin/edit_vehicle_vw', $data);
@@ -189,7 +202,7 @@ class Vehicle extends BaseController
                     'polution_exp_date' => $this->request->getPost('polution_exp_date'),
                     'permit_expr_date' => $this->request->getPost('permit_expr_date'),
                     'booking_type' => $this->request->getPost('booking_type'),
-                    'lift_vehicle_type'=>$this->request->getPost('lift_vehicle_type'),
+                    'lift_vehicle_type' => $this->request->getPost('lift_vehicle_type'),
                     'rc_no' => $this->request->getPost('rc_no')
                 ];
 
@@ -198,7 +211,7 @@ class Vehicle extends BaseController
                     $insurance_img = $file->getRandomName();
                     $file->move('uploads/', $insurance_img);
                     $data['insurance_img'] = $insurance_img;
-                } 
+                }
 
                 $file1 = $this->request->getFile('fit_doc');
                 if ($file1->isValid() && !$file1->hasMoved()) {
@@ -212,14 +225,14 @@ class Vehicle extends BaseController
                     $pollurion_doc1 = $pollurion_doc->getRandomName();
                     $pollurion_doc->move('uploads/', $pollurion_doc1);
                     $data['pollurion_doc'] = $pollurion_doc1;
-                } 
+                }
 
                 $file3 = $this->request->getFile('permit_doc');
                 if ($file3->isValid() && !$file3->hasMoved()) {
                     $permit_doc = $file3->getRandomName();
                     $file3->move('uploads/', $permit_doc);
                     $data['permit_doc'] = $permit_doc;
-                } 
+                }
 
                 $rc_copy = $this->request->getFile('rc_copy');
                 if ($rc_copy->isValid() && !$rc_copy->hasMoved()) {
@@ -343,10 +356,10 @@ class Vehicle extends BaseController
 
             $user_id = $this->session->get('user_id');
             $userDetails = $this->AdminModel->getSingleData('user', $user_id);
-            if ($userDetails->user_type == 4) {
-                $data['allDriverVehicle'] = $this->AdminModel->getDriverVehicle();
-            } elseif ($userDetails->user_type == 3) {
-                $data['allDriverVehicle'] = $this->AdminModel->getDriverVehicle();
+
+            if ($this->session->get('user_type') == 2) {
+
+                $data['allDriverVehicle'] = $this->AdminModel->getFranchiseDriverVehicle($this->session->get('franchise_id'));
             } else {
                 $data['allDriverVehicle'] = $this->AdminModel->getDriverVehicle();
             }

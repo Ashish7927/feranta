@@ -49,6 +49,7 @@ class Admin extends BaseController
 						'fullname' => $data['full_name'],
 						'email' => $data['email'],
 						'user_type' => $data['user_type'],
+						'franchise_id' => $data['franchise_id'],
 						'isLoggedIn' => TRUE
 					];
 					$session->set($ses_data);
@@ -1598,8 +1599,13 @@ class Admin extends BaseController
 			// if(){
 
 			// }
-			$data['allvendor'] = $this->AdminModel->GetAllUser();
 
+			if($this->session->get('user_type') == 2){
+
+				$data['allvendor'] = $this->AdminModel->GetFranchiseUser($this->session->get('franchise_id'));
+			}else{
+				$data['allvendor'] = $this->AdminModel->GetAllUser();
+			}
 			return view('admin/vendor_vw.php', $data);
 		} else {
 			return redirect()->to('admin/');
@@ -1617,7 +1623,7 @@ class Admin extends BaseController
 			$data['allstate'] = $this->AdminModel->GetAllstate();
 			$data['allcity'] = $this->AdminModel->GetAllcity();
 			$data['pincode'] = $this->AdminModel->GetAllpincode();
-
+			$data['franchise_id'] = $this->session->get('franchise_id');
 			return view('admin/add_vendor_vw.php', $data);
 		} else {
 			return redirect()->to('admin/');
@@ -1639,7 +1645,7 @@ class Admin extends BaseController
 			$data['allstate'] = $this->AdminModel->GetAllstate();
 			$data['allcity'] = $this->AdminModel->GetAllcity();
 			$data['pincode'] = $this->AdminModel->GetAllpincode();
-
+			$data['franchise_id'] = $this->session->get('franchise_id');
 			return view('admin/edit_vendor_vw.php', $data);
 		} else {
 			return redirect()->to('admin/');
@@ -1746,8 +1752,10 @@ class Admin extends BaseController
 					'ditrict'  => $this->request->getVar('ditrict'),
 					'father_name'  => $this->request->getVar('father_name'),
 					'blood_group'  => $this->request->getVar('blood_group'),
+					'dob'  => $this->request->getVar('dob'),
 					'cheque'  => $cheque_name,
-					'branch_name'  => $this->request->getVar('branch_name')
+					'branch_name'  => $this->request->getVar('branch_name'),
+					'created_by'  => $user_id
 
 				];
 
@@ -1869,6 +1877,7 @@ class Admin extends BaseController
 							'ditrict'  => $this->request->getVar('ditrict'),
 							'father_name'  => $this->request->getVar('father_name'),
 							'blood_group'  => $this->request->getVar('blood_group'),
+							'dob'  => $this->request->getVar('dob'),
 							'branch_name'  => $this->request->getVar('branch_name'),
 
 							'exp_year'  => $this->request->getVar('exp_year'),

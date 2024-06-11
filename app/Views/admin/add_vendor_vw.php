@@ -3,8 +3,22 @@
 
 <style>
     .highlight-error {
-  border-color: red;
-}
+        border-color: red;
+    }
+</style>
+<style>
+    .field-icon {
+        float: right;
+        margin-left: -25px;
+        margin-top: -25px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .container {
+        padding-top: 50px;
+        margin: auto;
+    }
 </style>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
@@ -32,21 +46,21 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Name</label>
-                                        <input type="text" class="form-control" name="name" placeholder="Enter full name" value="<?= set_value('name'); ?>">
+                                        <input type="text" class="form-control" name="name" placeholder="Enter full name" value="<?= set_value('name'); ?>" required>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('name'); ?></span><?php } ?>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Email address</label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= set_value('email'); ?>">
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= set_value('email'); ?>" required>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('email'); ?></span><?php } ?>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Contact No</label>
-                                        <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= set_value('contact'); ?>">
+                                        <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= set_value('contact'); ?>" required>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('contact'); ?></span><?php } ?>
                                     </div>
                                 </div>
@@ -61,7 +75,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Select State</label>
-                                        <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id">
+                                        <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id" required>
                                             <option value="">Select State</option>
                                             <?php foreach ($allstate as $state) { ?>
                                                 <option value="<?= $state->state_id ?>"><?= $state->state_name ?></option>
@@ -73,7 +87,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Select City</label>
-                                        <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)">
+                                        <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)" required>
                                             <option value="">Select City</option>
                                             <?php foreach ($allcity as $city) { ?>
                                                 <option value="<?= $city->city_id ?>"><?= $city->city_name ?></option>
@@ -108,7 +122,7 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Ditrict</label>
+                                        <label>District </label>
                                         <input type="text" name="ditrict" class="form-control" value="">
                                     </div>
                                 </div>
@@ -117,6 +131,13 @@
                                     <div class="form-group">
                                         <label>Father's Name</label>
                                         <input type="text" name="father_name" class="form-control" value="">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Date of Birth</label>
+                                        <input type="date" name="dob" class="form-control" value="">
                                     </div>
                                 </div>
 
@@ -137,20 +158,20 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Adharno</label>
-                                        <input type="text" data-type="adhaar-number" maxLength="14" class="form-control" id="adharno" name="adharno" placeholder="Enter Adharno" value="<?= set_value('adharno'); ?>">
+                                        <label>Aadhar Card No</label>
+                                        <input type="text" data-type="adhaar-number" maxLength="14" class="form-control" id="adharno" name="adharno" required placeholder="Enter Adharno" value="<?= set_value('adharno'); ?>">
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('adharno'); ?></span><?php } ?>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Adhar Front Image</label>
+                                        <label>Aadhar Card Front</label>
                                         <input type="file" name="frontimg" class="form-control">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Adhar Back Image</label>
+                                        <label>Aadhar Card Back</label>
                                         <input type="file" name="backimg" class="form-control">
                                     </div>
                                 </div>
@@ -208,14 +229,15 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Username</label>
-                                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" value="<?= set_value('username'); ?>">
+                                        <input type="text" class="form-control" id="username" name="username" required placeholder="Enter username" value="<?= set_value('username'); ?>">
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('username'); ?></span><?php } ?>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Password</label>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" value="<?= set_value('password'); ?>">
+                                        <input type="password" class="form-control" id="password" name="password" required placeholder="Enter Password" value="<?= set_value('password'); ?>">
+                                        <span toggle="#password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('password'); ?></span><?php } ?>
                                     </div>
                                 </div>
@@ -237,15 +259,22 @@
                                 <div class="col-sm-6" id="franchises" style="display: none;">
                                     <div class="form-group ">
                                         <label>Select Franchise</label>
-                                        <select class="form-control" name="franchise_id" id="franchise_id">
+                                        <select class="form-control" name="franchise_id" id="franchise_id" <?php if ($franchise_id != '') {
+                                                                                                                echo 'disabled';
+                                                                                                            } ?>>
                                             <option value="">Select option</option>
                                             <?php foreach ($franchises as $franchise) { ?>
-                                                <option value="<?= $franchise->id; ?>"><?= $franchise->franchise_name; ?></option>
+                                                <option value="<?= $franchise->id; ?>" <?php if ($franchise_id != '' && $franchise_id == $franchise->id) {
+                                                                                            echo 'selected';
+                                                                                        } ?>><?= $franchise->franchise_name; ?></option>
 
                                             <?php } ?>
                                         </select>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('is_driver'); ?></span><?php } ?>
                                     </div>
+                                    <?php if ($franchise_id != '') {
+                                        echo "<input type='hidden' name='franchise_id' value='" . $franchise_id . "'>";
+                                    } ?>
                                 </div>
 
                                 <div class="col-sm-6 is_driver" style="display: none;">
@@ -402,6 +431,18 @@
                 $(this).addClass("highlight-error");
             } else {
                 $(this).removeClass("highlight-error");
+            }
+        });
+
+
+        $(".toggle-password").click(function() {
+
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            var input = $($(this).attr("toggle"));
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
             }
         });
     </script>

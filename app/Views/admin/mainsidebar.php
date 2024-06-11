@@ -77,9 +77,7 @@
                   </li>
                   <li><a href="<?php echo base_url(); ?>admin/Cms_management"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">CMS Management</span></a></li>
                   <li><a href="<?php echo base_url(); ?>admin/Banner"><i class="gi gi-cargo sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Banner Management</span></a> </li>
-                  <?php } ?>
                   <li><a href="<?php echo base_url(); ?>admin/Customer"><i class="gi gi-cargo sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Manage Customer</span></a> </li>
-                  <?php if ($user->user_type == 1) { ?>
                   <li><a href="<?php echo base_url(); ?>admin/Subadmin"><i class="gi gi-keys sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Manage Subadmin</span></a></li>
                   <li><a href="<?php echo base_url(); ?>admin/Manage_coupon"><i class="gi gi-gift sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Manage Coupon</span></a></li>
                   <?php } ?>

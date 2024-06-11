@@ -3043,7 +3043,7 @@ class ApiController extends ResourceController
                 'error'    => null,
                 'response' => [
                     'success' => 'All Checkin Checkout list',
-                    'list' => $Listdata
+                    'checklist' => $Listdata
                 ],
             ];
         }

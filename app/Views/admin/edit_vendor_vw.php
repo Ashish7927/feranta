@@ -5,8 +5,22 @@
 
 <style>
     .highlight-error {
-  border-color: red;
-}
+        border-color: red;
+    }
+</style>
+<style>
+    .field-icon {
+        float: right;
+        margin-left: -25px;
+        margin-top: -25px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .container {
+        padding-top: 50px;
+        margin: auto;
+    }
 </style>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
@@ -35,28 +49,28 @@
                                     <div class="form-group">
                                         <label>Name</label>
                                         <input type="hidden" class="form-control" name="id" value="<?= $vendor->id; ?>">
-                                        <input type="text" class="form-control" name="name" placeholder="Enter full name" value="<?= $vendor->full_name; ?>">
+                                        <input type="text" class="form-control" name="name" placeholder="Enter full name" value="<?= $vendor->full_name; ?>" required>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('name'); ?></span><?php } ?>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Email address</label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= $vendor->email; ?>">
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= $vendor->email; ?>" required>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('email'); ?></span><?php } ?>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Contact No</label>
-                                        <input type="tel" class="form-control" id="contat" name="contact" placeholder="contact no" value="<?= $vendor->contact_no; ?>">
+                                        <input type="tel" class="form-control" id="contat" name="contact" placeholder="contact no" value="<?= $vendor->contact_no; ?>" required>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('contact'); ?></span><?php } ?>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Alternate Contact No</label>
-                                        <input type="tel" class="form-control" id="contat" name="altcontact" placeholder="alternate contact no" value="<?= $vendor->alter_cnum; ?>">
+                                        <input type="tel" class="form-control" id="contat" name="altcontact" placeholder="alternate contact no" value="<?= $vendor->alter_cnum; ?>" >
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('altcontact'); ?></span><?php } ?>
                                     </div>
                                 </div>
@@ -64,7 +78,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Select State</label>
-                                        <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id">
+                                        <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id" required>
                                             <option value="">Select State</option>
                                             <?php foreach ($allstate as $state) { ?>
                                                 <option value="<?= $state->state_id ?>" <?php if ($state->state_id == $vendor->state_id) {
@@ -78,7 +92,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Select City</label>
-                                        <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)">
+                                        <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)" required>
                                             <option value="">Select City</option>
                                             <?php foreach ($allcity as $city) { ?>
                                                 <option value="<?= $city->city_id ?>" <?php if ($city->city_id == $vendor->city_id) {
@@ -114,7 +128,7 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Ditrict</label>
+                                        <label>District </label>
                                         <input type="text" name="ditrict" class="form-control" value="<?= $vendor->ditrict; ?>">
                                     </div>
                                 </div>
@@ -123,6 +137,13 @@
                                     <div class="form-group">
                                         <label>Father's Name</label>
                                         <input type="text" name="father_name" class="form-control" value="<?= $vendor->father_name; ?>">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Date of Birth</label>
+                                        <input type="date" name="dob" class="form-control" value="<?= $vendor->dob; ?>">
                                     </div>
                                 </div>
 
@@ -142,20 +163,20 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Adharno</label>
-                                        <input type="text" data-type="adhaar-number" maxLength="14" class="form-control" id="adharno" name="adharno" placeholder="Enter Adharno" value="<?= $vendor->adhar_no; ?>">
+                                        <label>Aadhar Card No</label>
+                                        <input type="text" data-type="adhaar-number" maxLength="14" class="form-control" id="adharno" name="adharno" placeholder="Enter Adharno" value="<?= $vendor->adhar_no; ?>" required>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('adharno'); ?></span><?php } ?>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Adhar Front Image</label>
+                                        <label>Aadhar Card Front</label>
                                         <input type="file" name="frontimg" class="form-control">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Adhar Back Image</label>
+                                        <label>Aadhar Card Back</label>
                                         <input type="file" name="backimg" class="form-control">
                                     </div>
                                 </div>
@@ -210,16 +231,17 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Username</label>
-                                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" value="<?= $vendor->user_name; ?>">
+                                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" value="<?= $vendor->user_name; ?>" required>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('username'); ?></span><?php } ?>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Password</label>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" value="<?php if ($vendor->password != '') {
+                                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" required value="<?php if ($vendor->password != '') {
                                                                                                                                                             echo base64_decode(base64_decode($vendor->password));
                                                                                                                                                         } ?>">
+                                        <span toggle="#password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('password'); ?></span><?php } ?>
                                     </div>
                                 </div>
@@ -250,7 +272,9 @@
                                                                         } ?>>
                                     <div class="form-group ">
                                         <label>Select Franchise</label>
-                                        <select class="form-control" name="franchise_id" id="franchise_id">
+                                        <select class="form-control" name="franchise_id" id="franchise_id" <?php if ($franchise_id != '') {
+                                                                                                                echo 'disabled';
+                                                                                                            } ?>>
                                             <option value="">Select option</option>
                                             <?php foreach ($franchises as $franchise) { ?>
                                                 <option value="<?= $franchise->id; ?>" <?php if ($vendor->franchise_id == $franchise->id) {
@@ -261,6 +285,9 @@
                                         </select>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('is_driver'); ?></span><?php } ?>
                                     </div>
+                                    <?php if ($franchise_id != '') {
+                                        echo "<input type='hidden' name='franchise_id' value='" . $franchise_id . "'>";
+                                    } ?>
                                 </div>
 
                                 <div class="col-sm-6 is_driver" <?php if ($vendor->user_type != 3) {
@@ -451,6 +478,17 @@
                 $(this).addClass("highlight-error");
             } else {
                 $(this).removeClass("highlight-error");
+            }
+        });
+
+        $(".toggle-password").click(function() {
+
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            var input = $($(this).attr("toggle"));
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
             }
         });
     </script>

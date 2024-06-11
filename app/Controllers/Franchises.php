@@ -104,7 +104,6 @@ class Franchises extends BaseController
                 ];
                 $user_id = $this->request->getPost('francise_user_id');
                 $this->AdminModel->UpdateRecordById('user', $user_id, $data1);
-
             } else {
                 $this->session->setFlashdata('msg', 'Franchise Already  exist.');
                 $this->session->setFlashdata('uid', $id);
@@ -150,10 +149,15 @@ class Franchises extends BaseController
         if ($this->session->get('user_id')) {
 
             $data['member_track'] = $this->AdminModel->GetAllRecord('members_checkin');
-            $data['allvendor'] = $this->AdminModel->GetAllMember();
-            return view('admin/member_track_vw', $data);
 
-        }else {
+            if ($this->session->get('user_type') == 2) {
+
+                $data['allvendor'] = $this->AdminModel->GetFranchiseMember($this->session->get('franchise_id'));
+            } else {
+                $data['allvendor'] = $this->AdminModel->GetAllMember();
+            }
+            return view('admin/member_track_vw', $data);
+        } else {
             return redirect()->to('Admin/');
         }
     }
