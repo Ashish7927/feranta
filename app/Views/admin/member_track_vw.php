@@ -24,7 +24,9 @@
             <th class="text-center">Franchise Name</th>
             <th class="text-center">Email</th>
             <th class="text-center">Contact No</th>
-            
+            <th>
+              Attendance Details
+            </th>
             <th class="text-center">Status</th>
             <th class="text-center">Actions</th>
           </tr>
@@ -35,7 +37,7 @@
           foreach ($allvendor as $vendor) {
             if ($vendor->is_admin == 1) {
               continue;
-          }
+            }
           ?>
             <tr>
               <td class="text-center"><?= $i++; ?></td>
@@ -45,10 +47,12 @@
                 <td class="text-center"><img src="img/placeholders/avatars/avatar11.jpg" alt="avatar" class="img-circle"></td>
               <?php } ?>
               <td class="text-center"><?= $vendor->full_name; ?></td>
-              <td class="text-center"><?=  $vendor->franchise_name; ?></td>
+              <td class="text-center"><?= $vendor->franchise_name; ?></td>
               <td class="text-center"><?= $vendor->email; ?></td>
               <td class="text-center"><?= $vendor->contact_no; ?></td>
-             
+              <td class="text-center">
+                <button type="button" onclick="getAttendanceData(<?= $vendor->id; ?>);" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Attendance</button>
+              </td>
               <td class="text-center">
                 <?php if ($vendor->status == 0) { ?>
                   <a href="javascript:void(0);" onClick="statusupdate('<?= $vendor->id; ?>','1');"><button type="button" class="btn btn-danger ">Deactivate</button></a>
@@ -74,6 +78,43 @@
 
   </div>
 </div>
+
+<!-- Attendance Modal  -->
+
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Member Attendance Details</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Sl no</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Location</th>
+              <th>Image</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceData">
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
 <!-- END Page Content -->
 <form name="frm_deleteBanner" id="frm_deleteBanner" action="<?php echo base_url(); ?>/Admin/deletevendor" method="post">
@@ -104,6 +145,21 @@
     if (conf) {
       $("#status_update").submit();
     }
+  }
+
+  function getAttendanceData(id)
+  {
+    $('#attendanceData').html('');
+    $.ajax({
+            url: "<?php echo base_url(); ?>/franchises/get-attendance-data",
+            method: "POST",
+            data: {
+                member_id: id
+            },
+            success: function(response) {
+                $('#attendanceData').html(response);
+            }
+        });
   }
 </script>
 

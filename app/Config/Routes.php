@@ -76,6 +76,7 @@ $routes->post('/franchises/edit/(:num)', 'Franchises::edit/$1');
 $routes->post('/franchises/status', 'Franchises::status');
 $routes->post('/franchises/delete', 'Franchises::delete');
 $routes->get('/member-tracking', 'Franchises::memberTracking');
+$routes->post('/franchises/get-attendance-data', 'Franchises::getAttendanceData');
 
 $routes->get('/delete-request', 'DeleteRequest::index');
 $routes->post('/delete-request/add', 'DeleteRequest::add');

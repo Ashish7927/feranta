@@ -129,8 +129,22 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
+                                        <label>Pincode </label>
+                                        <input type="text" name="pin" class="form-control" value="">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
                                         <label>Father's Name</label>
                                         <input type="text" name="father_name" class="form-control" value="">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Spouse name</label>
+                                        <input type="text" name="spouse_name" class="form-control" value="">
                                     </div>
                                 </div>
 

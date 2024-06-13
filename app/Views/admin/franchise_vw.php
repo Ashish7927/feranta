@@ -1,5 +1,20 @@
 <?php include('header.php') ?>
 <?php include("mainsidebar.php") ?>
+
+<style>
+    .field-icon {
+        float: right;
+        margin-left: -25px;
+        margin-top: -25px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .container {
+        padding-top: 50px;
+        margin: auto;
+    }
+</style>
 <!-- Page content -->
 <div id="page-content">
 
@@ -18,23 +33,23 @@
 
                         <div class="form-group">
                             <label>Name</label>
-                            <input type="text" class="form-control" name="franchise_name" placeholder="Enter full name" value="<?= set_value('franchise_name'); ?>" require>
+                            <input type="text" class="form-control" name="franchise_name" placeholder="Enter full name" value="<?= set_value('franchise_name'); ?>" required>
                         </div>
 
                         <div class="form-group">
                             <label>Email address</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= set_value('email'); ?>" require>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= set_value('email'); ?>" required>
                         </div>
 
                         <div class="form-group">
                             <label>Contact No</label>
-                            <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= set_value('contact'); ?>" require>
+                            <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= set_value('contact'); ?>" required>
                         </div>
 
 
                         <div class="form-group">
                             <label>Select State</label>
-                            <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id" require>
+                            <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id" required>
                                 <option value="">Select State</option>
                                 <?php foreach ($allstate as $state) { ?>
                                     <option value="<?= $state->state_id ?>"><?= $state->state_name ?></option>
@@ -44,7 +59,7 @@
 
                         <div class="form-group">
                             <label>Select City</label>
-                            <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)" require>
+                            <select class="form-control" name="city" id="cityDiv" onchange="CheckcityId(this.value)" required>
                                 <option value="">Select City</option>
                                 <?php foreach ($allcity as $city) { ?>
                                     <option value="<?= $city->city_id ?>"><?= $city->city_name ?></option>
@@ -54,17 +69,23 @@
 
                         <div class="form-group">
                             <label>Address</label>
-                            <input type="text" name="address" class="form-control" value="">
+                            <input type="text" name="address" class="form-control" value="" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pincode</label>
+                            <input type="text" name="pincode" class="form-control" value="" required>
                         </div>
 
                         <div class="form-group">
                             <label>Username</label>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username " value="<?= set_value('username'); ?>" require>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username " value="<?= set_value('username'); ?>" required>
                         </div>
 
                         <div class="form-group">
                             <label>Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" value="<?= set_value('password'); ?>" require>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" value="<?= set_value('password'); ?>" required>
+                            <span toggle="#password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
                         </div>
 
                         <div class="modal-footer">
@@ -87,6 +108,7 @@
                             <th>Name</th>
                             <th>Email</th>
                             <th>Contact</th>
+                            <th>City</th>
                             <th>Status</th>
                             <th class="text-center">Actions</th>
 
@@ -102,6 +124,7 @@
                                 <td><?= $franchise->franchise_name; ?></td>
                                 <td><?= $franchise->email; ?></td>
                                 <td><?= $franchise->contact; ?></td>
+                                <td><?= $franchise->city_name; ?></td>
                                 <td class="text-center">
                                     <?php if ($franchise->status == 1) { ?>
                                         <a href="javascript:void(0);" onClick="statusupdate('<?= $franchise->id; ?>','0');"><button type="button" class="btn btn-danger ">Deactivate</button></a>
@@ -114,7 +137,7 @@
                                     <div class="btn-group">
 
                                         <a href="#modal-center<?= $franchise->id; ?>" uk-toggle title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
-                                        <a href="javascript:void(0);" onClick="deleteRecord('<?= $franchise->id; ?>');" title="Delete" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a>
+                                        <!-- <a href="javascript:void(0);" onClick="deleteRecord('<?= $franchise->id; ?>');" title="Delete" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></a> -->
                                     </div>
                                 </td>
                             </tr>
@@ -144,23 +167,23 @@
                                     <input type="hidden" name="francise_user_id" value="<?= $franchise->user_id; ?>">
                                     <div class="form-group">
                                         <label>Name</label>
-                                        <input type="text" class="form-control" name="franchise_name" placeholder="Enter full name" value="<?= $franchise->franchise_name; ?>" require>
+                                        <input type="text" class="form-control" name="franchise_name" placeholder="Enter full name" value="<?= $franchise->franchise_name; ?>" required>
                                     </div>
 
                                     <div class="form-group">
                                         <label>Email address</label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= $franchise->email;  ?>" require>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="<?= $franchise->email;  ?>" required>
                                     </div>
 
                                     <div class="form-group">
                                         <label>Contact No</label>
-                                        <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= $franchise->contact;  ?>" require>
+                                        <input type="tel" class="form-control" id="contact" name="contact" placeholder="contact no" value="<?= $franchise->contact;  ?>" required>
                                     </div>
 
 
                                     <div class="form-group">
                                         <label>Select State</label>
-                                        <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id" require>
+                                        <select class="form-control" name="state" onchange="CheckstateId(this.value)" id="state_id" required>
                                             <option value="">Select State</option>
                                             <?php foreach ($allstate as $state) { ?>
                                                 <option value="<?= $state->state_id ?>" <?php if ($franchise->state == $state->state_id) {
@@ -184,17 +207,23 @@
 
                                     <div class="form-group">
                                         <label>Address</label>
-                                        <input type="text" name="address" class="form-control" value="<?= $franchise->address;  ?>">
+                                        <input type="text" name="address" class="form-control" value="<?= $franchise->address;  ?>" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Pincode</label>
+                                        <input type="text" name="pincode" class="form-control" value="<?= $franchise->pincode;  ?>" required>
                                     </div>
 
                                     <div class="form-group">
                                         <label>Username</label>
-                                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username " value="<?= $franchise->user_name;  ?>" require>
+                                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username " value="<?= $franchise->user_name;  ?>" required>
                                     </div>
 
                                     <div class="form-group">
                                         <label>Password</label>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" value="<?= base64_decode(base64_decode($franchise->password));  ?>" require>
+                                        <input type="password" class="form-control" id="password1" name="password" placeholder="Enter password" value="<?= base64_decode(base64_decode($franchise->password));  ?>" required>
+                                        <span toggle="#password1" class="fa fa-fw fa-eye field-icon toggle-password"></span>
                                     </div>
 
                                 </div>
@@ -224,7 +253,6 @@
 
 <script type="text/javascript">
     function deleteRecord(id) {
-        $("#operation").val('delete');
         $("#franchiseid").val(id);
         var conf = confirm("Are you sure want to delete this State");
         if (conf) {
@@ -279,3 +307,14 @@
 
 
 <?php include('footer.php') ?>
+<script>
+        $(".toggle-password").click(function() {
+    $(this).toggleClass("fa-eye fa-eye-slash");
+    var input = $($(this).attr("toggle"));
+    if (input.attr("type") == "password") {
+        input.attr("type", "text");
+    } else {
+        input.attr("type", "password");
+    }
+    });
+</script>

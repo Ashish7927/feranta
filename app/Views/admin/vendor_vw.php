@@ -24,7 +24,7 @@
             <th class="text-center">Role Name</th>
             <th class="text-center">Email</th>
             <th class="text-center">Contact No</th>
-            
+            <th class="text-center">Registerd By</th>
             <th class="text-center">Status</th>
             <th class="text-center">Actions</th>
           </tr>
@@ -45,7 +45,7 @@
               <td class="text-center"><?php  if($vendor->user_type == 3 ){ echo 'Owner'; }else{ echo 'Driver'; } ?></td>
               <td class="text-center"><?= $vendor->email; ?></td>
               <td class="text-center"><?= $vendor->contact_no; ?></td>
-             
+              <td class="text-center"><?php if($vendor->created_by == 1){echo 'Super Admin';}elseif($vendor->created_by == ''){echo 'Self';}else{echo $vendor->franchise_name ;} ?></td>
               <td class="text-center">
                 <?php if ($vendor->status == 0) { ?>
                   <a href="javascript:void(0);" onClick="statusupdate('<?= $vendor->id; ?>','1');"><button type="button" class="btn btn-danger ">Deactivate</button></a>

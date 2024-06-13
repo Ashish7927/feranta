@@ -41,19 +41,25 @@ class Admin extends BaseController
 			$user_type = $data['user_type'];
 			//$authenticatePassword = password_verify($password, $pass);
 
-			if ($pass == $password and $status = 1) {
+			if ($pass == $password) {
 
 				if($user_type == 1 || ($user_type == 2 && $data['is_admin'] == 1)){
-					$ses_data = [
-						'user_id' => $data['id'],
-						'fullname' => $data['full_name'],
-						'email' => $data['email'],
-						'user_type' => $data['user_type'],
-						'franchise_id' => $data['franchise_id'],
-						'isLoggedIn' => TRUE
-					];
-					$session->set($ses_data);
-					return redirect()->to('admin/dashboard');
+					if( $status = 1){
+						$ses_data = [
+							'user_id' => $data['id'],
+							'fullname' => $data['full_name'],
+							'email' => $data['email'],
+							'user_type' => $data['user_type'],
+							'franchise_id' => $data['franchise_id'],
+							'isLoggedIn' => TRUE
+						];
+						$session->set($ses_data);
+						return redirect()->to('admin/dashboard');
+					}else{
+						$session->setFlashdata('msg', 'Your Account is Inactive, Contact to Admin!');
+				return redirect()->to('admin/');
+					}
+					
 				}else{
 					$session->setFlashdata('msg', 'Invalid Request');
 				return redirect()->to('admin/');
@@ -1750,7 +1756,9 @@ class Admin extends BaseController
 					'exp_year'  => $this->request->getVar('exp_year'),
 					'block'  => $this->request->getVar('block'),
 					'ditrict'  => $this->request->getVar('ditrict'),
+					'pin'  => $this->request->getVar('pin'),
 					'father_name'  => $this->request->getVar('father_name'),
+					'spouse_name'  => $this->request->getVar('spouse_name'),
 					'blood_group'  => $this->request->getVar('blood_group'),
 					'dob'  => $this->request->getVar('dob'),
 					'cheque'  => $cheque_name,
@@ -1875,7 +1883,9 @@ class Admin extends BaseController
 
 							'block'  => $this->request->getVar('block'),
 							'ditrict'  => $this->request->getVar('ditrict'),
+							'pin'  => $this->request->getVar('pin'),
 							'father_name'  => $this->request->getVar('father_name'),
+							'spouse_name'  => $this->request->getVar('spouse_name'),
 							'blood_group'  => $this->request->getVar('blood_group'),
 							'dob'  => $this->request->getVar('dob'),
 							'branch_name'  => $this->request->getVar('branch_name'),

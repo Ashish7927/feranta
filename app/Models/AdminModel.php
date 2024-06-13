@@ -529,9 +529,11 @@ class AdminModel extends Model
 	function GetAllUser()
 	{
 		$builder = $this->db->table('user');
-		$builder->select('*');
-		$builder->where('user_type', 3);
-		$builder->orWhere('user_type', 4);
+		$builder->select('user.*,franchises.franchise_name');
+		$builder->join('user u', "u.id = user.created_by",'left');
+		$builder->join('franchises', "franchises.id = u.franchise_id",'left');
+		$builder->where('user.user_type', 3);
+		$builder->orWhere('user.user_type', 4);
 		return $builder->get()->getResult();
 	}
 
@@ -775,7 +777,7 @@ class AdminModel extends Model
 	function getDriverwiseLiftRequest($driver_id)
 	{
 		$builder = $this->db->table('lift_request');
-		$builder->select('lift_request.*,booking.user_id,booking.booking_type,booking.from_location,user.full_name,booking.to_location,booking.origin_lat,booking.origin_lng,booking.destination_lat,booking.destination_lng');
+		$builder->select('lift_request.*,booking.user_id,booking.booking_type,booking.from_location,user.full_name,user.contact_no,booking.to_location,booking.origin_lat,booking.origin_lng,booking.destination_lat,booking.destination_lng');
 		$builder->join('service_bookings booking', 'booking.id = lift_request.booking_id');
 		$builder->join('user user', 'user.id = booking.user_id');
 		$builder->where('lift_request.driver_id', $driver_id);
@@ -859,16 +861,18 @@ class AdminModel extends Model
 	public function GetAllFranchises()
 	{
 		$builder = $this->db->table('franchises');
-		$builder->select('franchises.*,user.id as user_id,user.user_name,user.password');
+		$builder->select('franchises.*,user.id as user_id,user.user_name,user.password,city.city_name');
 		$builder->join('user', 'user.franchise_id = franchises.id AND user.is_admin = 1', 'left');
+		$builder->join('city', 'city.city_id = franchises.city', 'left');
 		return $builder->get()->getResult();
 	}
 
 	public function GetFranchiseUser($franchise_id)
 	{
 		$builder = $this->db->table('user');
-		$builder->select('user.*,u.id as uid');
+		$builder->select('user.*,u.id as uid,u.franchise_id,franchises.franchise_name');
 		$builder->join('user u', "u.id = user.created_by AND u.franchise_id = ".$franchise_id);
+		$builder->join('franchises', "franchises.id = u.franchise_id");
 		$builder->where('user.user_type', 3);
 		$builder->orWhere('user.user_type', 4);
 		return $builder->get()->getResult();

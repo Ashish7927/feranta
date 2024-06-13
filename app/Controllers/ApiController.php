@@ -141,6 +141,9 @@ class ApiController extends ResourceController
         $state = $this->AdminModel->GetAllRecord('state');
         $city = $this->AdminModel->GetAllRecord('city');
         $pincode = $this->AdminModel->GetAllRecord('pincode');
+        $blood_group = $this->AdminModel->GetAllRecord('blood_group');
+        $districts = $this->AdminModel->GetAllRecord('districts');
+        $blocks = $this->AdminModel->GetAllRecord('blocks');
         $response = [
             'status'   => 200,
             'error'    => null,
@@ -149,7 +152,11 @@ class ApiController extends ResourceController
                 'vehicle_type' => $alltytpes,
                 'state' => $state,
                 'city' => $city,
-                'pincode' => $pincode
+                'pincode' => $pincode,
+                'blood_group' => $blood_group,
+                'districts' => $districts,
+                'blocks' => $blocks
+
             ],
         ];
         return $this->respondCreated($response);
@@ -2944,7 +2951,8 @@ class ApiController extends ResourceController
     {
         $rules = [
             'member_id' => 'required',
-            // 'image' => 'required',
+            'lat' => 'required',
+            'lng' => 'required',
             'type' => 'required',
         ];
 
@@ -2961,6 +2969,9 @@ class ApiController extends ResourceController
             $type = $this->request->getVar('type');
             $imgfile = $this->request->getVar('image');
 
+            $lat = $this->request->getVar('lat');
+            $lng = $this->request->getVar('lng');
+            $location = $this->getAddressFromLatLng($lat, $lng);
             $file = $this->request->getFile('image');
             if ($file != null && $file->isValid() && !$file->hasMoved()) {
                 $imgfile = $file->getRandomName();
@@ -2974,7 +2985,8 @@ class ApiController extends ResourceController
                 'type' => $type,
                 'image' => $imgfile,
                 'date' => date('Y-m-d'),
-                'time' => date('H:i')
+                'time' => date('H:i'),
+                'location'=>$location
             ];
 
             $this->AdminModel->InsertRecord('members_checkin', $data);

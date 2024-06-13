@@ -41,6 +41,7 @@ class Franchises extends BaseController
                 'email' => $this->request->getPost('email'),
                 'contact' => $this->request->getPost('contact'),
                 'address' => $this->request->getPost('address'),
+                'pincode' => $this->request->getPost('pincode'),
                 'state' => $this->request->getPost('state'),
                 'city' => $this->request->getPost('city'),
                 'status' => 1
@@ -86,6 +87,7 @@ class Franchises extends BaseController
                     'email' => $this->request->getPost('email'),
                     'contact' => $this->request->getPost('contact'),
                     'address' => $this->request->getPost('address'),
+                    'pincode' => $this->request->getPost('pincode'),
                     'state' => $this->request->getPost('state'),
                     'city' => $this->request->getPost('city')
 
@@ -116,7 +118,7 @@ class Franchises extends BaseController
 
     function delete()
     {
-        if ($this->session->get('franchiseid')) {
+        if ($this->session->get('user_id')) {
             $id = $this->request->getPost('id');
             $this->AdminModel->DeleteRecordById('franchises', $id);
 
@@ -138,6 +140,9 @@ class Franchises extends BaseController
             ];
 
             $this->AdminModel->UpdateRecordById('franchises', $id, $data);
+
+            $this->db->query("UPDATE user SET status = $state_status  WHERE franchise_id = $id AND is_admin = 1;");
+
             return redirect()->to('franchises');
         } else {
             return redirect()->to('Admin/');
@@ -160,5 +165,27 @@ class Franchises extends BaseController
         } else {
             return redirect()->to('Admin/');
         }
+    }
+
+    function getAttendanceData()
+	{
+		$member_id = $this->request->getPost('member_id');
+        $Listdata = $this->AdminModel->getMemebrCheckinCheckoutList($member_id);
+        $html='';
+        $i=1;
+        foreach($Listdata as $data)
+        {
+            $html .="<tr>
+              <th>$i</th>
+              <th>$data->type</th>
+              <th>$data->date</th>
+              <th>$data->time</th>
+              <th>$data->location</th>
+              <th><img src='".base_url()."/uploads/".$data->image."' class='img-circle' width='50px'></th>
+              </tr>";
+              $i++;
+        }
+
+        echo $html;
     }
 }
