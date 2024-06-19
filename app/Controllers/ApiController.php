@@ -1065,7 +1065,7 @@ class ApiController extends ResourceController
             $lat = $this->request->getVar('lat');
             $lng = $this->request->getVar('lng');
             $distance = $this->haversineGreatCircleDistance($serviceDetails->destination_lat, $serviceDetails->destination_lng, $lat, $lng);
-            if ($distance <= 500) {
+            // if ($distance <= 500) {
 
                 if ($serviceDetails->booking_status == 1) {
 
@@ -1089,15 +1089,15 @@ class ApiController extends ResourceController
                         'success' => 'Service updated Successfully'
                     ],
                 ];
-            } else {
-                $response = [
-                    'status'   => 200,
-                    'error'    => 1,
-                    'response' => [
-                        'message' => "You can only end Booking within 500 meter distance to drop location."
-                    ]
-                ];
-            }
+            // } else {
+            //     $response = [
+            //         'status'   => 200,
+            //         'error'    => 1,
+            //         'response' => [
+            //             'message' => "You can only end Booking within 500 meter distance to drop location."
+            //         ]
+            //     ];
+            // }
         }
         return $this->respondCreated($response);
     }
@@ -1520,6 +1520,15 @@ class ApiController extends ResourceController
                 'branch_name'  => $this->request->getVar('branch_name'),
                 'user_type'  => 4,
                 'license_no'  => $this->request->getVar('license_no'),
+                'license_expire_date'  => $this->request->getVar('license_expire_date'),
+                'dob'  => $this->request->getVar('dob'),
+
+                'mother_name'  => $this->request->getVar('mother_name'),
+                'nominee_name'  => $this->request->getVar('nominee_name'),
+                'nominee_rltn'  => $this->request->getVar('nominee_rltn'),
+                'nominee_add'  => $this->request->getVar('nominee_add'),
+                'nominee_dob'  => $this->request->getVar('nominee_dob'),
+                
                 'license_img'  => $license_img1,
                 'status' => 1,
                 'ac_name'  => $this->request->getVar('ac_name'),
@@ -2212,6 +2221,16 @@ class ApiController extends ResourceController
 
                 'user_type'  => 3,
                 'license_no'  => $this->request->getVar('license_no'),
+                'license_expire_date'  => $this->request->getVar('license_expire_date'),
+                'dob'  => $this->request->getVar('dob'),
+
+                'mother_name'  => $this->request->getVar('mother_name'),
+                'nominee_name'  => $this->request->getVar('nominee_name'),
+                'nominee_rltn'  => $this->request->getVar('nominee_rltn'),
+                'nominee_add'  => $this->request->getVar('nominee_add'),
+                'nominee_dob'  => $this->request->getVar('nominee_dob'),
+
+
                 'license_img'  => $license_img1,
                 'status' => 1,
                 'ac_name'  => $this->request->getVar('ac_name'),
@@ -2376,7 +2395,7 @@ class ApiController extends ResourceController
             $lat = $this->request->getVar('lat');
             $lng = $this->request->getVar('lng');
             $distance = $this->haversineGreatCircleDistance($bookingDetails->destination_lat, $bookingDetails->destination_lng, $lat, $lng);
-            if ($distance <= 500) {
+            // if ($distance <= 500) {
 
                 $data = [
                     'status' => 3
@@ -2390,15 +2409,15 @@ class ApiController extends ResourceController
                         'success' => 'Booking updated Successfully'
                     ],
                 ];
-            } else {
-                $response = [
-                    'status'   => 200,
-                    'error'    => 1,
-                    'response' => [
-                        'message' => "You can only end Booking within 500 meter distance to drop location."
-                    ]
-                ];
-            }
+            // } else {
+            //     $response = [
+            //         'status'   => 200,
+            //         'error'    => 1,
+            //         'response' => [
+            //             'message' => "You can only end Booking within 500 meter distance to drop location."
+            //         ]
+            //     ];
+            // }
         }
         return $this->respondCreated($response);
     }
@@ -2612,6 +2631,7 @@ class ApiController extends ResourceController
             ];
         } else {
             $vendor_id = $this->request->getPost('owner_id');
+            $member_id = $this->request->getPost('member_id');
             $no_of_sit = $this->request->getPost('no_of_sit');
             $redg_no = $this->request->getPost('redg_no');
             $model_name = $this->request->getPost('model_name');
@@ -2673,6 +2693,7 @@ class ApiController extends ResourceController
                 'permit_expr_date' => $this->request->getPost('permit_expr_date'),
                 'permit_doc' => $permit_doc,
                 'booking_type' => $this->request->getPost('booking_type'),
+                'added_by' => $this->request->getPost('member_id'),
                 'status' => 0
             ];
 
@@ -3056,6 +3077,207 @@ class ApiController extends ResourceController
                 'response' => [
                     'success' => 'All Checkin Checkout list',
                     'checklist' => $Listdata
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function memberwiseOwenrList()
+    {
+        $rules = [
+            'member_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $member_id = $this->request->getVar('member_id');
+            $memberList = $this->AdminModel->getAllOwnerList($member_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => ' list',
+                    'ownerlist' => $memberList
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function getMemberwiseVehicleList()
+    {
+        $rules = [
+            'member_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $member_id = $this->request->getVar('member_id');
+            $vehicleList = $this->AdminModel->getMemberwiseVehicleList($member_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => ' list',
+                    'vehicleList' => $vehicleList
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function updateUser()
+    {
+        $rules = [
+            'user_id' =>'required|numeric',
+            'full_name' => 'required',
+            'contact_no' => 'required|numeric|exact_length[10]|is_unique[user.contact_no]',
+            'email' => 'required|is_unique[user.email]',
+            'city' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $id = $this->request->getVar('user_id');
+            $file = $this->request->getFile('img');
+
+            if ($file != null && $file->isValid() && !$file->hasMoved()) {
+                $imagename = $file->getRandomName();
+                $file->move('uploads/', $imagename);
+            } else {
+                $imagename = "";
+            }
+
+            $file1 = $this->request->getFile('frontimg');
+
+            if ($file1 != null && $file1->isValid() && !$file1->hasMoved()) {
+                $imagename1 = $file1->getRandomName();
+                $file1->move('uploads/', $imagename1);
+            } else {
+                $imagename1 = "";
+            }
+            $file2 = $this->request->getFile('backimg');
+
+            if ($file2 != null &&  $file2->isValid() && !$file2->hasMoved()) {
+                $imagename2 = $file2->getRandomName();
+                $file2->move('uploads/', $imagename2);
+            } else {
+                $imagename2 = "";
+            }
+
+            $license_img = $this->request->getFile('license_img');
+
+            if ($license_img != null && $license_img->isValid() && !$license_img->hasMoved()) {
+                $license_img1 = $license_img->getRandomName();
+                $license_img->move('uploads/', $license_img1);
+            } else {
+                $license_img1 = "";
+            }
+
+            $cheque = $this->request->getFile('cheque');
+
+            if ($cheque != null && $cheque->isValid() && !$cheque->hasMoved()) {
+                $cheque_name = $cheque->getRandomName();
+                $cheque->move('uploads/', $cheque_name);
+            } else {
+                $cheque_name = "";
+            }
+
+            $data = [
+                'full_name' => $this->request->getVar('full_name'),
+                'email'  => $this->request->getVar('email'),
+                'user_name'  => $this->request->getVar('full_name'),
+                'contact_no'  => $this->request->getVar('contact_no'),
+                'alter_cnum'  => $this->request->getVar('altcontact'),
+                'state_id'  => $this->request->getVar('state'),
+                'city_id'  => $this->request->getVar('city'),
+                'pin'  => $this->request->getVar('pincode'),
+                'address1'  => $this->request->getVar('address1'),
+                'address2'  => $this->request->getVar('address2'),
+                'adhar_no'  => $this->request->getVar('adharno'),
+                'block'  => $this->request->getVar('block'),
+                'ditrict'  => $this->request->getVar('ditrict'),
+                'father_name'  => $this->request->getVar('father_name'),
+                'blood_group'  => $this->request->getVar('blood_group'),
+                'branch_name'  => $this->request->getVar('branch_name'),
+                'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
+
+                'user_type'  => 3,
+                'license_no'  => $this->request->getVar('license_no'),
+                'license_expire_date'  => $this->request->getVar('license_expire_date'),
+                'dob'  => $this->request->getVar('dob'),
+
+                'mother_name'  => $this->request->getVar('mother_name'),
+                'nominee_name'  => $this->request->getVar('nominee_name'),
+                'nominee_rltn'  => $this->request->getVar('nominee_rltn'),
+                'nominee_add'  => $this->request->getVar('nominee_add'),
+                'nominee_dob'  => $this->request->getVar('nominee_dob'),
+                'status' => 1,
+                'ac_name'  => $this->request->getVar('ac_name'),
+                'bank_name'  => $this->request->getVar('bank_name'),
+                'acc_no'  => $this->request->getVar('acc_no'),
+                'ifsc'  => $this->request->getVar('ifsc'),
+                'is_driver'  => $this->request->getVar('is_driver')
+
+
+            ];
+
+            if ($imagename != "") {
+                $data['profile_image']  = $imagename;
+            }
+            if ($imagename1 != "") {
+
+                $data['adhar_font']  = $imagename1;
+            }
+            if ($imagename2 != "") {
+
+                $data['adhar_back']  = $imagename1;
+            }
+
+            if ($license_img1 != "") {
+
+                $data['license_img']  = $license_img1;
+            }
+
+            if ($cheque_name != "") {
+
+                $data['cheque']  = $cheque_name;
+            }
+
+
+            $this->AdminModel->updateUser($data, $id);
+
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'User details updated successfully!',
+                    'userDetails' => $data
                 ],
             ];
         }

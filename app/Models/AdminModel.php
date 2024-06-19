@@ -920,5 +920,24 @@ class AdminModel extends Model
 
 		return $builder->get()->getResult();
 	}
+
+	function getAllOwnerList($member_id)
+	{
+		$builder = $this->db->table('user');
+		$builder->select('id,full_name,contact_no');
+		$builder->where('user_type',3);
+		$builder->where('created_by',$member_id);
+		$builder->orderBy('id','DESC');
+		return $builder->get()->getResult();
+	}
+
+	function getMemberwiseVehicleList($member_id)
+	{
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('*');
+		$builder->where('added_by',$member_id);
+		$builder->orderBy('id','DESC');
+		return $builder->get()->getResult();
+	}
 	
 }

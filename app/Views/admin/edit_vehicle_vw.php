@@ -33,7 +33,7 @@
                                             <?php foreach ($AllVendor as $vendor) { ?>
                                                 <option value="<?= $vendor->id; ?>" <?php if ($vendor->id == $vehicle->vendor_id) {
                                                                                         echo 'selected';
-                                                                                    } ?>><?= $vendor->full_name ?></option>
+                                                                                    } ?>><?= $vendor->full_name.' - '.$vendor->contact_no ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>

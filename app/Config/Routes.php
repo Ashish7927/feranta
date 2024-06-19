@@ -143,3 +143,6 @@ $routes->post('api/verify-otp-for-driver-assign', 'ApiController::verifyDriverAs
 $routes->post('api/member-checkin-checkout', 'ApiController::employeeCheckInCheckOut');
 $routes->post('api/get-customer-lift-booking-history', 'ApiController::liftBookingHistoryCustomer');
 $routes->post('api/get-member-checkin-data', 'ApiController::getCheckinList');
+$routes->post('api/get-memberwise-owner-list', 'ApiController::memberwiseOwenrList');
+$routes->post('api/get-memberwise-vehicle-list', 'ApiController::getMemberwiseVehicleList');
+$routes->post('api/update-user-details', 'ApiController::updateUser');

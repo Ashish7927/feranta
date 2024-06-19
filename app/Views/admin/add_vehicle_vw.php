@@ -32,7 +32,7 @@
                                         <select name="vendor_id" id="vendor_id" class="form-control select2" required>
                                             <option value="">-- Select Owner --</option>
                                             <?php foreach ($AllVendor as $vendor) { ?>
-                                                <option value="<?= $vendor->id; ?>"><?= $vendor->full_name ?></option>
+                                                <option value="<?= $vendor->id; ?>"><?= $vendor->full_name.' - '.$vendor->contact_no ?></option>
                                             <?php } ?>
                                         </select>
                                     </div>
