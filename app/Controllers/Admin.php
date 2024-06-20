@@ -1630,6 +1630,10 @@ class Admin extends BaseController
 			$data['allcity'] = $this->AdminModel->GetAllcity();
 			$data['pincode'] = $this->AdminModel->GetAllpincode();
 			$data['franchise_id'] = $this->session->get('franchise_id');
+
+			$data['allbloodgroup'] = $this->AdminModel->GetAllRecord('blood_group');
+			$data['allditrict'] = $this->AdminModel->GetAllRecord('districts');
+			$data['allblock'] = $this->AdminModel->GetAllRecord('blocks');
 			return view('admin/add_vendor_vw.php', $data);
 		} else {
 			return redirect()->to('admin/');
@@ -1652,6 +1656,9 @@ class Admin extends BaseController
 			$data['allcity'] = $this->AdminModel->GetAllcity();
 			$data['pincode'] = $this->AdminModel->GetAllpincode();
 			$data['franchise_id'] = $this->session->get('franchise_id');
+			$data['allbloodgroup'] = $this->AdminModel->GetAllRecord('blood_group');
+			$data['allditrict'] = $this->AdminModel->GetAllRecord('districts');
+			$data['allblock'] = $this->AdminModel->GetAllRecord('blocks');
 			return view('admin/edit_vendor_vw.php', $data);
 		} else {
 			return redirect()->to('admin/');
@@ -1758,6 +1765,15 @@ class Admin extends BaseController
 					'ditrict'  => $this->request->getVar('ditrict'),
 					'pin'  => $this->request->getVar('pin'),
 					'father_name'  => $this->request->getVar('father_name'),
+
+					'license_expire_date'  => $this->request->getVar('license_expire_date'),
+					'mother_name'  => $this->request->getVar('mother_name'),
+					'nominee_name'  => $this->request->getVar('nominee_name'),
+					'nominee_rltn'  => $this->request->getVar('nominee_rltn'),
+					'nominee_add'  => $this->request->getVar('nominee_add'),
+					'nominee_dob'  => $this->request->getVar('nominee_dob'),
+
+
 					'spouse_name'  => $this->request->getVar('spouse_name'),
 					'blood_group'  => $this->request->getVar('blood_group'),
 					'dob'  => $this->request->getVar('dob'),
@@ -1885,6 +1901,14 @@ class Admin extends BaseController
 							'ditrict'  => $this->request->getVar('ditrict'),
 							'pin'  => $this->request->getVar('pin'),
 							'father_name'  => $this->request->getVar('father_name'),
+
+							'license_expire_date'  => $this->request->getVar('license_expire_date'),
+							'mother_name'  => $this->request->getVar('mother_name'),
+							'nominee_name'  => $this->request->getVar('nominee_name'),
+							'nominee_rltn'  => $this->request->getVar('nominee_rltn'),
+							'nominee_add'  => $this->request->getVar('nominee_add'),
+							'nominee_dob'  => $this->request->getVar('nominee_dob'),
+
 							'spouse_name'  => $this->request->getVar('spouse_name'),
 							'blood_group'  => $this->request->getVar('blood_group'),
 							'dob'  => $this->request->getVar('dob'),
@@ -2387,5 +2411,24 @@ class Admin extends BaseController
             return redirect()->to('admin/');
         }
     }
+
+	function driverSubscription()
+	{
+		if ($this->session->get('user_id')) {
+
+			$user_id = $this->session->get('user_id');
+			$data['setting'] = $this->AdminModel->Settingdata();
+			$data['singleuser'] = $this->AdminModel->userdata($user_id);
+			if($this->session->get('user_type') == 2){
+
+				$data['allvendor'] = $this->AdminModel->GetFranchiseUser($this->session->get('franchise_id'));
+			}else{
+				$data['allvendor'] = $this->AdminModel->GetAllUser();
+			}
+			return view('admin/lift_driver_vw', $data);
+		} else {
+			return redirect()->to('admin/');
+		}
+	}
 
 }

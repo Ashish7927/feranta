@@ -122,14 +122,25 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Block</label>
-                                        <input type="text" name="block" class="form-control" value="<?= $vendor->block; ?>">
+                                        
+                                        <select class="form-control" name="block" id="block" >
+                                            <option value="">Select block</option>
+                                            <?php foreach ($allblock as $block) { ?>
+                                                <option value="<?= $block->id ?>" <?php if($vendor->block == $block->id ){echo 'selected';}?>><?= $block->block_name ?></option>
+                                            <?php } ?>
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>District </label>
-                                        <input type="text" name="ditrict" class="form-control" value="<?= $vendor->ditrict; ?>">
+                                        <select class="form-control" name="ditrict" id="ditrict" >
+                                            <option value="">Select block</option>
+                                            <?php foreach ($allditrict as $ditrict) { ?>
+                                                <option value="<?= $ditrict->id ?>" <?php if($vendor->ditrict == $ditrict->id ){echo 'selected';}?> ><?= $ditrict->district_name ?></option>
+                                            <?php } ?>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -144,6 +155,39 @@
                                     <div class="form-group">
                                         <label>Father's Name</label>
                                         <input type="text" name="father_name" class="form-control" value="<?= $vendor->father_name; ?>">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Mother's Name</label>
+                                        <input type="text" name="mother_name" class="form-control" value="<?= $vendor->mother_name; ?>">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Nominee Name</label>
+                                        <input type="text" name="nominee_name" class="form-control" value="<?= $vendor->nominee_name; ?>">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Relation with Nominee </label>
+                                        <input type="text" name="nominee_rltn" class="form-control" value="<?= $vendor->nominee_rltn; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Nominee Address</label>
+                                        <input type="text" name="nominee_add" class="form-control" value="<?= $vendor->nominee_add; ?>">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Nominee Date of Birth</label>
+                                        <input type="date" name="nominee_dob" class="form-control" value="<?= $vendor->nominee_dob; ?>">
                                     </div>
                                 </div>
 
@@ -164,7 +208,12 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Blood group</label>
-                                        <input type="text" name="blood_group" class="form-control" value="<?= $vendor->blood_group; ?>">
+                                        <select class="form-control" name="blood_group" id="blood_group" >
+                                            <option value="">Select block</option>
+                                            <?php foreach ($allbloodgroup as $bloodgroup) { ?>
+                                                <option value="<?= $bloodgroup->id ?>" <?php if($vendor->blood_group == $bloodgroup->id ){echo 'selected';}?> ><?= $bloodgroup->blood_group ?></option>
+                                            <?php } ?>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -333,6 +382,18 @@
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('license_no'); ?></span><?php } ?>
                                     </div>
                                 </div>
+
+                                <div class="col-sm-6 driver_div" <?php if ($vendor->user_type != 4 && $vendor->is_driver != 1) {
+                                                                        echo 'style="display: none;"';
+                                                                    } ?>>
+                                    <div class="form-group">
+                                        <label>License Expiry Date</label>
+                                        <input type="text" class="form-control driver_input" id="license_expire_date" name="license_expire_date" placeholder="Enter your License Expire date." value="<?= $vendor->license_expire_date; ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('license_expire_date'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+
 
                                 <div class="col-sm-6 driver_div" <?php if ($vendor->user_type != 4 && $vendor->is_driver != 1) {
                                                                         echo 'style="display: none;"';

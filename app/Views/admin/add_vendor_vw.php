@@ -116,14 +116,24 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Block</label>
-                                        <input type="text" name="block" class="form-control" value="">
+                                        <select class="form-control" name="block" id="block" >
+                                            <option value="">Select block</option>
+                                            <?php foreach ($allblock as $block) { ?>
+                                                <option value="<?= $block->id ?>"><?= $block->block_name ?></option>
+                                            <?php } ?>
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>District </label>
-                                        <input type="text" name="ditrict" class="form-control" value="">
+                                        <select class="form-control" name="ditrict" id="ditrict" >
+                                            <option value="">Select block</option>
+                                            <?php foreach ($allditrict as $ditrict) { ?>
+                                                <option value="<?= $ditrict->id ?>"><?= $ditrict->district_name ?></option>
+                                            <?php } ?>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -143,6 +153,41 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
+                                        <label>Mother's Name</label>
+                                        <input type="text" name="mother_name" class="form-control" value="">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Nominee Name</label>
+                                        <input type="text" name="nominee_name" class="form-control" value="">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Relation with Nominee </label>
+                                        <input type="text" name="nominee_rltn" class="form-control" value="">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Nominee Address</label>
+                                        <input type="text" name="nominee_add" class="form-control" value="">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Nominee Date of Birth</label>
+                                        <input type="date" name="nominee_dob" class="form-control" value="">
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-sm-6">
+                                    <div class="form-group">
                                         <label>Spouse name</label>
                                         <input type="text" name="spouse_name" class="form-control" value="">
                                     </div>
@@ -158,7 +203,12 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Blood group</label>
-                                        <input type="text" name="blood_group" class="form-control" value="">
+                                        <select class="form-control" name="blood_group" id="blood_group" >
+                                            <option value="">Select block</option>
+                                            <?php foreach ($allbloodgroup as $bloodgroup) { ?>
+                                                <option value="<?= $bloodgroup->id ?>"><?= $bloodgroup->blood_group ?></option>
+                                            <?php } ?>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -308,6 +358,14 @@
                                         <label>License No.</label>
                                         <input type="text" class="form-control driver_input" id="license_no" name="license_no" placeholder="Enter your License N0." value="<?= set_value('license_no'); ?>">
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('license_no'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 driver_div" style="display: none;">
+                                    <div class="form-group">
+                                        <label>License Expiry Date</label>
+                                        <input type="text" class="form-control driver_input" id="license_expire_date" name="license_expire_date" placeholder="Enter your License Expire date." value="<?= set_value('license_expire_date'); ?>">
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('license_expire_date'); ?></span><?php } ?>
                                     </div>
                                 </div>
 

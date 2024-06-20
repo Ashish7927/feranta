@@ -3149,8 +3149,8 @@ class ApiController extends ResourceController
         $rules = [
             'user_id' =>'required|numeric',
             'full_name' => 'required',
-            'contact_no' => 'required|numeric|exact_length[10]|is_unique[user.contact_no]',
-            'email' => 'required|is_unique[user.email]',
+            'contact_no' => 'required|numeric|exact_length[10]',
+            'email' => 'required',
             'city' => 'required'
         ];
 

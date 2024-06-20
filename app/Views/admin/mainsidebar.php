@@ -53,6 +53,8 @@
                   <li> <a href="<?php echo base_url(); ?>member-tracking"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Franchise Member</span></a></li>
                   <?php if ($user->user_type == 1) { ?>
                   <li> <a href="<?php echo base_url(); ?>delete-request"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Delete Request</span></a></li>
+
+                  <li> <a href="<?php echo base_url(); ?>driver-subscription"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Driver Subscription</span></a></li>
                   
                   <li>
                       <a href="" class="sidebar-nav-menu">
