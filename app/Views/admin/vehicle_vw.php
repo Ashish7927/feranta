@@ -95,7 +95,7 @@
             <div class="modal-body uk-text-left">
                 <div class="form-group">
                     <label>Driver</label>
-                    <select name="driver_id" id="driver_id" class="form-control" required onchange="UpdateDriverDetails(this.value);">
+                    <select name="driver_id" id="driver_id" class="form-control select2" required onchange="UpdateDriverDetails(this.value);">
                         <option value="">-- Select Driver --</option>
                         <?php foreach ($AllDriver as $driver) { ?>
                             <option value="<?= $driver->id; ?>"><?= $driver->full_name ?></option>

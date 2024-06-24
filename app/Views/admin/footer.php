@@ -30,6 +30,10 @@
         	$(document).ready(function() {
     $('#example').dataTable();
 } );
+
+$(document).ready(function() {
+        $(".select2").select2({});
+        });
         </script>
         
         

@@ -836,137 +836,137 @@ class Admin extends BaseController
 		return redirect()->to('admin/City');
 	}
 
-	function Banner()
-	{
-		if ($this->session->get('user_id')) {
+	// function Banner()
+	// {
+	// 	if ($this->session->get('user_id')) {
 
-			$user_id = $this->session->get('user_id');
+	// 		$user_id = $this->session->get('user_id');
 
-			$data['setting'] = $this->AdminModel->Settingdata();
-			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-			$data['banner_data'] = $this->AdminModel->bannerdata();
-
-
-			return view('admin/banner_vw', $data);
-		} else {
-			return redirect()->to('admin/');
-		}
-	}
-	function addbanner()
-	{
-		if ($this->session->get('user_id')) {
-
-			$title = $this->request->getPost('title');
-			$subtitle = $this->request->getPost('subtitle');
-			$url = $this->request->getPost('url');
-			$description = $this->request->getPost('description');
-			$ban_type = $this->request->getPost('ban_type');
-			$orderby = $this->request->getPost('orderby');
-			$file = $this->request->getFile('img');
+	// 		$data['setting'] = $this->AdminModel->Settingdata();
+	// 		$data['singleuser'] = $this->AdminModel->userdata($user_id);
+	// 		$data['banner_data'] = $this->AdminModel->bannerdata();
 
 
-			if ($file->isValid() && !$file->hasMoved()) {
-				$imagename = $file->getRandomName();
-				$file->move('uploads/', $imagename);
-			} else {
-				$imagename = "";
-			}
+	// 		return view('admin/banner_vw', $data);
+	// 	} else {
+	// 		return redirect()->to('admin/');
+	// 	}
+	// }
+	// function addbanner()
+	// {
+	// 	if ($this->session->get('user_id')) {
 
-			$data = [
-				'banner_title' => $title,
-				'banner_subtitle' => $subtitle,
-				'urrl' => $url,
-				'description' => $description,
-				'type' => $ban_type,
-				'orderby' => $orderby,
-				'image' => $imagename
-
-			];
-
-			$this->AdminModel->addbanner($data);
-			return redirect()->to('admin/Banner');
-		} else {
-			return redirect()->to('admin/');
-		}
-	}
-
-	function Delete_Banner()
-	{
-		if ($this->session->get('user_id')) {
-
-			$BannerId = $this->request->getPost('user_id');
-
-			$this->AdminModel->DeleteBanner($BannerId);
-
-			return redirect()->to('/admin/Banner');
-		} else {
-			return redirect()->to('admin/');
-		}
-	}
-	function edit_banner()
-	{
-		if ($this->session->get('user_id')) {
-
-			$user_id = $this->session->get('user_id');
-
-			$data['setting'] = $this->AdminModel->Settingdata();
-			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-
-			$banner_id = $this->request->uri->getSegment(3);
-			$data['single_banner_data'] = $this->AdminModel->single_bannerdata($banner_id);
+	// 		$title = $this->request->getPost('title');
+	// 		$subtitle = $this->request->getPost('subtitle');
+	// 		$url = $this->request->getPost('url');
+	// 		$description = $this->request->getPost('description');
+	// 		$ban_type = $this->request->getPost('ban_type');
+	// 		$orderby = $this->request->getPost('orderby');
+	// 		$file = $this->request->getFile('img');
 
 
-			return view('admin/banner_edit_vw', $data);
-		} else {
-			return redirect()->to('admin/');
-		}
-	}
-	function Update_Banner()
-	{
-		if ($this->session->get('user_id')) {
+	// 		if ($file->isValid() && !$file->hasMoved()) {
+	// 			$imagename = $file->getRandomName();
+	// 			$file->move('uploads/', $imagename);
+	// 		} else {
+	// 			$imagename = "";
+	// 		}
 
-			$banner_id = $this->request->getPost('EditId');
-			$title = $this->request->getPost('title');
-			$subtitle = $this->request->getPost('subtitle');
-			$url = $this->request->getPost('url');
-			$description = $this->request->getPost('description');
-			$ban_type = $this->request->getPost('ban_type');
-			$orderby = $this->request->getPost('orderby');
-			$file = $this->request->getFile('img');
+	// 		$data = [
+	// 			'banner_title' => $title,
+	// 			'banner_subtitle' => $subtitle,
+	// 			'urrl' => $url,
+	// 			'description' => $description,
+	// 			'type' => $ban_type,
+	// 			'orderby' => $orderby,
+	// 			'image' => $imagename
 
-			if ($file->isValid() && !$file->hasMoved()) {
-				$imagename = $file->getRandomName();
-				$file->move('uploads/', $imagename);
-			} else {
-				$imagename = "";
-			}
-			if ($imagename != '') {
-				$data = [
-					'banner_title' => $title,
-					'banner_subtitle' => $subtitle,
-					'urrl' => $url,
-					'description' => $description,
-					'type' => $ban_type,
-					'orderby' => $orderby,
-					'image' => $imagename
+	// 		];
 
-				];
-			} else {
-				$data = [
-					'banner_title' => $title,
-					'banner_subtitle' => $subtitle,
-					'urrl' => $url,
-					'description' => $description,
-					'type' => $ban_type,
-					'orderby' => $orderby,
-				];
-			}
-			$this->AdminModel->Editbanner($data, $banner_id);
-			return redirect()->to('admin/edit_banner/' . $banner_id);
-		} else {
-			return redirect()->to('admin/');
-		}
-	}
+	// 		$this->AdminModel->addbanner($data);
+	// 		return redirect()->to('admin/Banner');
+	// 	} else {
+	// 		return redirect()->to('admin/');
+	// 	}
+	// }
+
+	// function Delete_Banner()
+	// {
+	// 	if ($this->session->get('user_id')) {
+
+	// 		$BannerId = $this->request->getPost('user_id');
+
+	// 		$this->AdminModel->DeleteBanner($BannerId);
+
+	// 		return redirect()->to('/admin/Banner');
+	// 	} else {
+	// 		return redirect()->to('admin/');
+	// 	}
+	// }
+	// function edit_banner()
+	// {
+	// 	if ($this->session->get('user_id')) {
+
+	// 		$user_id = $this->session->get('user_id');
+
+	// 		$data['setting'] = $this->AdminModel->Settingdata();
+	// 		$data['singleuser'] = $this->AdminModel->userdata($user_id);
+
+	// 		$banner_id = $this->request->uri->getSegment(3);
+	// 		$data['single_banner_data'] = $this->AdminModel->single_bannerdata($banner_id);
+
+
+	// 		return view('admin/banner_edit_vw', $data);
+	// 	} else {
+	// 		return redirect()->to('admin/');
+	// 	}
+	// }
+	// function Update_Banner()
+	// {
+	// 	if ($this->session->get('user_id')) {
+
+	// 		$banner_id = $this->request->getPost('EditId');
+	// 		$title = $this->request->getPost('title');
+	// 		$subtitle = $this->request->getPost('subtitle');
+	// 		$url = $this->request->getPost('url');
+	// 		$description = $this->request->getPost('description');
+	// 		$ban_type = $this->request->getPost('ban_type');
+	// 		$orderby = $this->request->getPost('orderby');
+	// 		$file = $this->request->getFile('img');
+
+	// 		if ($file->isValid() && !$file->hasMoved()) {
+	// 			$imagename = $file->getRandomName();
+	// 			$file->move('uploads/', $imagename);
+	// 		} else {
+	// 			$imagename = "";
+	// 		}
+	// 		if ($imagename != '') {
+	// 			$data = [
+	// 				'banner_title' => $title,
+	// 				'banner_subtitle' => $subtitle,
+	// 				'urrl' => $url,
+	// 				'description' => $description,
+	// 				'type' => $ban_type,
+	// 				'orderby' => $orderby,
+	// 				'image' => $imagename
+
+	// 			];
+	// 		} else {
+	// 			$data = [
+	// 				'banner_title' => $title,
+	// 				'banner_subtitle' => $subtitle,
+	// 				'urrl' => $url,
+	// 				'description' => $description,
+	// 				'type' => $ban_type,
+	// 				'orderby' => $orderby,
+	// 			];
+	// 		}
+	// 		$this->AdminModel->Editbanner($data, $banner_id);
+	// 		return redirect()->to('admin/edit_banner/' . $banner_id);
+	// 	} else {
+	// 		return redirect()->to('admin/');
+	// 	}
+	// }
 
 	function Cms_management()
 	{
@@ -1464,134 +1464,134 @@ class Admin extends BaseController
 			return redirect()->to('admin/');
 		}
 	}
-	function Manage_coupon()
-	{
-		if ($this->session->get('user_id')) {
-			$user_id = $this->session->get('user_id');
+	// function Manage_coupon()
+	// {
+	// 	if ($this->session->get('user_id')) {
+	// 		$user_id = $this->session->get('user_id');
 
-			$data['setting'] = $this->AdminModel->Settingdata();
-			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-			$data['allCupons'] = $this->AdminModel->GetCupon();
-			$data['AllCity'] = $this->AdminModel->GetAllcity();
-
-
-			return view('admin/manage_coupon', $data);
-		} else {
-			return redirect()->to('admin/');
-		}
-	}
-
-	function AddCuopon()
-	{
-		if ($this->session->get('user_id')) {
-
-			$user_id = $this->session->get('user_id');
-
-			$data['setting'] = $this->AdminModel->Settingdata();
-			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-			$data['allCupons'] = $this->AdminModel->GetCupon();
+	// 		$data['setting'] = $this->AdminModel->Settingdata();
+	// 		$data['singleuser'] = $this->AdminModel->userdata($user_id);
+	// 		$data['allCupons'] = $this->AdminModel->GetCupon();
+	// 		$data['AllCity'] = $this->AdminModel->GetAllcity();
 
 
+	// 		return view('admin/manage_coupon', $data);
+	// 	} else {
+	// 		return redirect()->to('admin/');
+	// 	}
+	// }
 
-			$rules = [
-				'cocode' => 'required|is_unique[coupon_code.code]'
-			];
-			if ($this->validate($rules)) {
-				$file = $this->request->getFile('img');
+	// function AddCuopon()
+	// {
+	// 	if ($this->session->get('user_id')) {
 
-				if ($file->isValid() && !$file->hasMoved()) {
-					$imagename = $file->getRandomName();
-					$file->move('uploads/', $imagename);
-				} else {
-					$imagename = "";
-				}
+	// 		$user_id = $this->session->get('user_id');
+
+	// 		$data['setting'] = $this->AdminModel->Settingdata();
+	// 		$data['singleuser'] = $this->AdminModel->userdata($user_id);
+	// 		$data['allCupons'] = $this->AdminModel->GetCupon();
 
 
-				$data = [
-					'name' => $this->request->getPost('coname'),
-					'code' => $this->request->getPost('cocode'),
-					'discount_type' => $this->request->getPost('cotype'),
-					'discount_value' => $this->request->getPost('disvalue'),
-					'valid_uo_to' => $this->request->getPost('validate'),
-					'used_up_to' => $this->request->getPost('noofuse'),
-					//'city_id' => $this->request->getPost('city'),
-					'no_of_use_user' => $this->request->getPost('noofuseperuser'),
-					'price_cart' => $this->request->getPost('priceapplay'),
-					'img' => $imagename
-				];
 
-				$this->AdminModel->AddCuponCode($data);
+	// 		$rules = [
+	// 			'cocode' => 'required|is_unique[coupon_code.code]'
+	// 		];
+	// 		if ($this->validate($rules)) {
+	// 			$file = $this->request->getFile('img');
 
-				return redirect()->to('admin/Manage_coupon');
-			} else {
-				$data['validation'] = $this->validator;
-				echo view('admin/manage_coupon', $data);
-			}
-		} else {
-			return redirect()->to('admin/');
-		}
-	}
+	// 			if ($file->isValid() && !$file->hasMoved()) {
+	// 				$imagename = $file->getRandomName();
+	// 				$file->move('uploads/', $imagename);
+	// 			} else {
+	// 				$imagename = "";
+	// 			}
 
-	function EditCuopon()
-	{
-		if ($this->session->get('user_id')) {
 
-			$cupn_id = $this->request->getPost('cuoponID');
-			$file = $this->request->getFile('img');
+	// 			$data = [
+	// 				'name' => $this->request->getPost('coname'),
+	// 				'code' => $this->request->getPost('cocode'),
+	// 				'discount_type' => $this->request->getPost('cotype'),
+	// 				'discount_value' => $this->request->getPost('disvalue'),
+	// 				'valid_uo_to' => $this->request->getPost('validate'),
+	// 				'used_up_to' => $this->request->getPost('noofuse'),
+	// 				//'city_id' => $this->request->getPost('city'),
+	// 				'no_of_use_user' => $this->request->getPost('noofuseperuser'),
+	// 				'price_cart' => $this->request->getPost('priceapplay'),
+	// 				'img' => $imagename
+	// 			];
 
-			if ($file->isValid() && !$file->hasMoved()) {
-				$imagename = $file->getRandomName();
-				$file->move('uploads/', $imagename);
-			} else {
-				$imagename = "";
-			}
+	// 			$this->AdminModel->AddCuponCode($data);
 
-			if ($imagename != "") {
-				$data = [
-					'name' => $this->request->getPost('coname'),
-					'code' => $this->request->getPost('cocode'),
-					'discount_type' => $this->request->getPost('cotype'),
-					'discount_value' => $this->request->getPost('disvalue'),
-					'valid_uo_to' => $this->request->getPost('validate'),
-					'used_up_to' => $this->request->getPost('noofuse'),
-					//'city_id' => $this->request->getPost('city'),
-					'no_of_use_user' => $this->request->getPost('noofuseperuser'),
-					'price_cart' => $this->request->getPost('priceapplay'),
-					'img' => $imagename
-				];
-			} else {
-				$data = [
-					'name' => $this->request->getPost('coname'),
-					'code' => $this->request->getPost('cocode'),
-					'discount_type' => $this->request->getPost('cotype'),
-					'discount_value' => $this->request->getPost('disvalue'),
-					'valid_uo_to' => $this->request->getPost('validate'),
-					'used_up_to' => $this->request->getPost('noofuse'),
-					//'city_id' => $this->request->getPost('city'),
-					'no_of_use_user' => $this->request->getPost('noofuseperuser'),
-					'price_cart' => $this->request->getPost('priceapplay'),
-				];
-			}
+	// 			return redirect()->to('admin/Manage_coupon');
+	// 		} else {
+	// 			$data['validation'] = $this->validator;
+	// 			echo view('admin/manage_coupon', $data);
+	// 		}
+	// 	} else {
+	// 		return redirect()->to('admin/');
+	// 	}
+	// }
 
-			$this->AdminModel->EditCuponCode($data, $cupn_id);
+	// function EditCuopon()
+	// {
+	// 	if ($this->session->get('user_id')) {
 
-			return redirect()->to('admin/Manage_coupon');
-		} else {
-			return redirect()->to('admin/');
-		}
-	}
+	// 		$cupn_id = $this->request->getPost('cuoponID');
+	// 		$file = $this->request->getFile('img');
 
-	function deleteCupon()
-	{
+	// 		if ($file->isValid() && !$file->hasMoved()) {
+	// 			$imagename = $file->getRandomName();
+	// 			$file->move('uploads/', $imagename);
+	// 		} else {
+	// 			$imagename = "";
+	// 		}
 
-		if ($this->session->get('user_id')) {
-			$cupon_id = $this->request->getPost('user_id');
-			$this->db->table('coupon_code')->delete(array('coupon_code_id' => $cupon_id));
-			return redirect()->to('admin/Manage_coupon');
-		} else {
-			return redirect()->to('admin/');
-		}
-	}
+	// 		if ($imagename != "") {
+	// 			$data = [
+	// 				'name' => $this->request->getPost('coname'),
+	// 				'code' => $this->request->getPost('cocode'),
+	// 				'discount_type' => $this->request->getPost('cotype'),
+	// 				'discount_value' => $this->request->getPost('disvalue'),
+	// 				'valid_uo_to' => $this->request->getPost('validate'),
+	// 				'used_up_to' => $this->request->getPost('noofuse'),
+	// 				//'city_id' => $this->request->getPost('city'),
+	// 				'no_of_use_user' => $this->request->getPost('noofuseperuser'),
+	// 				'price_cart' => $this->request->getPost('priceapplay'),
+	// 				'img' => $imagename
+	// 			];
+	// 		} else {
+	// 			$data = [
+	// 				'name' => $this->request->getPost('coname'),
+	// 				'code' => $this->request->getPost('cocode'),
+	// 				'discount_type' => $this->request->getPost('cotype'),
+	// 				'discount_value' => $this->request->getPost('disvalue'),
+	// 				'valid_uo_to' => $this->request->getPost('validate'),
+	// 				'used_up_to' => $this->request->getPost('noofuse'),
+	// 				//'city_id' => $this->request->getPost('city'),
+	// 				'no_of_use_user' => $this->request->getPost('noofuseperuser'),
+	// 				'price_cart' => $this->request->getPost('priceapplay'),
+	// 			];
+	// 		}
+
+	// 		$this->AdminModel->EditCuponCode($data, $cupn_id);
+
+	// 		return redirect()->to('admin/Manage_coupon');
+	// 	} else {
+	// 		return redirect()->to('admin/');
+	// 	}
+	// }
+
+	// function deleteCupon()
+	// {
+
+	// 	if ($this->session->get('user_id')) {
+	// 		$cupon_id = $this->request->getPost('user_id');
+	// 		$this->db->table('coupon_code')->delete(array('coupon_code_id' => $cupon_id));
+	// 		return redirect()->to('admin/Manage_coupon');
+	// 	} else {
+	// 		return redirect()->to('admin/');
+	// 	}
+	// }
 
 
 	function Vendor()
@@ -1754,6 +1754,7 @@ class Admin extends BaseController
 					'franchise_id' => $this->request->getVar('franchise_id'),
 					'user_type'  => $this->request->getVar('role'),
 					'license_no'  => $this->request->getVar('license_no'),
+					'license_type'  => $this->request->getVar('license_type'),
 					'license_img'  => $license_img1,
 					'status' => 1,
 					'ac_name'  => $this->request->getVar('ac_name'),
@@ -1891,6 +1892,7 @@ class Admin extends BaseController
 							'status'  => 1,
 							'user_type'  => $this->request->getVar('role'),
 							'license_no'  => $this->request->getVar('license_no'),
+							'license_type'  => $this->request->getVar('license_type'),
 							'is_driver' => $this->request->getVar('is_driver'),
 							'ac_name'  => $this->request->getVar('ac_name'),
 							'bank_name'  => $this->request->getVar('bank_name'),

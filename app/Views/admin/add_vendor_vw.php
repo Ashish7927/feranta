@@ -363,6 +363,19 @@
 
                                 <div class="col-sm-6 driver_div" style="display: none;">
                                     <div class="form-group">
+                                        <label>License Type</label>
+
+                                        <select name="license_type" id="license_type" class="form-control driver_input">
+                                            <option value="">-Please select license type-</option>
+                                            <option value="mcwg">MCWG (Motorcycles with and without gear) </option>
+                                            <option value="lmv-nt">LMV-NT (Non-transport Light Motor Vehicles like cars, jeeps, etc.)</option>
+                                        </select>
+                                        <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('license_type'); ?></span><?php } ?>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 driver_div" style="display: none;">
+                                    <div class="form-group">
                                         <label>License Expiry Date</label>
                                         <input type="text" class="form-control driver_input" id="license_expire_date" name="license_expire_date" placeholder="Enter your License Expire date." value="<?= set_value('license_expire_date'); ?>">
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('license_expire_date'); ?></span><?php } ?>

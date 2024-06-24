@@ -1520,6 +1520,7 @@ class ApiController extends ResourceController
                 'branch_name'  => $this->request->getVar('branch_name'),
                 'user_type'  => 4,
                 'license_no'  => $this->request->getVar('license_no'),
+                'license_type'  => $this->request->getVar('license_type'),
                 'license_expire_date'  => $this->request->getVar('license_expire_date'),
                 'dob'  => $this->request->getVar('dob'),
 
@@ -1996,14 +1997,25 @@ class ApiController extends ResourceController
                 $password = base64_encode(base64_encode($password));
                 if ($data[0]->password == $password) {
 
-                    $response = [
-                        'status'   => 200,
-                        'error'    => null,
-                        'response' => [
-                            'message' => 'Login success!',
-                            'profileDetails' => $data[0]
-                        ],
-                    ];
+                    if(($data[0]->franchise_id != null || $data[0]->franchise_id != '') && $data[0]->user_type == 2 ){
+                        $response = [
+                            'status'   => 200,
+                            'error'    => null,
+                            'response' => [
+                                'message' => 'Login success!',
+                                'profileDetails' => $data[0]
+                            ],
+                        ];
+                    }else{
+                        $response = [
+                            'status'   => 200,
+                            'error'    => 1,
+                            'response' => [
+                                'message' => 'Invalid Request!'
+                            ]
+                        ]; 
+                    }
+                    
                 } else {
                     $response = [
                         'status'   => 200,
@@ -2221,6 +2233,7 @@ class ApiController extends ResourceController
 
                 'user_type'  => 3,
                 'license_no'  => $this->request->getVar('license_no'),
+                'license_type'  => $this->request->getVar('license_type'),
                 'license_expire_date'  => $this->request->getVar('license_expire_date'),
                 'dob'  => $this->request->getVar('dob'),
 
@@ -2736,6 +2749,7 @@ class ApiController extends ResourceController
             $redg_no = $this->request->getPost('redg_no');
             $model_name = $this->request->getPost('model_name');
             $vehicle_type = $this->request->getPost('vehicle_type');
+            $vendor_id = $this->request->getPost('owner_id');
 
             $data = [
                 'type_id' => $vehicle_type,
@@ -2755,6 +2769,10 @@ class ApiController extends ResourceController
                 'permit_expr_date' => $this->request->getPost('permit_expr_date'),
                 'booking_type' => $this->request->getPost('booking_type')
             ];
+
+            if(isset($vendor_id) && $vendor_id != ''){
+                $data['vendor_id'] = $vendor_id;
+            }
 
             $file = $this->request->getFile('insurance_img');
             if ($file != null && $file->isValid() && !$file->hasMoved()) {
@@ -3226,9 +3244,8 @@ class ApiController extends ResourceController
                 'blood_group'  => $this->request->getVar('blood_group'),
                 'branch_name'  => $this->request->getVar('branch_name'),
                 'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
-
-                'user_type'  => 3,
                 'license_no'  => $this->request->getVar('license_no'),
+                'license_type'  => $this->request->getVar('license_type'),
                 'license_expire_date'  => $this->request->getVar('license_expire_date'),
                 'dob'  => $this->request->getVar('dob'),
 
@@ -3237,7 +3254,6 @@ class ApiController extends ResourceController
                 'nominee_rltn'  => $this->request->getVar('nominee_rltn'),
                 'nominee_add'  => $this->request->getVar('nominee_add'),
                 'nominee_dob'  => $this->request->getVar('nominee_dob'),
-                'status' => 1,
                 'ac_name'  => $this->request->getVar('ac_name'),
                 'bank_name'  => $this->request->getVar('bank_name'),
                 'acc_no'  => $this->request->getVar('acc_no'),

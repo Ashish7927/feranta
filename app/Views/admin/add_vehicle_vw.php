@@ -1,10 +1,6 @@
 <?php include('header.php') ?>
 <?php include("mainsidebar.php") ?>
 
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>
 <div id="loader" class="uk-overlay-primary uk-position-cover" style="display:none; z-index:1000000000;">
     <div class="uk-position-center">
         <span uk-spinner="ratio: 2"></span>
@@ -242,9 +238,7 @@
                 $(".vehicle_type").css("display", "block");
             }
         }
-        $(document).ready(function() {
-        $(".select2").select2({});
-        });
+        
     </script>
 
     <?php include('footer.php') ?>
