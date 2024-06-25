@@ -36,39 +36,64 @@ class Franchises extends BaseController
     {
         if ($this->session->get('user_id')) {
 
-            $data = [
-                'franchise_name' => $this->request->getPost('franchise_name'),
-                'email' => $this->request->getPost('email'),
-                'contact' => $this->request->getPost('contact'),
-                'address' => $this->request->getPost('address'),
-                'pincode' => $this->request->getPost('pincode'),
-                'state' => $this->request->getPost('state'),
-                'city' => $this->request->getPost('city'),
-                'status' => 1
+            $email = $this->request->getPost('email');
+            $contact = $this->request->getPost('contact');
+            $username = $this->request->getPost('username');
 
-            ];
+            $CountEmail = $this->db->query("SELECT * FROM user  where email=$email")->getResult();
+            $CountContact = $this->db->query("SELECT * FROM user  where contact_no=$contact")->getResult();
+            $CountUsername = $this->db->query("SELECT * FROM user  where user_name=$username")->getResult();
 
-            $franchise_id = $this->AdminModel->InsertFranchise($data);
+            if (count($CountEmail) != 0) {
+                return redirect()->back()->withInput()->with('message', 'Email  Already  exist.');
+            } else {
+                if (count($CountContact) != 0) {
+                    return redirect()->back()->withInput()->with('message', 'Contact No  Already  exist.');
+                } else {
 
-            $data = [
-                'full_name' => $this->request->getPost('franchise_name'),
-                'email' => $this->request->getPost('email'),
-                'contact_no' => $this->request->getPost('contact'),
-                'address1' => $this->request->getPost('address'),
-                'state_id' => $this->request->getPost('state'),
-                'city_id' => $this->request->getPost('city'),
-                'user_name' => $this->request->getPost('username'),
-                'password' => base64_encode(base64_encode($this->request->getVar('password'))),
-                'user_type' => 2,
-                'franchise_id' => $franchise_id,
-                'is_admin' => 1,
-                'status' => 1
+                    if (count($CountUsername) != 0) {
+                        return redirect()->back()->withInput()->with('message', 'Username  Already  exist.');
+                    } else {
 
-            ];
 
-            $this->AdminModel->InsertRecord('user', $data);
 
-            return redirect()->to('franchises');
+
+                        $data = [
+                            'franchise_name' => $this->request->getPost('franchise_name'),
+                            'email' => $this->request->getPost('email'),
+                            'contact' => $this->request->getPost('contact'),
+                            'address' => $this->request->getPost('address'),
+                            'pincode' => $this->request->getPost('pincode'),
+                            'state' => $this->request->getPost('state'),
+                            'city' => $this->request->getPost('city'),
+                            'status' => 1
+
+                        ];
+
+                        $franchise_id = $this->AdminModel->InsertFranchise($data);
+
+                        $data = [
+                            'full_name' => $this->request->getPost('franchise_name'),
+                            'email' => $this->request->getPost('email'),
+                            'contact_no' => $this->request->getPost('contact'),
+                            'address1' => $this->request->getPost('address'),
+                            'state_id' => $this->request->getPost('state'),
+                            'city_id' => $this->request->getPost('city'),
+                            'user_name' => $this->request->getPost('username'),
+                            'password' => base64_encode(base64_encode($this->request->getVar('password'))),
+                            'user_type' => 2,
+                            'franchise_id' => $franchise_id,
+                            'is_admin' => 1,
+                            'status' => 1
+
+                        ];
+
+                        $this->AdminModel->InsertRecord('user', $data);
+
+                        return redirect()->to('franchises');
+                    }
+                }
+            }
         } else {
             return redirect()->to('admin/');
         }
@@ -78,36 +103,57 @@ class Franchises extends BaseController
     {
         if ($this->session->get('user_id')) {
 
+            $email = $this->request->getPost('email');
+            $contact = $this->request->getPost('contact');
+            $username = $this->request->getPost('username');
+
             $state = $this->request->getPost('franchise_name');
             $Countstate = $this->db->query("SELECT * FROM franchises  where franchise_name='$state' and id!='$id' ")->getResult();
 
             if (count($Countstate) == 0) {
-                $data = [
-                    'franchise_name' => $this->request->getPost('franchise_name'),
-                    'email' => $this->request->getPost('email'),
-                    'contact' => $this->request->getPost('contact'),
-                    'address' => $this->request->getPost('address'),
-                    'pincode' => $this->request->getPost('pincode'),
-                    'state' => $this->request->getPost('state'),
-                    'city' => $this->request->getPost('city')
 
-                ];
-                $this->AdminModel->UpdateRecordById('franchises', $id, $data);
+                $CountEmail = $this->db->query("SELECT * FROM user  where email=$email and id!=$id ")->getResult();
+                $CountContact = $this->db->query("SELECT * FROM user  where contact_no=$contact and id!=$id ")->getResult();
+                $CountUsername = $this->db->query("SELECT * FROM user  where user_name=$username and id!=$id ")->getResult();
+                if (count($CountEmail) != 0) {
+                    return redirect()->back()->withInput()->with('msg', 'Email  Already  exist.');
+                } else {
+                    if (count($CountContact) != 0) {
+                        return redirect()->back()->withInput()->with('msg', 'Contact No  Already  exist.');
+                    } else {
 
-                $data1 = [
-                    'full_name' => $this->request->getPost('franchise_name'),
-                    'email' => $this->request->getPost('email'),
-                    'contact_no' => $this->request->getPost('contact'),
-                    'address1' => $this->request->getPost('address'),
-                    'state_id' => $this->request->getPost('state'),
-                    'city_id' => $this->request->getPost('city'),
-                    'user_name' => $this->request->getPost('username'),
-                    'password' => base64_encode(base64_encode($this->request->getVar('password')))
-                ];
-                $user_id = $this->request->getPost('francise_user_id');
-                $this->AdminModel->UpdateRecordById('user', $user_id, $data1);
+                        if (count($CountUsername) != 0) {
+                            return redirect()->back()->withInput()->with('msg', 'Username  Already  exist.');
+                        } else {
+                            $data = [
+                                'franchise_name' => $this->request->getPost('franchise_name'),
+                                'email' => $this->request->getPost('email'),
+                                'contact' => $this->request->getPost('contact'),
+                                'address' => $this->request->getPost('address'),
+                                'pincode' => $this->request->getPost('pincode'),
+                                'state' => $this->request->getPost('state'),
+                                'city' => $this->request->getPost('city')
+
+                            ];
+                            $this->AdminModel->UpdateRecordById('franchises', $id, $data);
+
+                            $data1 = [
+                                'full_name' => $this->request->getPost('franchise_name'),
+                                'email' => $this->request->getPost('email'),
+                                'contact_no' => $this->request->getPost('contact'),
+                                'address1' => $this->request->getPost('address'),
+                                'state_id' => $this->request->getPost('state'),
+                                'city_id' => $this->request->getPost('city'),
+                                'user_name' => $this->request->getPost('username'),
+                                'password' => base64_encode(base64_encode($this->request->getVar('password')))
+                            ];
+                            $user_id = $this->request->getPost('francise_user_id');
+                            $this->AdminModel->UpdateRecordById('user', $user_id, $data1);
+                        }
+                    }
+                }
             } else {
-                $this->session->setFlashdata('msg', 'Franchise Already  exist.');
+                $this->session->setFlashdata('msg', 'Franchise Name Already  exist.');
                 $this->session->setFlashdata('uid', $id);
             }
             return redirect()->to('franchises');
@@ -168,22 +214,21 @@ class Franchises extends BaseController
     }
 
     function getAttendanceData()
-	{
-		$member_id = $this->request->getPost('member_id');
+    {
+        $member_id = $this->request->getPost('member_id');
         $Listdata = $this->AdminModel->getMemebrCheckinCheckoutList($member_id);
-        $html='';
-        $i=1;
-        foreach($Listdata as $data)
-        {
-            $html .="<tr>
+        $html = '';
+        $i = 1;
+        foreach ($Listdata as $data) {
+            $html .= "<tr>
               <th>$i</th>
               <th>$data->type</th>
               <th>$data->date</th>
               <th>$data->time</th>
               <th>$data->location</th>
-              <th><img src='".base_url()."/uploads/".$data->image."' class='img-circle' width='50px'></th>
+              <th><img src='" . base_url() . "/uploads/" . $data->image . "' class='img-circle' width='50px'></th>
               </tr>";
-              $i++;
+            $i++;
         }
 
         echo $html;

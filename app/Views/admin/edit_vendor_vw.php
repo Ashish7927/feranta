@@ -38,7 +38,9 @@
             <div class="uk-card uk-card-body uk-card-default uk-card-small">
                 <h4>Basic Info</h4>
                 <hr>
-
+                <?php if (session('message') !== null) : ?>
+                <p style="color: red;"><?= session('message'); ?></p>
+            <?php endif; ?>
                 <form action="<?php echo base_url(); ?>/admin/Updatevendor" enctype="multipart/form-data" method="post">
                     <div class="uk-grid-small  uk-grid-divider" uk-grid>
                         <div class="uk-width-expand@m">
@@ -314,7 +316,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Select Role</label>
-                                        <select class="form-control" name="role" onchange="CheckRole(this.value)" id="role_id">
+                                        <select class="form-control" name="role" onchange="CheckRole(this.value)" id="role_id" required>
                                             <option value="">Select Role</option>
                                             <option value="3" <?php if ($vendor->user_type == 3) {
                                                                     echo 'selected';

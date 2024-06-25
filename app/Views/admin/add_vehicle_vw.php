@@ -40,6 +40,7 @@
                                             <option value="">-- Select Booking Type --</option>
                                             <option value="1">Cab Booking</option>
                                             <option value="2">Lift Booking</option>
+                                            <option value="3">Ambulance</option>
                                         </select>
                                     </div>
                                 </div>

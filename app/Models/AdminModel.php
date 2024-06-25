@@ -529,7 +529,7 @@ class AdminModel extends Model
 	function GetAllUser()
 	{
 		$builder = $this->db->table('user');
-		$builder->select('user.*,franchises.franchise_name');
+		$builder->select('user.*,franchises.franchise_name,u.full_name as member_name');
 		$builder->join('user u', "u.id = user.created_by",'left');
 		$builder->join('franchises', "franchises.id = u.franchise_id",'left');
 		$builder->where('user.user_type', 3);
@@ -846,6 +846,7 @@ class AdminModel extends Model
 		$builder = $this->db->table('members_checkin');
 		$builder->select('*');
 		$builder->Where('member_id', $member_id);
+		$builder->orderBy('id','DESC');
 		return $builder->get()->getResult();
 	}
 
@@ -870,7 +871,7 @@ class AdminModel extends Model
 	public function GetFranchiseUser($franchise_id)
 	{
 		$builder = $this->db->table('user');
-		$builder->select('user.*,u.id as uid,u.franchise_id,franchises.franchise_name');
+		$builder->select('user.*,u.id as uid,u.franchise_id,u.full_name as member_name,franchises.franchise_name');
 		$builder->join('user u', "u.id = user.created_by AND u.franchise_id = ".$franchise_id);
 		$builder->join('franchises', "franchises.id = u.franchise_id");
 		$builder->where('user.user_type', 3);
@@ -926,7 +927,7 @@ class AdminModel extends Model
 		$builder = $this->db->table('user');
 		$builder->select('id,full_name,contact_no');
 		$builder->where('user_type',3);
-		$builder->where('created_by',$member_id);
+		// $builder->where('created_by',$member_id);
 		$builder->orderBy('id','DESC');
 		return $builder->get()->getResult();
 	}
@@ -934,10 +935,33 @@ class AdminModel extends Model
 	function getMemberwiseVehicleList($member_id)
 	{
 		$builder = $this->db->table('vehicle_details');
-		$builder->select('*');
-		$builder->where('added_by',$member_id);
-		$builder->orderBy('id','DESC');
+		$builder->select('vehicle_details.*,owner.full_name as owner_name,owner.contact_no as owner_number,driver.full_name as driver_name,driver.contact_no as driver_number');
+		$builder->join('user owner', "owner.id = vehicle_details.vendor_id","left");
+		$builder->join('user driver', "driver.id = vehicle_details.driver_id","left");
+		$builder->where('vehicle_details.added_by',$member_id);
+		$builder->orderBy('vehicle_details.id','DESC');
 		return $builder->get()->getResult();
+	}
+
+	function getMemberDriverList()
+	{
+		$builder = $this->db->table('user');
+		$builder->select('user.*,v.driver_id');
+		$builder->join('vehicle_details v', "v.driver_id = user.id","left");
+		$builder->where('user.user_type',4);
+		$builder->where('v.driver_id',null);
+		$builder->orderBy('user.id','DESC');
+		return $builder->get()->getResult();
+
+	}
+
+	public function InsertVehicle($data)
+	{
+		// Insert data into the 'products' table
+		$this->db->table('vehicle_details')->insert($data);
+
+		// Return the last insert ID
+		return $this->db->insertID();
 	}
 	
 }

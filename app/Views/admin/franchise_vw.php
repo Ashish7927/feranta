@@ -25,6 +25,10 @@
             <div class="uk-card  uk-card-default uk-card-small">
                 <div class="modal-header">
                     <h4 class="modal-title">Add Franchise</h4>
+                    <p></p>
+                    <?php if (session('message') !== null) : ?>
+                        <p style="color: red;"><?= session('message'); ?></p>
+                    <?php endif; ?>
                 </div>
 
 
@@ -222,8 +226,8 @@
 
                                     <div class="form-group">
                                         <label>Password</label>
-                                        <input type="password" class="form-control" id="password1" name="password" placeholder="Enter password" value="<?= base64_decode(base64_decode($franchise->password));  ?>" required>
-                                        <span toggle="#password1" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                                        <input type="password" class="form-control" id="password<?= $franchise->id ?>" name="password" placeholder="Enter password" value="<?= base64_decode(base64_decode($franchise->password));  ?>" required>
+                                        <span toggle="#password<?= $franchise->id ?>" class="fa fa-fw fa-eye field-icon toggle-password"></span>
                                     </div>
 
                                 </div>
@@ -308,13 +312,13 @@
 
 <?php include('footer.php') ?>
 <script>
-        $(".toggle-password").click(function() {
-    $(this).toggleClass("fa-eye fa-eye-slash");
-    var input = $($(this).attr("toggle"));
-    if (input.attr("type") == "password") {
-        input.attr("type", "text");
-    } else {
-        input.attr("type", "password");
-    }
+    $(".toggle-password").click(function() {
+        $(this).toggleClass("fa-eye fa-eye-slash");
+        var input = $($(this).attr("toggle"));
+        if (input.attr("type") == "password") {
+            input.attr("type", "text");
+        } else {
+            input.attr("type", "password");
+        }
     });
 </script>

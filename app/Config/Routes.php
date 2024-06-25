@@ -148,3 +148,7 @@ $routes->post('api/get-member-checkin-data', 'ApiController::getCheckinList');
 $routes->post('api/get-memberwise-owner-list', 'ApiController::memberwiseOwenrList');
 $routes->post('api/get-memberwise-vehicle-list', 'ApiController::getMemberwiseVehicleList');
 $routes->post('api/update-user-details', 'ApiController::updateUser');
+$routes->post('api/get-memberwise-driver-list', 'ApiController::memberwiseDriverList');
+$routes->post('api/get-driver-vehicle-details', 'ApiController::driverVehicleDetails');
+$routes->post('api/driver-add-ratting-review', 'ApiController::addDriverRatingReviews');
+

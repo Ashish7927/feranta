@@ -50,6 +50,9 @@
                                             <option value="2" <?php if (2 == $vehicle->booking_type) {
                                                                     echo 'selected';
                                                                 } ?>>Lift Booking</option>
+                                                                <option value="3" <?php if (3 == $vehicle->booking_type) {
+                                                                    echo 'selected';
+                                                                } ?>>Ambulance</option>
                                         </select>
                                     </div>
                                 </div>

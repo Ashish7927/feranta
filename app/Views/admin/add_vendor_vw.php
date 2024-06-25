@@ -293,7 +293,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Username</label>
-                                        <input type="text" class="form-control" id="username" name="username" required placeholder="Enter username" value="<?= set_value('username'); ?>">
+                                        <input type="text" class="form-control" id="username" name="username" required placeholder="Enter username" value="<?= set_value('username'); ?>" required>
                                         <?php if (isset($validation)) { ?><span class="text-danger"><?= $error = $validation->getError('username'); ?></span><?php } ?>
                                     </div>
                                 </div>
@@ -310,7 +310,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Select Role</label>
-                                        <select class="form-control" name="role" onchange="CheckRole(this.value)" id="role_id">
+                                        <select class="form-control" name="role" onchange="CheckRole(this.value)" id="role_id" required>
                                             <option value="">Select Role</option>
                                             <option value="3">Owner</option>
                                             <option value="4">Driver</option>

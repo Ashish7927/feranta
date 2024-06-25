@@ -1681,6 +1681,7 @@ class Admin extends BaseController
 			$rules = [
 				'name' => 'required|min_length[3]',
 				'email' => 'required|valid_email|is_unique[user.email]',
+				'username' => 'required|is_unique[user.username]',
 				'contact' => 'required|numeric|max_length[10]|is_unique[user.contact_no]',
 				'password' => 'required|min_length[6]',
 				'state' => 'required',
@@ -1745,7 +1746,6 @@ class Admin extends BaseController
 					'address1'  => $this->request->getVar('address1'),
 					'address2'  => $this->request->getVar('address2'),
 					'adhar_no'  => $this->request->getVar('adharno'),
-
 					'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
 					'profile_image'  => $imagename,
 
@@ -1797,6 +1797,21 @@ class Admin extends BaseController
 				}
 				
 			} else {
+
+				$user_id = $this->session->get('user_id');
+
+			$data['setting'] = $this->AdminModel->Settingdata();
+			$data['singleuser'] = $this->AdminModel->userdata($user_id);
+			$data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
+			$data['allstate'] = $this->AdminModel->GetAllstate();
+			$data['allcity'] = $this->AdminModel->GetAllcity();
+			$data['pincode'] = $this->AdminModel->GetAllpincode();
+			$data['franchise_id'] = $this->session->get('franchise_id');
+
+			$data['allbloodgroup'] = $this->AdminModel->GetAllRecord('blood_group');
+			$data['allditrict'] = $this->AdminModel->GetAllRecord('districts');
+			$data['allblock'] = $this->AdminModel->GetAllRecord('blocks');
+			
 				$data['validation'] = $this->validator;
 				echo view('admin/add_vendor_vw', $data);
 			}
@@ -1954,18 +1969,19 @@ class Admin extends BaseController
 					} else {
 						$this->session->setFlashdata('msg', 'Username  Already  exist.');
 						$this->session->setFlashdata('uid', $id);
+						return redirect()->back()->withInput()->with('message', 'Username  Already  exist.');
 					}
 				} else {
 					$this->session->setFlashdata('msg', 'Contact Number  Already  exist.');
 					$this->session->setFlashdata('uid', $id);
+					return redirect()->back()->withInput()->with('message', 'Contact Number  Already  exist.');
 				}
 			} else {
 				$this->session->setFlashdata('msg', 'Email Already  exist.');
 				$this->session->setFlashdata('uid', $id);
+				return redirect()->back()->withInput()->with('message', 'Email Already  exist.');
 			}
 
-
-			return redirect()->to('admin/Vendor');
 		} else {
 			return redirect()->to('admin/');
 		}

@@ -6,6 +6,7 @@ use CodeIgniter\RESTful\ResourceController;
 use App\Models\AdminModel;
 use CodeIgniter\Files\File;
 use Google\Client;
+date_default_timezone_set('Asia/Kolkata');
 
 class ApiController extends ResourceController
 {
@@ -1497,7 +1498,6 @@ class ApiController extends ResourceController
             $data = [
                 'full_name' => $this->request->getVar('full_name'),
                 'email'  => $this->request->getVar('email'),
-                'user_name'  => $this->request->getVar('username'),
                 'contact_no'  => $this->request->getVar('contact_no'),
                 'alter_cnum'  => $this->request->getVar('altcontact'),
                 'state_id'  => $this->request->getVar('state'),
@@ -2210,7 +2210,6 @@ class ApiController extends ResourceController
             $data = [
                 'full_name' => $this->request->getVar('full_name'),
                 'email'  => $this->request->getVar('email'),
-                'user_name'  => $this->request->getVar('full_name'),
                 'contact_no'  => $this->request->getVar('contact_no'),
                 'alter_cnum'  => $this->request->getVar('altcontact'),
                 'state_id'  => $this->request->getVar('state'),
@@ -2645,6 +2644,7 @@ class ApiController extends ResourceController
         } else {
             $vendor_id = $this->request->getPost('owner_id');
             $member_id = $this->request->getPost('member_id');
+            $driver_id = $this->request->getPost('driver_id');
             $no_of_sit = $this->request->getPost('no_of_sit');
             $redg_no = $this->request->getPost('redg_no');
             $model_name = $this->request->getPost('model_name');
@@ -2710,8 +2710,13 @@ class ApiController extends ResourceController
                 'status' => 0
             ];
 
-            $this->AdminModel->InsertRecord('vehicle_details', $data);
+            $vehicle_id = $this->AdminModel->InsertVehicle($data);
 
+            if($vehicle_id){
+                if(isset($driver_id) && $driver_id != '')
+            {
+                $this->sendOtpForAssignDriver($driver_id,$vehicle_id,$vendor_id);
+            }
             $response = [
                 'status'   => 201,
                 'error'    => null,
@@ -2720,6 +2725,15 @@ class ApiController extends ResourceController
                     'userDetails' => $data
                 ],
             ];
+            }else{
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Something went wrong!'
+                    ]
+                ];
+            }
         }
 
         return $this->respondCreated($response);
@@ -2750,6 +2764,12 @@ class ApiController extends ResourceController
             $model_name = $this->request->getPost('model_name');
             $vehicle_type = $this->request->getPost('vehicle_type');
             $vendor_id = $this->request->getPost('owner_id');
+            $driver_id = $this->request->getPost('driver_id');
+            
+            if(isset($driver_id) && $driver_id != '')
+            {
+                $this->sendOtpForAssignDriver($driver_id,$vehicle_id,$vendor_id);
+            }
 
             $data = [
                 'type_id' => $vehicle_type,
@@ -2816,9 +2836,38 @@ class ApiController extends ResourceController
         return $this->respondCreated($response);
     }
 
+    public function sendOtpForAssignDriver($driver_id,$vehicle_id,$owner_id)
+    {
+        $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicle_id);
+        if ($vehicleDetails->driver_id != '' && $vehicleDetails->driver_id != $driver_id) {
+            if($vehicleDetails->driver_id  == $driver_id){
+                return true;
+            }
+            $data = [
+                'status'  => 3,
+                'updated_by' => $owner_id
+            ];
+            $this->AdminModel->updateDriverRemoved($vehicleDetails->driver_id, $vehicle_id, $data);
+        }
+
+        $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $owner_id WHERE vehicle_id = $vehicle_id AND status = 0; ");
+
+        $otp = rand(100000, 999999);
+        $data = [
+            'driver_id' => $driver_id,
+            'vehicle_id' => $vehicle_id,
+            'owner_id' => $owner_id,
+            'updated_by' => $owner_id,
+            'status' => 0,
+            'otp' => $otp
+        ];
+
+        $this->AdminModel->InsertRecord('driver_vehicle_mapping', $data);
+    }
+
     function getDriverList()
     {
-        $driverList = $this->AdminModel->getAllDriverList();
+        $driverList = $this->AdminModel->getMemberDriverList();
         $response = [
             'status'   => 201,
             'error'    => null,
@@ -3229,7 +3278,6 @@ class ApiController extends ResourceController
             $data = [
                 'full_name' => $this->request->getVar('full_name'),
                 'email'  => $this->request->getVar('email'),
-                'user_name'  => $this->request->getVar('full_name'),
                 'contact_no'  => $this->request->getVar('contact_no'),
                 'alter_cnum'  => $this->request->getVar('altcontact'),
                 'state_id'  => $this->request->getVar('state'),
@@ -3294,6 +3342,124 @@ class ApiController extends ResourceController
                 'response' => [
                     'success' => 'User details updated successfully!',
                     'userDetails' => $data
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function memberwiseDriverList()
+    {
+        $rules = [
+            'member_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $member_id = $this->request->getVar('member_id');
+            $memberList = $this->AdminModel->getMemberDriverList();
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => ' list',
+                    'driverlist' => $memberList
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function driverVehicleDetails()
+    {
+        $rules = [
+            'driver_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $driver_id = $this->request->getVar('driver_id');
+            $vehicleDetails = $serviceDetails = $this->AdminModel->getSingleData('vehicle_details', $driver_id,'driver_id');
+            if(!empty($vehicleDetails)){
+                $response = [
+                    'status'   => 201,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'vehicle details',
+                        'driverlist' => $vehicleDetails
+                    ],
+                ];
+            }else{
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Vehicle not assign to this driver!'
+                    ]
+                ];
+            }
+            
+        }
+
+        return $this->respondCreated($response);
+    }
+
+    public function addDriverRatingReviews()
+    {
+        $rules = [
+            'user_id' => 'required',
+            'customer_id' => 'required',
+            'booking_id' => 'required',
+            'rating' => 'required'
+
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $user_id = $this->request->getVar('user_id');
+            $customer_id = $this->request->getVar('customer_id');
+            $booking_id = $this->request->getVar('booking_id');
+            $rating = $this->request->getVar('rating');
+            $review = $this->request->getVar('review');
+
+            $data = [
+                'user_id' => $user_id,
+                'customer_id' => $customer_id,
+                'booking_id' => $booking_id,
+                'ratting' => $rating,
+                'review' => $review,
+                'status' => 1
+            ];
+
+            $this->AdminModel->InsertRecord('ratting_review', $data);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'rating added successfully!'
                 ],
             ];
         }
