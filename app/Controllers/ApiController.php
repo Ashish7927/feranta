@@ -2683,6 +2683,14 @@ class ApiController extends ResourceController
                 $permit_doc = "";
             }
 
+            $rc_copy = $this->request->getFile('rc_copy');
+            if ($rc_copy != null && $rc_copy->isValid() && !$rc_copy->hasMoved()) {
+                $rc_copy_doc = $rc_copy->getRandomName();
+                $rc_copy->move('uploads/', $rc_copy_doc);
+            } else {
+                $rc_copy_doc = "";
+            }
+
 
             $data = [
                 'type_id' => $vehicle_type,
@@ -2707,7 +2715,9 @@ class ApiController extends ResourceController
                 'permit_doc' => $permit_doc,
                 'booking_type' => $this->request->getPost('booking_type'),
                 'added_by' => $this->request->getPost('member_id'),
-                'status' => 0
+                'status' => 0,
+                'rc_no' => $this->request->getPost('rc_no'),
+                'rc_copy' => $rc_copy_doc,
             ];
 
             $vehicle_id = $this->AdminModel->InsertVehicle($data);
@@ -2787,7 +2797,8 @@ class ApiController extends ResourceController
                 'fit_expr' => $this->request->getPost('fit_expr'),
                 'polution_exp_date' => $this->request->getPost('polution_exp_date'),
                 'permit_expr_date' => $this->request->getPost('permit_expr_date'),
-                'booking_type' => $this->request->getPost('booking_type')
+                'booking_type' => $this->request->getPost('booking_type'),
+                'rc_no' => $this->request->getPost('rc_no')
             ];
 
             if(isset($vendor_id) && $vendor_id != ''){
@@ -2821,6 +2832,13 @@ class ApiController extends ResourceController
                 $file3->move('uploads/', $permit_doc);
                 $data['permit_doc'] = $permit_doc;
             }
+
+            $rc_copy = $this->request->getFile('rc_copy');
+                if ($rc_copy != null &&  $rc_copy->isValid() && !$rc_copy->hasMoved()) {
+                    $rc_copy_doc = $rc_copy->getRandomName();
+                    $rc_copy->move('uploads/', $rc_copy_doc);
+                    $data['rc_copy'] = $rc_copy_doc;
+                }
 
             $this->AdminModel->UpdateRecordById('vehicle_details', $vehicle_id, $data);
 

@@ -40,9 +40,9 @@ class Franchises extends BaseController
             $contact = $this->request->getPost('contact');
             $username = $this->request->getPost('username');
 
-            $CountEmail = $this->db->query("SELECT * FROM user  where email=$email")->getResult();
-            $CountContact = $this->db->query("SELECT * FROM user  where contact_no=$contact")->getResult();
-            $CountUsername = $this->db->query("SELECT * FROM user  where user_name=$username")->getResult();
+            $CountEmail = $this->db->query("SELECT * FROM user  where email='$email'")->getResult();
+            $CountContact = $this->db->query("SELECT * FROM user  where contact_no='$contact'")->getResult();
+            $CountUsername = $this->db->query("SELECT * FROM user  where user_name='$username'")->getResult();
 
             if (count($CountEmail) != 0) {
                 return redirect()->back()->withInput()->with('message', 'Email  Already  exist.');
@@ -112,9 +112,9 @@ class Franchises extends BaseController
 
             if (count($Countstate) == 0) {
 
-                $CountEmail = $this->db->query("SELECT * FROM user  where email=$email and id!=$id ")->getResult();
-                $CountContact = $this->db->query("SELECT * FROM user  where contact_no=$contact and id!=$id ")->getResult();
-                $CountUsername = $this->db->query("SELECT * FROM user  where user_name=$username and id!=$id ")->getResult();
+                $CountEmail = $this->db->query("SELECT * FROM user  where email='$email' and id!='$id' ")->getResult();
+                $CountContact = $this->db->query("SELECT * FROM user  where contact_no='$contact' and id!='$id' ")->getResult();
+                $CountUsername = $this->db->query("SELECT * FROM user  where user_name='$username' and id!='$id' ")->getResult();
                 if (count($CountEmail) != 0) {
                     return redirect()->back()->withInput()->with('msg', 'Email  Already  exist.');
                 } else {

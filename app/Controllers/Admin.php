@@ -43,8 +43,8 @@ class Admin extends BaseController
 
 			if ($pass == $password) {
 
-				if($user_type == 1 || ($user_type == 2 && $data['is_admin'] == 1)){
-					if( $status = 1){
+				if ($user_type == 1 || ($user_type == 2 && $data['is_admin'] == 1)) {
+					if ($status = 1) {
 						$ses_data = [
 							'user_id' => $data['id'],
 							'fullname' => $data['full_name'],
@@ -55,16 +55,14 @@ class Admin extends BaseController
 						];
 						$session->set($ses_data);
 						return redirect()->to('admin/dashboard');
-					}else{
+					} else {
 						$session->setFlashdata('msg', 'Your Account is Inactive, Contact to Admin!');
-				return redirect()->to('admin/');
+						return redirect()->to('admin/');
 					}
-					
-				}else{
+				} else {
 					$session->setFlashdata('msg', 'Invalid Request');
-				return redirect()->to('admin/');
+					return redirect()->to('admin/');
 				}
-				
 			} else {
 				$session->setFlashdata('msg', 'Password is incorrect.');
 				return redirect()->to('admin/');
@@ -1606,10 +1604,10 @@ class Admin extends BaseController
 
 			// }
 
-			if($this->session->get('user_type') == 2){
+			if ($this->session->get('user_type') == 2) {
 
 				$data['allvendor'] = $this->AdminModel->GetFranchiseUser($this->session->get('franchise_id'));
-			}else{
+			} else {
 				$data['allvendor'] = $this->AdminModel->GetAllUser();
 			}
 			return view('admin/vendor_vw.php', $data);
@@ -1681,7 +1679,7 @@ class Admin extends BaseController
 			$rules = [
 				'name' => 'required|min_length[3]',
 				'email' => 'required|valid_email|is_unique[user.email]',
-				'username' => 'required|is_unique[user.username]',
+				'username' => 'required|is_unique[user.user_name]',
 				'contact' => 'required|numeric|max_length[10]|is_unique[user.contact_no]',
 				'password' => 'required|min_length[6]',
 				'state' => 'required',
@@ -1728,12 +1726,12 @@ class Admin extends BaseController
 
 				$cheque = $this->request->getFile('cheque');
 
-						if ($cheque->isValid() && !$cheque->hasMoved()) {
-							$cheque_name = $cheque->getRandomName();
-							$cheque->move('uploads/', $cheque_name);
-						} else {
-							$cheque_name = "";
-						}
+				if ($cheque->isValid() && !$cheque->hasMoved()) {
+					$cheque_name = $cheque->getRandomName();
+					$cheque->move('uploads/', $cheque_name);
+				} else {
+					$cheque_name = "";
+				}
 
 				$data = [
 					'full_name' => $this->request->getVar('name'),
@@ -1790,28 +1788,27 @@ class Admin extends BaseController
 				//print_r($data);exit;
 
 				$this->AdminModel->adduser($data);
-				if($this->request->getVar('role') == 2 || $this->request->getVar('role') == '2'){
+				if ($this->request->getVar('role') == 2 || $this->request->getVar('role') == '2') {
 					return redirect()->to('member-tracking');
-				}else{
+				} else {
 					return redirect()->to('admin/Vendor');
 				}
-				
 			} else {
 
 				$user_id = $this->session->get('user_id');
 
-			$data['setting'] = $this->AdminModel->Settingdata();
-			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-			$data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
-			$data['allstate'] = $this->AdminModel->GetAllstate();
-			$data['allcity'] = $this->AdminModel->GetAllcity();
-			$data['pincode'] = $this->AdminModel->GetAllpincode();
-			$data['franchise_id'] = $this->session->get('franchise_id');
+				$data['setting'] = $this->AdminModel->Settingdata();
+				$data['singleuser'] = $this->AdminModel->userdata($user_id);
+				$data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
+				$data['allstate'] = $this->AdminModel->GetAllstate();
+				$data['allcity'] = $this->AdminModel->GetAllcity();
+				$data['pincode'] = $this->AdminModel->GetAllpincode();
+				$data['franchise_id'] = $this->session->get('franchise_id');
 
-			$data['allbloodgroup'] = $this->AdminModel->GetAllRecord('blood_group');
-			$data['allditrict'] = $this->AdminModel->GetAllRecord('districts');
-			$data['allblock'] = $this->AdminModel->GetAllRecord('blocks');
-			
+				$data['allbloodgroup'] = $this->AdminModel->GetAllRecord('blood_group');
+				$data['allditrict'] = $this->AdminModel->GetAllRecord('districts');
+				$data['allblock'] = $this->AdminModel->GetAllRecord('blocks');
+
 				$data['validation'] = $this->validator;
 				echo view('admin/add_vendor_vw', $data);
 			}
@@ -1960,12 +1957,11 @@ class Admin extends BaseController
 						$this->AdminModel->updateUser($data, $id);
 
 
-						if($this->request->getVar('role') == 2 || $this->request->getVar('role') == '2'){
+						if ($this->request->getVar('role') == 2 || $this->request->getVar('role') == '2') {
 							return redirect()->to('member-tracking');
-						}else{
+						} else {
 							return redirect()->to('admin/Editvendor/' . $id);
 						}
-						
 					} else {
 						$this->session->setFlashdata('msg', 'Username  Already  exist.');
 						$this->session->setFlashdata('uid', $id);
@@ -1981,7 +1977,6 @@ class Admin extends BaseController
 				$this->session->setFlashdata('uid', $id);
 				return redirect()->back()->withInput()->with('message', 'Email Already  exist.');
 			}
-
 		} else {
 			return redirect()->to('admin/');
 		}
@@ -2420,15 +2415,15 @@ class Admin extends BaseController
 	}
 
 	function deletevendor()
-    {
-        if ($this->session->get('user_id')) {
-            $id = $this->request->getPost('user_id');
-            $this->AdminModel->DeleteRecordById('user', $id);
-            return redirect()->to('admin/Vendor');
-        } else {
-            return redirect()->to('admin/');
-        }
-    }
+	{
+		if ($this->session->get('user_id')) {
+			$id = $this->request->getPost('user_id');
+			$this->AdminModel->DeleteRecordById('user', $id);
+			return redirect()->to('admin/Vendor');
+		} else {
+			return redirect()->to('admin/');
+		}
+	}
 
 	function driverSubscription()
 	{
@@ -2437,16 +2432,95 @@ class Admin extends BaseController
 			$user_id = $this->session->get('user_id');
 			$data['setting'] = $this->AdminModel->Settingdata();
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-			if($this->session->get('user_type') == 2){
 
-				$data['allvendor'] = $this->AdminModel->GetFranchiseUser($this->session->get('franchise_id'));
-			}else{
-				$data['allvendor'] = $this->AdminModel->GetAllUser();
+			$data['priceDetails'] =  $this->AdminModel->getSingleData('driver_subscription', 1);
+
+			if ($this->session->get('user_type') == 2) {
+				$data['allvendor'] = $this->AdminModel->getFranchisisLiftDriver($this->session->get('franchise_id'));
+			} else {
+				$data['allvendor'] = $this->AdminModel->getAllLiftDriver();
 			}
+
 			return view('admin/lift_driver_vw', $data);
 		} else {
 			return redirect()->to('admin/');
 		}
 	}
 
+	function updateSubscriptionPrice()
+	{
+		if ($this->session->get('user_id')) {
+			$price = $this->request->getPost('price');
+			$validity = $this->request->getPost('validity');
+
+			$data = [
+				'price' => $price,
+				'validity' => $validity,
+				'updated_at' => date('Y-m-d H:i:s')
+
+			];
+
+			$this->AdminModel->UpdateRecordById('driver_subscription', 1, $data);
+			return redirect()->to('driver-subscription');
+		} else {
+			return redirect()->to('admin/');
+		}
+	}
+
+	function getSubscrptionData()
+	{
+		if ($this->session->get('user_id')) {
+			$driver_id = $this->request->getPost('driver_id');
+			$Listdata = $this->AdminModel->getDriverSubscriptionData($driver_id);
+			$html = '';
+			$i = 1;
+			foreach ($Listdata as $data) {
+				if($data->status == 1){
+					$status = 'Active';
+				}else{
+					$status = 'Expire';
+				}
+				$html .= "<tr>
+              <th>$i</th>
+              <th>$data->amount</th>
+              <th>$data->validity Days</th>
+              <th>$data->recharge_date</th>
+              <th>$data->expiry_date</th>
+              <th>$status</th>";
+				$i++;
+			}
+
+			echo $html;
+		} else {
+			return redirect()->to('admin/');
+		}
+	}
+
+	
+
+	function renewSubscription($id)
+	{
+		if ($this->session->get('user_id')) {
+
+			$subscriptionData = $this->AdminModel->getSingleData('driver_subscription', 1);
+			$validity = $subscriptionData->validity;
+			$expireDate = Date('y:m:d', strtotime("+$validity days"));
+
+			$data = [
+				'driver_id' => $id,
+				'amount' => $subscriptionData->price,
+				'validity' => $subscriptionData->validity,
+				'status' => 1,
+				'recharge_date' => date('Y-m-d'),
+				'expiry_date' => $expireDate,
+				'created_by'=> $this->session->get('user_id')
+			];
+
+			$this->AdminModel->InsertRecord('driver_subscription_history',$data);
+
+			return redirect()->to('driver-subscription');
+		} else {
+			return redirect()->to('admin/');
+		}
+	}
 }

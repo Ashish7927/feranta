@@ -82,7 +82,6 @@ $routes->get('/delete-request', 'DeleteRequest::index');
 $routes->post('/delete-request/add', 'DeleteRequest::add');
 $routes->post('/delete-request/edit/(:num)', 'DeleteRequest::edit/$1');
 $routes->post('/delete-request/delete', 'DeleteRequest::delete');
-
 $routes->get('/driver-subscription', 'Admin::driverSubscription');
 
 

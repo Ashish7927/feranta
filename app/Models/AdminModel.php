@@ -687,7 +687,17 @@ class AdminModel extends Model
 		$builder->select('*');
 		$builder->where('contact_no', $phone);
 		$builder->where('user_type', 4);
-		return $builder->get()->getResult();
+		
+		// return $builder->get()->getResult();
+		$builderB = $this->db->table('user');
+		$builderB->select('*');
+		$builderB->where('contact_no', $phone);
+		$builderB->where('user_type', 3);
+		$builderB->where('is_driver', 1);
+
+		return $result = $builder->union($builderB)
+		->get()
+		->getResult();
 	}
 
 	function getDriverwiseBookingRequest($driver_id)
@@ -951,7 +961,19 @@ class AdminModel extends Model
 		$builder->where('user.user_type',4);
 		$builder->where('v.driver_id',null);
 		$builder->orderBy('user.id','DESC');
-		return $builder->get()->getResult();
+		// return $builder->get()->getResult();
+
+		$builderB = $this->db->table('user');
+		$builderB->select('user.*,v.driver_id');
+		$builderB->join('vehicle_details v', "v.driver_id = user.id","left");
+		$builderB->where('user.user_type',3);
+		$builderB->where('user.is_driver',1);
+		$builderB->where('v.driver_id',null);
+		$builderB->orderBy('user.id','DESC');
+
+		return $result = $builder->union($builderB)
+		->get()
+		->getResult();
 
 	}
 
@@ -962,6 +984,46 @@ class AdminModel extends Model
 
 		// Return the last insert ID
 		return $this->db->insertID();
+	}
+
+	public function getFranchisisLiftDriver($franchise_id)
+	{
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('vehicle_details.driver_id,vehicle_details.booking_type,user.*,u.franchise_id,u.full_name as member_name,franchises.franchise_name,subscription.status as s_status');
+		$builder->join('user', "user.id = vehicle_details.driver_id");
+
+		$builder->join('user u', "u.id = user.created_by AND u.franchise_id = ".$franchise_id);
+		$builder->join('franchises', "franchises.id = u.franchise_id");
+
+		$builder->join('driver_subscription_history subscription', "subscription.id = (select max(id) from driver_subscription_history as s where s.driver_id = vehicle_details.driver_id)",'left');
+
+		$builder->where('vehicle_details.booking_type',2);
+		$builder->orderBy('vehicle_details.driver_id','DESC');
+		return $builder->get()->getResult();
+	}
+
+	function getAllLiftDriver()
+	{
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('vehicle_details.driver_id,vehicle_details.booking_type,u.*,subscription.status as s_status');
+		$builder->join('user u', "u.id = vehicle_details.driver_id");
+		$builder->join('driver_subscription_history subscription', "subscription.id = (select max(id) from driver_subscription_history as s where s.driver_id = vehicle_details.driver_id)",'left');
+		$builder->where('vehicle_details.booking_type',2);
+		$builder->orderBy('vehicle_details.driver_id','DESC');
+
+	// 	join('(select max(id) max_id, char_id 
+    // from experience group by char_id) as t1', 't1.char_id = c.id', 'left')
+
+		return $builder->get()->getResult();
+	}
+
+	function getDriverSubscriptionData($driver_id)
+	{
+		$builder = $this->db->table('driver_subscription_history');
+		$builder->select('*');
+		$builder->where('driver_id', $driver_id);
+		$builder->orderBy('id', 'ASC');
+		return $builder->get()->getResult();
 	}
 	
 }
