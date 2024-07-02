@@ -14,7 +14,7 @@
 
     </div>
     <h3>Franchise Member</h3>
-    <form action="<?php echo base_url(); ?>franchises/export-member-activity" method="GET">
+    <form action="<?php echo base_url(); ?>franchises/export-member-activity" method="POST">
       <div class="row">
 
         <div class="col-sm-3">

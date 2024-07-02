@@ -34,7 +34,6 @@ class Admin extends BaseController
 		$username = $this->request->getVar('username');
 		$password = base64_encode(base64_encode($this->request->getVar('password')));
 		$data = $AdminModel->where('user_name', $username)->first();
-
 		if ($data) {
 			$pass = $data['password'];
 			$status = $data['status'];
@@ -43,8 +42,8 @@ class Admin extends BaseController
 
 			if ($pass == $password) {
 
-				if ($user_type == 1 || ($user_type == 2 && $data['is_admin'] == 1)) {
-					if ($status = 1) {
+				if ($user_type == '1' || ($user_type == '2' && $data['is_admin'] == '1')) {
+					if ($status == '1') {
 						$ses_data = [
 							'user_id' => $data['id'],
 							'fullname' => $data['full_name'],
@@ -78,6 +77,8 @@ class Admin extends BaseController
 		if ($this->session->get('user_id')) {
 
 			$user_id = $this->session->get('user_id');
+			$data['allstate'] = $this->AdminModel->GetAllstate();
+            $data['allcity'] = $this->AdminModel->GetAllcity();
 
 			$data['setting'] = $this->AdminModel->Settingdata();
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);

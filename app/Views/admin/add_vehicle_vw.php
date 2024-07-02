@@ -97,7 +97,7 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Enter Vehicle Enginee Number</label>
+                                        <label>Enter Vehicle Engine Number</label>
                                         <input type="text" name="engine_no" class="form-control" required>
                                     </div>
                                 </div>
@@ -125,7 +125,7 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>No. of passanger sit</label>
+                                        <label>No of Passenger Seat</label>
                                         <input type="number" min='0' name="no_of_sit" class="form-control" required>
                                     </div>
                                 </div>
@@ -165,7 +165,7 @@
 
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label>Pollution expiary date</label>
+                                        <label>Pollution expiry date</label>
                                         <input type="date" class="form-control" id="polution_exp_date" name="polution_exp_date">
                                     </div>
                                 </div>

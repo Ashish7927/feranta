@@ -791,9 +791,9 @@ class ApiController extends ResourceController
 
                         $driverSubscriptionStatus = $this->AdminModel->getDriverSubscriptionStatus($service->driver_id);
 
-                       if(isset($driverSubscriptionStatus) && count($driverSubscriptionStatus) == 0){
-                        continue;
-                       } 
+                        if (isset($driverSubscriptionStatus) && count($driverSubscriptionStatus) == 0) {
+                            continue;
+                        }
 
                         $this->sendPushNotification($service->driver_id, 'A new booking request', 'Here is a booking request from ' . $from_add . 'to ' . $to_add);
                         $getVehicleId = $this->AdminModel->getSingleData('vehicle_details', $service->driver_id, 'driver_id');
@@ -2728,8 +2728,8 @@ class ApiController extends ResourceController
                 'rc_copy' => $rc_copy_doc,
             ];
 
-            if($this->request->getPost('booking_type') == 2){
-                $data['lift_vehicle_type']=$vehicle_type;
+            if ($this->request->getPost('booking_type') == 2) {
+                $data['lift_vehicle_type'] = $vehicle_type;
             }
 
             $vehicle_id = $this->AdminModel->InsertVehicle($data);
@@ -2811,8 +2811,8 @@ class ApiController extends ResourceController
                 'rc_no' => $this->request->getPost('rc_no')
             ];
 
-            if($this->request->getPost('booking_type') == 2){
-                $data['lift_vehicle_type']=$vehicle_type;
+            if ($this->request->getPost('booking_type') == 2) {
+                $data['lift_vehicle_type'] = $vehicle_type;
             }
 
             if (isset($vendor_id) && $vendor_id != '') {
@@ -2873,9 +2873,9 @@ class ApiController extends ResourceController
         $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicle_id);
         $driverDetails = $this->AdminModel->getSingleData('user', $driver_id);
 
-            if ($driverDetails->license_type == 'mcwg' && ($vehicleDetails->lift_vehicle_type == 1  || $vehicleDetails->booking_type != 2)) {
-                return true;
-            }
+        if ($driverDetails->license_type == 'mcwg' && ($vehicleDetails->lift_vehicle_type == 1  || $vehicleDetails->booking_type != 2)) {
+            return true;
+        }
         if ($vehicleDetails->driver_id != '' && $vehicleDetails->driver_id != $driver_id) {
             if ($vehicleDetails->driver_id  == $driver_id) {
                 return true;
@@ -3134,7 +3134,7 @@ class ApiController extends ResourceController
                 'status'   => 201,
                 'error'    => null,
                 'response' => [
-                    'success' => $type.' added successfully!'
+                    'success' => $type . ' added successfully!'
                 ],
             ];
         }
@@ -3283,121 +3283,149 @@ class ApiController extends ResourceController
             ];
         } else {
             $id = $this->request->getVar('user_id');
-            $file = $this->request->getFile('img');
+            $email = $this->request->getPost('email');
+            $contact = $this->request->getPost('contact_no');
 
-            if ($file != null && $file->isValid() && !$file->hasMoved()) {
-                $imagename = $file->getRandomName();
-                $file->move('uploads/', $imagename);
+            $CountEmail = $this->db->query("SELECT * FROM user  where email='$email' and id!='$id' ")->getResult();
+            $CountContact = $this->db->query("SELECT * FROM user  where contact_no='$contact' and id!='$id' ")->getResult();
+
+            if (count($CountEmail) != 0) {
+
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Email  Already  exist.'
+                    ]
+                ];
+            } else if (count($CountContact) != 0) {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Contact No  Already  exist.'
+                    ]
+                ];
             } else {
-                $imagename = "";
+
+
+
+                $file = $this->request->getFile('img');
+
+                if ($file != null && $file->isValid() && !$file->hasMoved()) {
+                    $imagename = $file->getRandomName();
+                    $file->move('uploads/', $imagename);
+                } else {
+                    $imagename = "";
+                }
+
+                $file1 = $this->request->getFile('frontimg');
+
+                if ($file1 != null && $file1->isValid() && !$file1->hasMoved()) {
+                    $imagename1 = $file1->getRandomName();
+                    $file1->move('uploads/', $imagename1);
+                } else {
+                    $imagename1 = "";
+                }
+                $file2 = $this->request->getFile('backimg');
+
+                if ($file2 != null &&  $file2->isValid() && !$file2->hasMoved()) {
+                    $imagename2 = $file2->getRandomName();
+                    $file2->move('uploads/', $imagename2);
+                } else {
+                    $imagename2 = "";
+                }
+
+                $license_img = $this->request->getFile('license_img');
+
+                if ($license_img != null && $license_img->isValid() && !$license_img->hasMoved()) {
+                    $license_img1 = $license_img->getRandomName();
+                    $license_img->move('uploads/', $license_img1);
+                } else {
+                    $license_img1 = "";
+                }
+
+                $cheque = $this->request->getFile('cheque');
+
+                if ($cheque != null && $cheque->isValid() && !$cheque->hasMoved()) {
+                    $cheque_name = $cheque->getRandomName();
+                    $cheque->move('uploads/', $cheque_name);
+                } else {
+                    $cheque_name = "";
+                }
+
+                $data = [
+                    'full_name' => $this->request->getVar('full_name'),
+                    'email'  => $this->request->getVar('email'),
+                    'contact_no'  => $this->request->getVar('contact_no'),
+                    'alter_cnum'  => $this->request->getVar('altcontact'),
+                    'state_id'  => $this->request->getVar('state'),
+                    'city_id'  => $this->request->getVar('city'),
+                    'pin'  => $this->request->getVar('pincode'),
+                    'address1'  => $this->request->getVar('address1'),
+                    'address2'  => $this->request->getVar('address2'),
+                    'adhar_no'  => $this->request->getVar('adharno'),
+                    'block'  => $this->request->getVar('block'),
+                    'ditrict'  => $this->request->getVar('ditrict'),
+                    'father_name'  => $this->request->getVar('father_name'),
+                    'blood_group'  => $this->request->getVar('blood_group'),
+                    'spouse_name'  => $this->request->getVar('spouse_name'),
+                    'spouse_name'  => $this->request->getVar('spouse_name'),
+                    'branch_name'  => $this->request->getVar('branch_name'),
+                    'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
+                    'license_no'  => $this->request->getVar('license_no'),
+                    'license_type'  => $this->request->getVar('license_type'),
+                    'license_expire_date'  => $this->request->getVar('license_expire_date'),
+                    'dob'  => $this->request->getVar('dob'),
+
+                    'mother_name'  => $this->request->getVar('mother_name'),
+                    'nominee_name'  => $this->request->getVar('nominee_name'),
+                    'nominee_rltn'  => $this->request->getVar('nominee_rltn'),
+                    'nominee_add'  => $this->request->getVar('nominee_add'),
+                    'nominee_dob'  => $this->request->getVar('nominee_dob'),
+                    'ac_name'  => $this->request->getVar('ac_name'),
+                    'bank_name'  => $this->request->getVar('bank_name'),
+                    'acc_no'  => $this->request->getVar('acc_no'),
+                    'ifsc'  => $this->request->getVar('ifsc'),
+                    'is_driver'  => $this->request->getVar('is_driver')
+
+
+                ];
+
+                if ($imagename != "") {
+                    $data['profile_image']  = $imagename;
+                }
+                if ($imagename1 != "") {
+
+                    $data['adhar_font']  = $imagename1;
+                }
+                if ($imagename2 != "") {
+
+                    $data['adhar_back']  = $imagename1;
+                }
+
+                if ($license_img1 != "") {
+
+                    $data['license_img']  = $license_img1;
+                }
+
+                if ($cheque_name != "") {
+
+                    $data['cheque']  = $cheque_name;
+                }
+
+
+                $this->AdminModel->updateUser($data, $id);
+
+                $response = [
+                    'status'   => 201,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'User details updated successfully!',
+                        'userDetails' => $data
+                    ],
+                ];
             }
-
-            $file1 = $this->request->getFile('frontimg');
-
-            if ($file1 != null && $file1->isValid() && !$file1->hasMoved()) {
-                $imagename1 = $file1->getRandomName();
-                $file1->move('uploads/', $imagename1);
-            } else {
-                $imagename1 = "";
-            }
-            $file2 = $this->request->getFile('backimg');
-
-            if ($file2 != null &&  $file2->isValid() && !$file2->hasMoved()) {
-                $imagename2 = $file2->getRandomName();
-                $file2->move('uploads/', $imagename2);
-            } else {
-                $imagename2 = "";
-            }
-
-            $license_img = $this->request->getFile('license_img');
-
-            if ($license_img != null && $license_img->isValid() && !$license_img->hasMoved()) {
-                $license_img1 = $license_img->getRandomName();
-                $license_img->move('uploads/', $license_img1);
-            } else {
-                $license_img1 = "";
-            }
-
-            $cheque = $this->request->getFile('cheque');
-
-            if ($cheque != null && $cheque->isValid() && !$cheque->hasMoved()) {
-                $cheque_name = $cheque->getRandomName();
-                $cheque->move('uploads/', $cheque_name);
-            } else {
-                $cheque_name = "";
-            }
-
-            $data = [
-                'full_name' => $this->request->getVar('full_name'),
-                'email'  => $this->request->getVar('email'),
-                'contact_no'  => $this->request->getVar('contact_no'),
-                'alter_cnum'  => $this->request->getVar('altcontact'),
-                'state_id'  => $this->request->getVar('state'),
-                'city_id'  => $this->request->getVar('city'),
-                'pin'  => $this->request->getVar('pincode'),
-                'address1'  => $this->request->getVar('address1'),
-                'address2'  => $this->request->getVar('address2'),
-                'adhar_no'  => $this->request->getVar('adharno'),
-                'block'  => $this->request->getVar('block'),
-                'ditrict'  => $this->request->getVar('ditrict'),
-                'father_name'  => $this->request->getVar('father_name'),
-                'blood_group'  => $this->request->getVar('blood_group'),
-                'spouse_name'  => $this->request->getVar('spouse_name'),
-                'spouse_name'  => $this->request->getVar('spouse_name'),
-                'branch_name'  => $this->request->getVar('branch_name'),
-                'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
-                'license_no'  => $this->request->getVar('license_no'),
-                'license_type'  => $this->request->getVar('license_type'),
-                'license_expire_date'  => $this->request->getVar('license_expire_date'),
-                'dob'  => $this->request->getVar('dob'),
-
-                'mother_name'  => $this->request->getVar('mother_name'),
-                'nominee_name'  => $this->request->getVar('nominee_name'),
-                'nominee_rltn'  => $this->request->getVar('nominee_rltn'),
-                'nominee_add'  => $this->request->getVar('nominee_add'),
-                'nominee_dob'  => $this->request->getVar('nominee_dob'),
-                'ac_name'  => $this->request->getVar('ac_name'),
-                'bank_name'  => $this->request->getVar('bank_name'),
-                'acc_no'  => $this->request->getVar('acc_no'),
-                'ifsc'  => $this->request->getVar('ifsc'),
-                'is_driver'  => $this->request->getVar('is_driver')
-
-
-            ];
-
-            if ($imagename != "") {
-                $data['profile_image']  = $imagename;
-            }
-            if ($imagename1 != "") {
-
-                $data['adhar_font']  = $imagename1;
-            }
-            if ($imagename2 != "") {
-
-                $data['adhar_back']  = $imagename1;
-            }
-
-            if ($license_img1 != "") {
-
-                $data['license_img']  = $license_img1;
-            }
-
-            if ($cheque_name != "") {
-
-                $data['cheque']  = $cheque_name;
-            }
-
-
-            $this->AdminModel->updateUser($data, $id);
-
-            $response = [
-                'status'   => 201,
-                'error'    => null,
-                'response' => [
-                    'success' => 'User details updated successfully!',
-                    'userDetails' => $data
-                ],
-            ];
         }
 
         return $this->respondCreated($response);

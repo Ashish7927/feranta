@@ -77,6 +77,7 @@ class Franchises extends BaseController
                             'email' => $this->request->getPost('email'),
                             'contact_no' => $this->request->getPost('contact'),
                             'address1' => $this->request->getPost('address'),
+                            'pin' => $this->request->getPost('pincode'),
                             'state_id' => $this->request->getPost('state'),
                             'city_id' => $this->request->getPost('city'),
                             'user_name' => $this->request->getPost('username'),
@@ -144,6 +145,7 @@ class Franchises extends BaseController
                                 'address1' => $this->request->getPost('address'),
                                 'state_id' => $this->request->getPost('state'),
                                 'city_id' => $this->request->getPost('city'),
+                                'pin' => $this->request->getPost('pincode'),
                                 'user_name' => $this->request->getPost('username'),
                                 'password' => base64_encode(base64_encode($this->request->getVar('password')))
                             ];

@@ -136,7 +136,8 @@ class Vehicle extends BaseController
                 'rc_copy' => $rc_copy_doc,
                 'booking_type' => $this->request->getPost('booking_type'),
                 'status' => 0,
-                'lift_vehicle_type' => $this->request->getPost('lift_vehicle_type')
+                'lift_vehicle_type' => $this->request->getPost('lift_vehicle_type'),
+                'added_by' => $this->session->get('user_id')
             ];
 
 
