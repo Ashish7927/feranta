@@ -14,6 +14,59 @@
 
     </div>
     <h3>All Owner & Driver</h3>
+
+    <form action="<?php echo base_url(); ?>admin/Vendor" method="GET">
+      <div class="row">
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label>Registred From</label>
+            <input type="date" class="form-control" name="from_date" value="<?= isset($_REQUEST['from_date']) ? $_REQUEST['from_date'] : ''; ?>">
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label>Registred To</label>
+            <input type="date" class="form-control" name="to_date" value="<?= isset($_REQUEST['to_date']) ? $_REQUEST['to_date'] : ''; ?>">
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label> Select Role</label>
+            <select name="user_type" id="user_type" class="form-control">
+              <option value="">Select Role</option>
+              <option value="3" <?php if (isset($_REQUEST['user_type']) && $_REQUEST['user_type'] == 3) {
+                                  echo 'selected';
+                                } ?>>Owner</option>
+              <option value="4" <?php if (isset($_REQUEST['user_type']) && $_REQUEST['user_type'] == 4) {
+                                  echo 'selected';
+                                } ?>>Driver</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label> Select Franchise</label>
+            <select name="franchise_id" id="franchise_id" class="form-control">
+              <option value="">Select Franchise</option>
+              <?php foreach ($franchises as $franchise) { ?>
+                <option value="<?= $franchise->id ?>" <?php if (isset($_REQUEST['franchise_id']) && $_REQUEST['franchise_id'] == $franchise->id) {
+                                                        echo 'selected';
+                                                      } ?>><?= $franchise->franchise_name ?></option>
+              <?php } ?>
+
+            </select>
+          </div>
+        </div>
+
+
+        <div class="col-sm-4">
+          <button type="submit" class="btn btn-primary">Update</button>
+          <a href="<?php echo base_url(); ?>admin/Vendor" class="btn btn-warning">Reset</a>
+        </div>
+      </div>
+    </form>
+    <p></p>
+
     <div class="table-responsive">
       <table id="example-datatable" class="table table-vcenter table-condensed table-bordered">
         <thead>
@@ -43,11 +96,21 @@
                 <td class="text-center"><img src="img/placeholders/avatars/avatar11.jpg" alt="avatar" class="img-circle"></td>
               <?php } ?>
               <td class="text-center"><?= $vendor->full_name; ?></td>
-              <td class="text-center"><?php  if($vendor->user_type == 3 ){ echo 'Owner'; }else{ echo 'Driver'; } ?></td>
+              <td class="text-center"><?php if ($vendor->user_type == 3) {
+                                        echo 'Owner';
+                                      } else {
+                                        echo 'Driver';
+                                      } ?></td>
               <td class="text-center"><?= $vendor->email; ?></td>
               <td class="text-center"><?= $vendor->contact_no; ?></td>
               <td class="text-center"><?= $vendor->member_name; ?></td>
-              <td class="text-center"><?php if($vendor->created_by == 1){echo 'Super Admin';}elseif($vendor->created_by == ''){echo 'Self';}else{echo $vendor->franchise_name ;} ?></td>
+              <td class="text-center"><?php if ($vendor->created_by == 1) {
+                                        echo 'Super Admin';
+                                      } elseif ($vendor->created_by == '') {
+                                        echo 'Self';
+                                      } else {
+                                        echo $vendor->franchise_name;
+                                      } ?></td>
               <td class="text-center">
                 <?php if ($vendor->status == 0) { ?>
                   <a href="javascript:void(0);" onClick="statusupdate('<?= $vendor->id; ?>','1');"><button type="button" class="btn btn-danger ">Deactivate</button></a>

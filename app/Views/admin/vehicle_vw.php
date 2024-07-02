@@ -40,16 +40,16 @@
                             <tr>
                                 <td class="text-center"><?= $i++; ?></td>
                                 <td><?= $state->model_name; ?></td>
-                                <td><?php if($state->booking_type == 1){
-                                    echo 'Cab Booking';
-                                }else{
-                                    echo 'Lift Booking';
-                                }  ?></td>
-                                <td><?php if($state->booking_type == 2){
-                                    echo $state->lift_vehicle_type == 1 ? 'Car' : 'Bike';
-                                }else{
-                                    echo $state->type_name;
-                                }  ?></td>
+                                <td><?php if ($state->booking_type == 1) {
+                                        echo 'Cab Booking';
+                                    } else {
+                                        echo 'Lift Booking';
+                                    }  ?></td>
+                                <td><?php if ($state->booking_type == 2) {
+                                        echo $state->lift_vehicle_type == 1 ? 'Car' : 'Bike';
+                                    } else {
+                                        echo $state->type_name;
+                                    }  ?></td>
                                 <td><?= $state->regd_no; ?></td>
                                 <td><?= $state->full_name; ?></td>
                                 <td><a href="#driver-modal" uk-toggle class="btn btn-success" onclick="GetDriverDetails(<?= $state->id; ?>,'<?= $state->driver_id; ?>');">Details</a></td>
@@ -89,13 +89,13 @@
         <button class="uk-modal-close-default" type="button" uk-close></button>
 
 
-        <form action="<?php echo base_url(); ?>vehicle/update-driver" method="post" id="driver_form">
+        <form action="<?php echo base_url(); ?>vehicle/update-driver" method="post" id="driver_form" onsubmit="return checkSubmit();">
             <input type="hidden" name="vehicleId" id="vehicleId" value="">
 
             <div class="modal-body uk-text-left">
                 <div class="form-group">
                     <label>Driver</label>
-                    <select name="driver_id" id="driver_id" class="form-control select2" required onchange="UpdateDriverDetails(this.value);">
+                    <select name="driver_id" id="driver_id" class="form-control " required onchange="UpdateDriverDetails(this.value);">
                         <option value="">-- Select Driver --</option>
                         <?php foreach ($AllDriver as $driver) { ?>
                             <option value="<?= $driver->id; ?>"><?= $driver->full_name ?></option>
@@ -113,6 +113,7 @@
                     <input type="text" readonly name="emailId" id="emailId" class="form-control" value="">
                 </div>
 
+
                 <div class="form-group">
                     <label>License No</label>
                     <input type="text" readonly name="licenseNo" id="licenseNo" class="form-control" value="">
@@ -121,9 +122,15 @@
                     <label>Status</label>
                     <input type="text" readonly name="driverStatus" id="driverStatus" class="form-control" value="">
                 </div>
+
+                <div class="form-group driverotp" style="display: none;">
+                    <label>OTP</label>
+                    <input type="number" onkeydown="limit(this, 6);" onkeyup="limit(this, 6);" onkeyup="this.value = minmax(this.value, 0, 6)"  name="driverotp" id="driverotp" class="form-control" value="">
+                </div>
+
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="submit" id="submit_btn" class="btn btn-primary">Update</button>
 
             </div>
         </form>
@@ -176,6 +183,10 @@
 
     function UpdateDriverDetails(val) {
         let vehicleId = $('#vehicleId').val();
+        $('#submit_btn').html('Update');
+        $(".driverotp").css("display", "none");
+        $("#submit_btn").css("display", "");
+        $('#driverotp').val('');
         $.ajax({
             url: "<?php echo base_url(); ?>/Admin/getDriverData",
             method: "POST",
@@ -191,17 +202,44 @@
                 $('#phoneNo').val(data.userdata.contact_no);
                 if (data.status == 0 || data.status == "0") {
                     $('#driverStatus').val('Requested');
+                    $(".driverotp").css("display", "block");
+                    $('#submit_btn').html('Update');
                 } else if (data.status == 1 || data.status == "1") {
                     $('#driverStatus').val('Accepted');
+                    $("#submit_btn").css("display", "none");
                 } else {
                     $('#driverStatus').val('--');
+                    $('#submit_btn').html('Send Otp');
                 }
             }
 
         });
-        // event.preventDefault();
-        // return false; 
     }
+
+    function checkSubmit() {
+        let driverstatus = $('#driverStatus').val();
+        let otp = $('#driverotp').val();
+        if (driverstatus == 'Requested' && otp == '') {
+            alert('please enter OTP!');
+            return false;
+        }
+        return true;
+    }
+
+    function limit(element, max_chars)
+{
+    if(element.value.length > max_chars) {
+        element.value = element.value.substr(0, max_chars);
+    }
+}
+function minmax(value, min, max) 
+{
+    if(parseInt(value) < min || isNaN(parseInt(value))) 
+        return 0; 
+    else if(parseInt(value) > max) 
+        return 100; 
+    else return value;
+}
 </script>
 
 <?php include('footer.php') ?>

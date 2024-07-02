@@ -66,6 +66,7 @@ $routes->post('/service-rate/delete', 'SeviceRate::delete');
 $routes->get('/service-booking', 'ServiceBooking::index');
 $routes->post('/service-booking/add', 'ServiceBooking::add');
 $routes->post('/service-booking/status', 'ServiceBooking::status');
+$routes->post('/service-booking/get-request-list', 'ServiceBooking::driverListData');
 
 $routes->get('/service-request', 'ServiceRequest::index');
 $routes->post('/service-request/status', 'ServiceRequest::status');
@@ -77,6 +78,9 @@ $routes->post('/franchises/status', 'Franchises::status');
 $routes->post('/franchises/delete', 'Franchises::delete');
 $routes->get('/member-tracking', 'Franchises::memberTracking');
 $routes->post('/franchises/get-attendance-data', 'Franchises::getAttendanceData');
+$routes->post('/franchises/get-member-data', 'Franchises::getMemberList');
+$routes->post('/franchises/export-member-activity', 'Franchises::exportMemberData');
+
 
 $routes->get('/delete-request', 'DeleteRequest::index');
 $routes->post('/delete-request/add', 'DeleteRequest::add');

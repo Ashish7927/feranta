@@ -6,6 +6,7 @@ use CodeIgniter\RESTful\ResourceController;
 use App\Models\AdminModel;
 use CodeIgniter\Files\File;
 use Google\Client;
+
 date_default_timezone_set('Asia/Kolkata');
 
 class ApiController extends ResourceController
@@ -460,7 +461,7 @@ class ApiController extends ResourceController
             $destination_lng = $this->request->getVar('destination_lng');
             $driver_id = $this->request->getVar('driver_id');
             $boarding_datetime = $this->request->getVar('boarding_datetime');
-            $getVehicleId = $this->AdminModel->getVehicleDriverData($driver_id);
+            $getVehicleId = $this->AdminModel->getVehicleDetailsbyDriverId($driver_id);
 
             if (empty($getVehicleId) || $getVehicleId ==  null) {
                 $response = [
@@ -499,7 +500,7 @@ class ApiController extends ResourceController
                         $to_add = $this->getAddressFromLatLng($destination_lat, $destination_lng);
 
                         $data = [
-                            'vehicle_id' => $getVehicleId->vehicle_id,
+                            'vehicle_id' => $getVehicleId->id,
                             'vehicle_type' => $getVehicleId->type_id,
                             'boarding_date' => $boarding_datetime,
                             'start_datetime' => $newTime,
@@ -788,6 +789,12 @@ class ApiController extends ResourceController
 
                     foreach ($checkAvailbility as $service) {
 
+                        $driverSubscriptionStatus = $this->AdminModel->getDriverSubscriptionStatus($service->driver_id);
+
+                       if(isset($driverSubscriptionStatus) && count($driverSubscriptionStatus) == 0){
+                        continue;
+                       } 
+
                         $this->sendPushNotification($service->driver_id, 'A new booking request', 'Here is a booking request from ' . $from_add . 'to ' . $to_add);
                         $getVehicleId = $this->AdminModel->getSingleData('vehicle_details', $service->driver_id, 'driver_id');
                         $data = [
@@ -1068,28 +1075,28 @@ class ApiController extends ResourceController
             $distance = $this->haversineGreatCircleDistance($serviceDetails->destination_lat, $serviceDetails->destination_lng, $lat, $lng);
             // if ($distance <= 500) {
 
-                if ($serviceDetails->booking_status == 1) {
+            if ($serviceDetails->booking_status == 1) {
 
-                    $this->db->query("UPDATE service_bookings SET status = 3 WHERE service_id = $service_id ");
+                $this->db->query("UPDATE service_bookings SET status = 3 WHERE service_id = $service_id ");
+            }
+            $data = [
+                'status' => 3
+            ];
+            $this->AdminModel->UpdateRecordById('service_details', $service_id, $data);
+            if ($serviceDetails->status == 1) {
+                $bookingDetails = $this->AdminModel->getSingleData('service_bookings', $service_id, 'service_id');
+                if ($bookingDetails) {
+                    $this->sendPushNotification($bookingDetails->user_id, 'Booking Complete', 'Your booking from ' . $bookingDetails->from_location . 'to ' . $bookingDetails->to_location . ' has been completed');
                 }
-                $data = [
-                    'status' => 3
-                ];
-                $this->AdminModel->UpdateRecordById('service_details', $service_id, $data);
-                if ($serviceDetails->status == 1) {
-                    $bookingDetails = $this->AdminModel->getSingleData('service_bookings', $service_id, 'service_id');
-                    if ($bookingDetails) {
-                        $this->sendPushNotification($bookingDetails->user_id, 'Booking Complete', 'Your booking from ' . $bookingDetails->from_location . 'to ' . $bookingDetails->to_location . ' has been completed');
-                    }
-                }
+            }
 
-                $response = [
-                    'status'   => 200,
-                    'error'    => null,
-                    'response' => [
-                        'success' => 'Service updated Successfully'
-                    ],
-                ];
+            $response = [
+                'status'   => 200,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Service updated Successfully'
+                ],
+            ];
             // } else {
             //     $response = [
             //         'status'   => 200,
@@ -1462,7 +1469,7 @@ class ApiController extends ResourceController
 
             $file1 = $this->request->getFile('frontimg');
 
-            if ($file1 != null &&$file1->isValid() && !$file1->hasMoved()) {
+            if ($file1 != null && $file1->isValid() && !$file1->hasMoved()) {
                 $imagename1 = $file1->getRandomName();
                 $file1->move('uploads/', $imagename1);
             } else {
@@ -1516,6 +1523,7 @@ class ApiController extends ResourceController
                 'ditrict'  => $this->request->getVar('ditrict'),
                 'father_name'  => $this->request->getVar('father_name'),
                 'blood_group'  => $this->request->getVar('blood_group'),
+                'spouse_name'  => $this->request->getVar('spouse_name'),
                 'cheque'  => $cheque_name,
                 'branch_name'  => $this->request->getVar('branch_name'),
                 'user_type'  => 4,
@@ -1529,7 +1537,7 @@ class ApiController extends ResourceController
                 'nominee_rltn'  => $this->request->getVar('nominee_rltn'),
                 'nominee_add'  => $this->request->getVar('nominee_add'),
                 'nominee_dob'  => $this->request->getVar('nominee_dob'),
-                
+
                 'license_img'  => $license_img1,
                 'status' => 1,
                 'ac_name'  => $this->request->getVar('ac_name'),
@@ -1997,7 +2005,7 @@ class ApiController extends ResourceController
                 $password = base64_encode(base64_encode($password));
                 if ($data[0]->password == $password) {
 
-                    if(($data[0]->franchise_id != null || $data[0]->franchise_id != '') && $data[0]->user_type == 2 ){
+                    if (($data[0]->franchise_id != null || $data[0]->franchise_id != '') && $data[0]->user_type == 2) {
                         $response = [
                             'status'   => 200,
                             'error'    => null,
@@ -2006,16 +2014,15 @@ class ApiController extends ResourceController
                                 'profileDetails' => $data[0]
                             ],
                         ];
-                    }else{
+                    } else {
                         $response = [
                             'status'   => 200,
                             'error'    => 1,
                             'response' => [
                                 'message' => 'Invalid Request!'
                             ]
-                        ]; 
+                        ];
                     }
-                    
                 } else {
                     $response = [
                         'status'   => 200,
@@ -2222,6 +2229,7 @@ class ApiController extends ResourceController
                 'ditrict'  => $this->request->getVar('ditrict'),
                 'father_name'  => $this->request->getVar('father_name'),
                 'blood_group'  => $this->request->getVar('blood_group'),
+                'spouse_name'  => $this->request->getVar('spouse_name'),
                 'cheque'  => $cheque_name,
                 'branch_name'  => $this->request->getVar('branch_name'),
                 'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
@@ -2409,18 +2417,18 @@ class ApiController extends ResourceController
             $distance = $this->haversineGreatCircleDistance($bookingDetails->destination_lat, $bookingDetails->destination_lng, $lat, $lng);
             // if ($distance <= 500) {
 
-                $data = [
-                    'status' => 3
-                ];
-                $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $data);
-                $this->sendPushNotification($bookingDetails->user_id, 'Booking Complete', 'Your booking from ' . $bookingDetails->from_location . 'to ' . $bookingDetails->to_location . ' has been completed');
-                $response = [
-                    'status'   => 200,
-                    'error'    => null,
-                    'response' => [
-                        'success' => 'Booking updated Successfully'
-                    ],
-                ];
+            $data = [
+                'status' => 3
+            ];
+            $this->AdminModel->UpdateRecordById('service_bookings', $booking_id, $data);
+            $this->sendPushNotification($bookingDetails->user_id, 'Booking Complete', 'Your booking from ' . $bookingDetails->from_location . 'to ' . $bookingDetails->to_location . ' has been completed');
+            $response = [
+                'status'   => 200,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Booking updated Successfully'
+                ],
+            ];
             // } else {
             //     $response = [
             //         'status'   => 200,
@@ -2720,22 +2728,25 @@ class ApiController extends ResourceController
                 'rc_copy' => $rc_copy_doc,
             ];
 
+            if($this->request->getPost('booking_type') == 2){
+                $data['lift_vehicle_type']=$vehicle_type;
+            }
+
             $vehicle_id = $this->AdminModel->InsertVehicle($data);
 
-            if($vehicle_id){
-                if(isset($driver_id) && $driver_id != '')
-            {
-                $this->sendOtpForAssignDriver($driver_id,$vehicle_id,$vendor_id);
-            }
-            $response = [
-                'status'   => 201,
-                'error'    => null,
-                'response' => [
-                    'success' => 'Vehicle added successfully!',
-                    'userDetails' => $data
-                ],
-            ];
-            }else{
+            if ($vehicle_id) {
+                if (isset($driver_id) && $driver_id != '') {
+                    $this->sendOtpForAssignDriver($driver_id, $vehicle_id, $vendor_id);
+                }
+                $response = [
+                    'status'   => 201,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Vehicle added successfully!',
+                        'userDetails' => $data
+                    ],
+                ];
+            } else {
                 $response = [
                     'status'   => 200,
                     'error'    => 1,
@@ -2775,10 +2786,9 @@ class ApiController extends ResourceController
             $vehicle_type = $this->request->getPost('vehicle_type');
             $vendor_id = $this->request->getPost('owner_id');
             $driver_id = $this->request->getPost('driver_id');
-            
-            if(isset($driver_id) && $driver_id != '')
-            {
-                $this->sendOtpForAssignDriver($driver_id,$vehicle_id,$vendor_id);
+
+            if (isset($driver_id) && $driver_id != '') {
+                $this->sendOtpForAssignDriver($driver_id, $vehicle_id, $vendor_id);
             }
 
             $data = [
@@ -2801,7 +2811,11 @@ class ApiController extends ResourceController
                 'rc_no' => $this->request->getPost('rc_no')
             ];
 
-            if(isset($vendor_id) && $vendor_id != ''){
+            if($this->request->getPost('booking_type') == 2){
+                $data['lift_vehicle_type']=$vehicle_type;
+            }
+
+            if (isset($vendor_id) && $vendor_id != '') {
                 $data['vendor_id'] = $vendor_id;
             }
 
@@ -2834,11 +2848,11 @@ class ApiController extends ResourceController
             }
 
             $rc_copy = $this->request->getFile('rc_copy');
-                if ($rc_copy != null &&  $rc_copy->isValid() && !$rc_copy->hasMoved()) {
-                    $rc_copy_doc = $rc_copy->getRandomName();
-                    $rc_copy->move('uploads/', $rc_copy_doc);
-                    $data['rc_copy'] = $rc_copy_doc;
-                }
+            if ($rc_copy != null &&  $rc_copy->isValid() && !$rc_copy->hasMoved()) {
+                $rc_copy_doc = $rc_copy->getRandomName();
+                $rc_copy->move('uploads/', $rc_copy_doc);
+                $data['rc_copy'] = $rc_copy_doc;
+            }
 
             $this->AdminModel->UpdateRecordById('vehicle_details', $vehicle_id, $data);
 
@@ -2854,11 +2868,16 @@ class ApiController extends ResourceController
         return $this->respondCreated($response);
     }
 
-    public function sendOtpForAssignDriver($driver_id,$vehicle_id,$owner_id)
+    public function sendOtpForAssignDriver($driver_id, $vehicle_id, $owner_id)
     {
         $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicle_id);
+        $driverDetails = $this->AdminModel->getSingleData('user', $driver_id);
+
+            if ($driverDetails->license_type == 'mcwg' && ($vehicleDetails->lift_vehicle_type == 1  || $vehicleDetails->booking_type != 2)) {
+                return true;
+            }
         if ($vehicleDetails->driver_id != '' && $vehicleDetails->driver_id != $driver_id) {
-            if($vehicleDetails->driver_id  == $driver_id){
+            if ($vehicleDetails->driver_id  == $driver_id) {
                 return true;
             }
             $data = [
@@ -2920,36 +2939,51 @@ class ApiController extends ResourceController
             $owner_id = $this->request->getVar('owner_id');
             $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicle_id);
 
-            if ($vehicleDetails->driver_id != '' && $vehicleDetails->driver_id != $driver_id) {
-                $data = [
-                    'status'  => 3,
-                    'updated_by' => $owner_id
+            $driverDetails = $this->AdminModel->getSingleData('user', $driver_id);
+
+            if ($driverDetails->license_type == 'mcwg' && ($vehicleDetails->lift_vehicle_type == 1  || $vehicleDetails->booking_type != 2)) {
+                $response = [
+                    'status'   => 200,
+                    'error'    => 1,
+                    'response' => [
+                        'message' => 'Driver have not a valid license for assign such vehicle'
+                    ]
                 ];
-                $this->AdminModel->updateDriverRemoved($vehicleDetails->driver_id, $vehicle_id, $data);
-            }
+            } else {
 
-            $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $owner_id WHERE vehicle_id = $vehicle_id AND status = 0; ");
 
-            $otp = rand(100000, 999999);
-            $data = [
-                'driver_id' => $driver_id,
-                'vehicle_id' => $vehicle_id,
-                'owner_id' => $owner_id,
-                'updated_by' => $owner_id,
-                'status' => 0,
-                'otp' => $otp
-            ];
 
-            $this->AdminModel->InsertRecord('driver_vehicle_mapping', $data);
+                if ($vehicleDetails->driver_id != '' && $vehicleDetails->driver_id != $driver_id) {
+                    $data = [
+                        'status'  => 3,
+                        'updated_by' => $owner_id
+                    ];
+                    $this->AdminModel->updateDriverRemoved($vehicleDetails->driver_id, $vehicle_id, $data);
+                }
 
-            $response = [
-                'status'   => 201,
-                'error'    => null,
-                'response' => [
-                    'success' => 'Otp send to driver!',
+                $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $owner_id WHERE vehicle_id = $vehicle_id AND status = 0; ");
+
+                $otp = rand(100000, 999999);
+                $data = [
+                    'driver_id' => $driver_id,
+                    'vehicle_id' => $vehicle_id,
+                    'owner_id' => $owner_id,
+                    'updated_by' => $owner_id,
+                    'status' => 0,
                     'otp' => $otp
-                ],
-            ];
+                ];
+
+                $this->AdminModel->InsertRecord('driver_vehicle_mapping', $data);
+
+                $response = [
+                    'status'   => 201,
+                    'error'    => null,
+                    'response' => [
+                        'success' => 'Otp send to driver!',
+                        'otp' => $otp
+                    ],
+                ];
+            }
         }
 
         return $this->respondCreated($response);
@@ -2978,7 +3012,7 @@ class ApiController extends ResourceController
             $owner_id = $this->request->getVar('owner_id');
             $otp = $this->request->getVar('otp');
             $getRequestId = $this->db->query("SELECT * FROM driver_vehicle_mapping WHERE driver_id = $driver_id AND vehicle_id = $vehicle_id AND status = 0;")->getRow();
-            
+
             if (!empty($getRequestId)) {
 
                 if ($getRequestId->otp == $otp) {
@@ -3092,7 +3126,7 @@ class ApiController extends ResourceController
                 'image' => $imgfile,
                 'date' => date('Y-m-d'),
                 'time' => date('H:i'),
-                'location'=>$location
+                'location' => $location
             ];
 
             $this->AdminModel->InsertRecord('members_checkin', $data);
@@ -3100,7 +3134,7 @@ class ApiController extends ResourceController
                 'status'   => 201,
                 'error'    => null,
                 'response' => [
-                    'success' => 'Data added successfully!'
+                    'success' => $type.' added successfully!'
                 ],
             ];
         }
@@ -3232,7 +3266,7 @@ class ApiController extends ResourceController
     public function updateUser()
     {
         $rules = [
-            'user_id' =>'required|numeric',
+            'user_id' => 'required|numeric',
             'full_name' => 'required',
             'contact_no' => 'required|numeric|exact_length[10]',
             'email' => 'required',
@@ -3308,6 +3342,8 @@ class ApiController extends ResourceController
                 'ditrict'  => $this->request->getVar('ditrict'),
                 'father_name'  => $this->request->getVar('father_name'),
                 'blood_group'  => $this->request->getVar('blood_group'),
+                'spouse_name'  => $this->request->getVar('spouse_name'),
+                'spouse_name'  => $this->request->getVar('spouse_name'),
                 'branch_name'  => $this->request->getVar('branch_name'),
                 'password'  => base64_encode(base64_encode($this->request->getVar('password'))),
                 'license_no'  => $this->request->getVar('license_no'),
@@ -3413,8 +3449,8 @@ class ApiController extends ResourceController
             ];
         } else {
             $driver_id = $this->request->getVar('driver_id');
-            $vehicleDetails = $serviceDetails = $this->AdminModel->getSingleData('vehicle_details', $driver_id,'driver_id');
-            if(!empty($vehicleDetails)){
+            $vehicleDetails = $serviceDetails = $this->AdminModel->getSingleData('vehicle_details', $driver_id, 'driver_id');
+            if (!empty($vehicleDetails)) {
                 $response = [
                     'status'   => 201,
                     'error'    => null,
@@ -3423,7 +3459,7 @@ class ApiController extends ResourceController
                         'driverlist' => $vehicleDetails
                     ],
                 ];
-            }else{
+            } else {
                 $response = [
                     'status'   => 200,
                     'error'    => 1,
@@ -3432,7 +3468,6 @@ class ApiController extends ResourceController
                     ]
                 ];
             }
-            
         }
 
         return $this->respondCreated($response);

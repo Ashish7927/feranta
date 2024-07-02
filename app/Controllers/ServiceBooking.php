@@ -183,4 +183,35 @@ class ServiceBooking extends BaseController
             return redirect()->to('Admin/');
         }
     }
+
+    function driverListData()
+	{
+		if ($this->session->get('user_id')) {
+			$booking_id = $this->request->getPost('booking_id');
+			$Listdata = $this->AdminModel->getRequestListBookingwise($booking_id);
+			$html = '';
+			$i = 1;
+			foreach ($Listdata as $data) {
+				if($data->status == 1){
+					$status = 'Accepted';
+				}elseif($data->status == 0){
+					$status = 'Pending';
+				}elseif($data->status == 3){
+                    $status = 'Rejected';
+                }else{
+                    echo 'Requested';
+                }
+				$html .= "<tr>
+              <th>$i</th>
+              <th>$data->full_name</th>
+              <th>$data->contact_no Days</th>
+              <th>$status</th>";
+				$i++;
+			}
+
+			echo $html;
+		} else {
+			return redirect()->to('admin/');
+		}
+	}
 }

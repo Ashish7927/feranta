@@ -46,7 +46,7 @@
 
                   <li> <a href="<?php echo base_url(); ?>service-booking"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Customer Booking</span></a></li>
 
-                  <li> <a href="<?php echo base_url(); ?>service-request"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Driver Booking Request</span></a></li>
+                  <!-- <li> <a href="<?php echo base_url(); ?>service-request"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Driver Booking Request</span></a></li> -->
                   
                   <li> <a href="<?php echo base_url(); ?>franchises"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Franchises</span></a></li>
                   <?php } ?>
@@ -77,7 +77,7 @@
 
                       </ul>
                   </li>
-                  <li><a href="<?php echo base_url(); ?>admin/Cms_management"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">CMS Management</span></a></li>
+                  <!-- <li><a href="<?php echo base_url(); ?>admin/Cms_management"><i class="hi hi-edit sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">CMS Management</span></a></li> -->
                   <!-- <li><a href="<?php echo base_url(); ?>admin/Banner"><i class="gi gi-cargo sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Banner Management</span></a> </li> -->
                   <li><a href="<?php echo base_url(); ?>admin/Customer"><i class="gi gi-cargo sidebar-nav-icon"></i><span class="sidebar-nav-mini-hide">Manage Customer</span></a> </li>
                   <li><a href="<?php echo base_url(); ?>admin/Subadmin"><i class="gi gi-keys sidebar-nav-icon"></i> <span class="sidebar-nav-mini-hide">Manage Subadmin</span></a></li>

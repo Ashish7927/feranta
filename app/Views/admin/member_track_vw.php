@@ -14,6 +14,57 @@
 
     </div>
     <h3>Franchise Member</h3>
+    <form action="<?php echo base_url(); ?>franchises/export-member-activity" method="GET">
+      <div class="row">
+
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label> Select Franchise</label>
+            <select name="franchise_id" id="franchise_id" class="form-control" onchange="getMembers(this.value);">
+              <option value="">Select Franchise</option>
+              <?php foreach ($franchises as $franchise) { ?>
+                <option value="<?= $franchise->id ?>" <?php if (isset($_REQUEST['franchise_id']) && $_REQUEST['franchise_id'] == $franchise->id) {
+                                                        echo 'selected';
+                                                      } ?>><?= $franchise->franchise_name ?></option>
+              <?php } ?>
+
+            </select>
+          </div>
+        </div>
+
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label> Select Role</label>
+            <select name="member_id" id="member_id" class="form-control">
+              <option value="">Select Member</option>
+              <option value="all" <?php if (isset($_REQUEST['member_id']) && $_REQUEST['member_id'] == 'all') {
+                                  echo 'selected';
+                                } ?>>All</option>
+             
+            </select>
+          </div>
+        </div>
+
+
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label>From Date</label>
+            <input type="date" class="form-control" name="from_date" value="<?= isset($_REQUEST['from_date']) ? $_REQUEST['from_date'] : ''; ?>">
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label>To Date</label>
+            <input type="date" class="form-control" name="to_date" value="<?= isset($_REQUEST['to_date']) ? $_REQUEST['to_date'] : ''; ?>">
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <button type="submit" class="btn btn-primary">Export</button>
+          <!-- <a href="<?php echo base_url(); ?>admin/Vendor" class="btn btn-warning">Reset</a> -->
+        </div>
+      </div>
+    </form>
+    <p></p>
     <div class="table-responsive">
       <table id="example-datatable" class="table table-vcenter table-condensed table-bordered">
         <thead>
@@ -147,19 +198,32 @@
     }
   }
 
-  function getAttendanceData(id)
-  {
+  function getAttendanceData(id) {
     $('#attendanceData').html('');
     $.ajax({
-            url: "<?php echo base_url(); ?>/franchises/get-attendance-data",
-            method: "POST",
-            data: {
-                member_id: id
-            },
-            success: function(response) {
-                $('#attendanceData').html(response);
-            }
-        });
+      url: "<?php echo base_url(); ?>/franchises/get-attendance-data",
+      method: "POST",
+      data: {
+        member_id: id
+      },
+      success: function(response) {
+        $('#attendanceData').html(response);
+      }
+    });
+  }
+
+  function getMembers(id)
+  {
+    $.ajax({
+      url: "<?php echo base_url(); ?>/franchises/get-member-data",
+      method: "POST",
+      data: {
+        franchise_id: id
+      },
+      success: function(response) {
+        $('#member_id').html(response);
+      }
+    });
   }
 </script>
 

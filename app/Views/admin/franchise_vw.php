@@ -104,6 +104,9 @@
         <div class="uk-card uk-card-body uk-card-default uk-card-small">
 
             <h3>Franchises</h3>
+            <?php if (session('msg') !== null) : ?>
+                <p style="color: red;"><?= session('msg'); ?></p>
+            <?php endif; ?>
             <div class="table-responsive">
                 <table id="example-datatable" class="table table-vcenter table-condensed table-bordered">
                     <thead>
@@ -159,11 +162,7 @@
                         <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
 
                             <button class="uk-modal-close-default" type="button" uk-close></button>
-                            <?php if (session()->getFlashdata('uid') == $franchise->id) : ?>
-                                <div class="alert alert-warning">
-                                    <?= session()->getFlashdata('msg') ?>
-                                </div>
-                            <?php endif; ?>
+
 
 
                             <form action="<?php echo base_url(); ?>franchises/edit/<?= $franchise->id; ?>" method="post">

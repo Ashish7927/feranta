@@ -90,6 +90,7 @@
                             <th>Driver Name</th>
                             <th>Driver Number</th>
                             <th>Total Fare</th>
+                            <th>Driver Request</th>
                             <th>Status</th>
                             <th class="text-center">Actions</th>
                         </tr>
@@ -110,6 +111,7 @@
                                 <td><?= $booking->full_name; ?></td>
                                 <td><?= $booking->contact_no; ?></td>
                                 <td><?= $booking->fare; ?></td>
+                                <td><button type="button" onclick="getDriverList(<?= $booking->id; ?>);" class="btn btn-primary" data-toggle="modal" data-target="#myModal">List</button></td>
                                 <td class="text-center">
                                     <?php if ($booking->status == 0) {
                                         echo 'Pending';
@@ -143,6 +145,55 @@
 </div>
 
 </div>
+
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Driver Subscription Details</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Sl no</th>
+              <th>Driver Name</th>
+              <th>Driver Contact</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="driverListData">
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  function getDriverList(id) {
+    $('#driverListData').html('');
+    $.ajax({
+      url: "<?php echo base_url(); ?>/service-booking/get-request-list",
+      method: "POST",
+      data: {
+        booking_id: id
+      },
+      success: function(response) {
+        $('#driverListData').html(response);
+      }
+    });
+  }
+</script>
+
 
 <form name="status_update" id="status_update" action="<?php echo base_url(); ?>/service-booking/status" method="post">
     <input type="hidden" name="state_id" id="state_id" value="">
@@ -180,6 +231,8 @@
         }
         return false;
     }
+
+
 </script>
 
 <?php include('footer.php') ?>

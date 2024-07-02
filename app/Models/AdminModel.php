@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Database\BaseBuilder;
 use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 
@@ -550,6 +551,8 @@ class AdminModel extends Model
 		$builder->join('vehicle_details vehicle', 'vehicle.id = driver_vehicle_mapping.vehicle_id');
 		$builder->join('user driver', 'driver.id = driver_vehicle_mapping.driver_id');
 		$builder->join('user owner', 'owner.id = driver_vehicle_mapping.owner_id');
+		$builder->where('driver_vehicle_mapping.status', 1);
+		$builder->orWhere('driver_vehicle_mapping.status', 3);
 		return $builder->get()->getResult();
 	}
 
@@ -669,6 +672,14 @@ class AdminModel extends Model
 		$builder->where('driver_vehicle_mapping.driver_id', $driver_id);
 		$builder->where('driver_vehicle_mapping.status', 1);
 		$builder->orderBy('id', 'DESC');
+		return $builder->get()->getRow();
+	}
+
+	function getVehicleDetailsbyDriverId($driver_id)
+	{
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('vehicle_details.*');
+		$builder->where('vehicle_details.driver_id', $driver_id);
 		return $builder->get()->getRow();
 	}
 
@@ -816,8 +827,9 @@ class AdminModel extends Model
 	function getOwnerwiseVehicleList($owner_id)
 	{
 		$builder = $this->db->table('vehicle_details');
-		$builder->select('*');
-		$builder->where('vendor_id', $owner_id);
+		$builder->select('vehicle_details.*,user.full_name,user.contact_no');
+		$builder->join('user', 'user.id = vehicle_details.driver_id','left');
+		$builder->where('vehicle_details.vendor_id', $owner_id);
 		return $builder->get()->getResult();
 	}
 
@@ -918,6 +930,8 @@ class AdminModel extends Model
 		$builder->join('user driver', 'driver.id = driver_vehicle_mapping.driver_id');
 		$builder->join('user owner', 'owner.id = driver_vehicle_mapping.owner_id');
 		$builder->join('user u', "u.id = owner.created_by AND u.franchise_id = ".$franchise_id);
+		$builder->where('driver_vehicle_mapping.status', 1);
+		$builder->orWhere('driver_vehicle_mapping.status', 3);
 		return $builder->get()->getResult();
 	}
 
@@ -969,7 +983,7 @@ class AdminModel extends Model
 		$builderB->where('user.user_type',3);
 		$builderB->where('user.is_driver',1);
 		$builderB->where('v.driver_id',null);
-		$builderB->orderBy('user.id','DESC');
+		$builderB->orderBy('user.full_name','DESC');
 
 		return $result = $builder->union($builderB)
 		->get()
@@ -1023,6 +1037,50 @@ class AdminModel extends Model
 		$builder->select('*');
 		$builder->where('driver_id', $driver_id);
 		$builder->orderBy('id', 'ASC');
+		return $builder->get()->getResult();
+	}
+
+	function getDriverSubscriptionStatus($driver_id)
+	{
+		$builder = $this->db->table('driver_subscription_history');
+		$builder->select('*');
+		$builder->where('driver_id', $driver_id);
+		$builder->where('status', 1);
+		$builder->orderBy('id', 'ASC');
+		return $builder->get()->getResult();
+	}
+
+	function getRequestListBookingwise($booking_id)
+	{
+		$builder = $this->db->table('service_request');
+		$builder->select('service_request.*,u.full_name,u.contact_no');
+		$builder->join('user u', "u.id = service_request.driver_id",'left');
+		$builder->where('service_request.booking_id', $booking_id);
+		$builder->orderBy('service_request.id', 'ASC');
+		return $builder->get()->getResult();
+	}
+
+	function getMemberAttendanceData($franchise_id,$member_id,$from_date,$to_date)
+	{
+		$builder = $this->db->table('members_checkin');
+		$builder->select('members_checkin.*,u.full_name');
+
+		if($franchise_id != '' && $member_id == 'all'){
+			$builder->whereIn('members_checkin.member_id', static function (BaseBuilder $builder, $franchise_id) {
+				$builder->select('id')->from('user')->where('franchise_id', $franchise_id);
+			});
+		}elseif($member_id != '' && $member_id != 'all'){
+			$builder->where('members_checkin.member_id', $member_id);
+		}
+
+		if($from_date != ''){
+			$builder->where('members_checkin.date >=', $from_date);
+		}
+		if($to_date != ''){
+			$builder->where('members_checkin.date <=', $to_date);
+		}
+		$builder->join('user u', "u.id = members_checkin.member_id",'left');
+		$builder->orderBy('members_checkin.id', 'ASC');
 		return $builder->get()->getResult();
 	}
 	

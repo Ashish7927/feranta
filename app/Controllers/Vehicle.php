@@ -290,56 +290,77 @@ class Vehicle extends BaseController
     function updateDriver()
     {
         if ($this->session->get('user_id')) {
-            $user_id = $this->session->get('user_id');
-            $vehicleId = $this->request->getPost('vehicleId');
+            $owner_id = $this->session->get('user_id');
+
+            $vehicle_id = $this->request->getPost('vehicleId');
             $driver_id = $this->request->getPost('driver_id');
-            $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicleId);
+
+            $driverotp = $this->request->getPost('driverotp');
+            $driverStatus = $this->request->getPost('driverStatus');
+
+            $vehicleDetails = $this->AdminModel->getSingleData('vehicle_details', $vehicle_id);
             if ($vehicleDetails) {
 
-                $checkDriverStatus = $this->AdminModel->driverVehicleData($driver_id, $vehicleId);
-                $success = 0;
-                $message = '';
-                if (!empty($checkDriverStatus) &&  count($checkDriverStatus) > 0) {
-                    if ($checkDriverStatus[0]->status == 2 || $checkDriverStatus[0]->status == 3) {
-                        $success = 1;
-                    } else if ($checkDriverStatus[0]->status == 1) {
-                        $message = 'Already assign!';
+                if ($driverotp == '' && $driverStatus != 'Requested') {
+
+                    $driverDetails = $this->AdminModel->getSingleData('user', $driver_id);
+
+                    if ($driverDetails->license_type == 'mcwg' && ($vehicleDetails->lift_vehicle_type == 1  || $vehicleDetails->booking_type != 2)) {
+                        $message = 'Driver have not a valid license for assign such vehicle!';
                     } else {
-                        $message = 'Already requested!';
+
+                        if ($vehicleDetails->driver_id != '' && $vehicleDetails->driver_id != $driver_id) {
+                            $data = [
+                                'status'  => 3,
+                                'updated_by' => $owner_id
+                            ];
+                            $this->AdminModel->updateDriverRemoved($vehicleDetails->driver_id, $vehicle_id, $data);
+                        }
+
+                        $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $owner_id WHERE vehicle_id = $vehicle_id AND status = 0; ");
+
+                        $otp = rand(100000, 999999);
+                        $data = [
+                            'driver_id' => $driver_id,
+                            'vehicle_id' => $vehicle_id,
+                            'owner_id' => $owner_id,
+                            'updated_by' => $owner_id,
+                            'status' => 0,
+                            'otp' => $otp
+                        ];
+
+                        $this->AdminModel->InsertRecord('driver_vehicle_mapping', $data);
+
+                        $message = 'Otp send to driver!';
                     }
                 } else {
-                    $success = 1;
-                }
 
-                if ($success == 1) {
-                    if ($vehicleDetails->driver_id != '' && $vehicleDetails->driver_id != $driver_id) {
-                        $data = [
-                            'status'  => 3,
-                            'updated_by' => $user_id
-                        ];
-                        $this->AdminModel->updateDriverRemoved($vehicleDetails->driver_id, $vehicleId, $data);
+                    $otp = $driverotp;
+                    $getRequestId = $this->db->query("SELECT * FROM driver_vehicle_mapping WHERE driver_id = $driver_id AND vehicle_id = $vehicle_id AND status = 0;")->getRow();
+
+                    if (!empty($getRequestId)) {
+
+                        if ($getRequestId->otp == $otp) {
+                            $data = [
+                                'status' => 1,
+                                'updated_by' => $owner_id
+                            ];
+                            $this->AdminModel->UpdateRecordById('driver_vehicle_mapping', $vehicle_id, $data);
+
+                            $data = [
+                                'status' => 1,
+                                'driver_id' => $driver_id
+                            ];
+                            $this->AdminModel->UpdateRecordById('vehicle_details', $vehicle_id, $data);
+
+                            $message = 'Otp matched & vehicle assign to driver successfully!';
+                        } else {
+                            $message = 'Invalid OTP!!';
+                        }
+                    } else {
+
+                        $message = 'Invalid Request!';
                     }
-                    $data = [
-                        'status'  => 2,
-                        'updated_by' => $user_id
-                    ];
-                    $this->db->query("UPDATE driver_vehicle_mapping SET status = 2, updated_by = $user_id WHERE vehicle_id = $vehicleId; ");
-                    $data = [
-                        'driver_id' => $driver_id,
-                        'vehicle_id' => $vehicleId,
-                        'owner_id' => $vehicleDetails->vendor_id,
-                        'updated_by' => $this->session->get('user_id'),
-                        'status' => 0
-                    ];
-
-                    $this->AdminModel->InsertRecord('driver_vehicle_mapping', $data);
-
-                    $data = [
-                        'driver_id'  => $driver_id,
-                        'status' => 0
-                    ];
-                    $this->AdminModel->UpdateRecordById('vehicle_details', $vehicleId, $data);
-                    $message = 'Assigned successfully!';
                 }
             } else {
                 $message = 'some thing went wrong!';

@@ -201,6 +201,8 @@ class Franchises extends BaseController
 
             $data['member_track'] = $this->AdminModel->GetAllRecord('members_checkin');
 
+            $data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
+
             if ($this->session->get('user_type') == 2) {
 
                 $data['allvendor'] = $this->AdminModel->GetFranchiseMember($this->session->get('franchise_id'));
@@ -232,5 +234,57 @@ class Franchises extends BaseController
         }
 
         echo $html;
+    }
+
+    function getMemberList()
+    {
+        $franchise_id = $this->request->getPost('franchise_id');
+        $Listdata = $this->AdminModel->GetFranchiseMember($franchise_id);
+        $html = '<option value="all" >All</option>';
+        foreach ($Listdata as $data) {
+            $html .= "<option value='$data->id' >$data->full_name</option>";
+        }
+
+        echo $html;
+    }
+
+    function exportMemberData()
+    {
+        $franchise_id = $this->request->getPost('franchise_id');
+        $member_id = $this->request->getPost('member_id');
+        $from_date = $this->request->getPost('from_date');
+        $to_date = $this->request->getPost('to_date');
+
+        $data = $this->AdminModel->getMemberAttendanceData($franchise_id,$member_id,$from_date,$to_date);
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        $sheet->setCellValue('A1', 'Sl No');
+        $sheet->setCellValue('B1', 'Member Name');
+        $sheet->setCellValue('C1', 'Location');
+        $sheet->setCellValue('D1', 'Type');
+        $sheet->setCellValue('E1', 'Date');
+        $sheet->setCellValue('F1', 'Time');
+
+        $row = 2;
+        foreach ($data as $item) {
+            $sheet->setCellValue('A' . $row, $row);
+            $sheet->setCellValue('B' . $row, $item->full_name);
+            $sheet->setCellValue('C' . $row, $item->location);
+            $sheet->setCellValue('D' . $row, $item->type);
+            $sheet->setCellValue('E' . $row, $item->date);
+            $sheet->setCellValue('F' . $row, $item->time);
+            $row++;
+        }
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $fileName = 'member_attendance.xlsx';
+        $writer->save($fileName);
+
+        return $this->response->download($fileName, null)->setFileName($fileName);
+
     }
 }

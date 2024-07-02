@@ -1600,9 +1600,8 @@ class Admin extends BaseController
 
 			$data['setting'] = $this->AdminModel->Settingdata();
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-			// if(){
 
-			// }
+			$data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
 
 			if ($this->session->get('user_type') == 2) {
 
