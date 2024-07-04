@@ -974,7 +974,7 @@ class AdminModel extends Model
 		$builder->join('vehicle_details v', "v.driver_id = user.id","left");
 		$builder->where('user.user_type',4);
 		$builder->where('v.driver_id',null);
-		$builder->orderBy('user.id','DESC');
+		$builder->orderBy('user.full_name','DESC');
 		// return $builder->get()->getResult();
 
 		$builderB = $this->db->table('user');
@@ -1066,9 +1066,8 @@ class AdminModel extends Model
 		$builder->select('members_checkin.*,u.full_name');
 
 		if($franchise_id != '' && $member_id == 'all'){
-			$builder->whereIn('members_checkin.member_id', static function (BaseBuilder $builder, $franchise_id) {
-				$builder->select('id')->from('user')->where('franchise_id', $franchise_id);
-			});
+			$subQuery = $this->db->table('user')->select('id')->where('franchise_id', $franchise_id);
+			$builder->whereIn('members_checkin.member_id', $subQuery);
 		}elseif($member_id != '' && $member_id != 'all'){
 			$builder->where('members_checkin.member_id', $member_id);
 		}
@@ -1082,6 +1081,26 @@ class AdminModel extends Model
 		$builder->join('user u', "u.id = members_checkin.member_id",'left');
 		$builder->orderBy('members_checkin.id', 'ASC');
 		return $builder->get()->getResult();
+	}
+
+	function getDriverListOwnerwise($owner_id)
+	{
+		$builder = $this->db->table('user');
+		$builder->select('user.*');
+		$builder->join('vehicle_details v', "v.driver_id = user.id AND v.vendor_id = $owner_id");
+		$builder->where('user.user_type',4);
+		// $builder->where('v.driver_id !=',null);
+		$builder->orderBy('user.full_name','DESC');
+
+		$builderB = $this->db->table('user');
+		$builderB->select('user.*');
+		$builderB->where('user.user_type',4);
+		$builderB->where('user.created_by',$owner_id);
+		$builderB->orderBy('user.full_name','DESC');
+
+		return $result = $builder->union($builderB)
+		->get()
+		->getResult();
 	}
 	
 }

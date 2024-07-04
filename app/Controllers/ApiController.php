@@ -3547,4 +3547,34 @@ class ApiController extends ResourceController
 
         return $this->respondCreated($response);
     }
+
+    public function ownerwiseDriverList()
+    {
+        $rules = [
+            'owner_id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            $response = [
+                'status'   => 200,
+                'error'    => 1,
+                'response' => [
+                    'message' => $this->validator->getErrors()
+                ]
+            ];
+        } else {
+            $owner_id = $this->request->getVar('owner_id');
+            $memberList = $this->AdminModel->getDriverListOwnerwise($owner_id);
+            $response = [
+                'status'   => 201,
+                'error'    => null,
+                'response' => [
+                    'success' => 'Driver list',
+                    'driverlist' => $memberList
+                ],
+            ];
+        }
+
+        return $this->respondCreated($response);
+    }
 }

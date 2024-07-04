@@ -154,4 +154,5 @@ $routes->post('api/update-user-details', 'ApiController::updateUser');
 $routes->post('api/get-memberwise-driver-list', 'ApiController::memberwiseDriverList');
 $routes->post('api/get-driver-vehicle-details', 'ApiController::driverVehicleDetails');
 $routes->post('api/driver-add-ratting-review', 'ApiController::addDriverRatingReviews');
+$routes->post('api/driver-list-ownerwise', 'ApiController::ownerwiseDriverList');
 
