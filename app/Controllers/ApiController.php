@@ -2004,6 +2004,7 @@ class ApiController extends ResourceController
             if (!empty($data) && $data != null) {
                 $password = base64_encode(base64_encode($password));
                 if ($data[0]->password == $password) {
+                    if($data[0]->status == 1){
 
                     if (($data[0]->franchise_id != null || $data[0]->franchise_id != '') && $data[0]->user_type == 2) {
                         $response = [
@@ -2023,6 +2024,15 @@ class ApiController extends ResourceController
                             ]
                         ];
                     }
+                }else{
+                    $response = [
+                        'status'   => 200,
+                        'error'    => 1,
+                        'response' => [
+                            'message' => 'Your account is not Active, Please contact to Admin!'
+                        ]
+                    ];
+                }
                 } else {
                     $response = [
                         'status'   => 200,
@@ -3477,7 +3487,7 @@ class ApiController extends ResourceController
             ];
         } else {
             $driver_id = $this->request->getVar('driver_id');
-            $vehicleDetails = $serviceDetails = $this->AdminModel->getSingleData('vehicle_details', $driver_id, 'driver_id');
+            $vehicleDetails = $serviceDetails = $this->AdminModel->driverVehicleDetails($driver_id);
             if (!empty($vehicleDetails)) {
                 $response = [
                     'status'   => 201,

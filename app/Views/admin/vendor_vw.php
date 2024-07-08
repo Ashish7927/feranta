@@ -15,7 +15,7 @@
     </div>
     <h3>All Owner & Driver</h3>
 
-    <form action="<?php echo base_url(); ?>admin/Vendor" method="GET">
+    <form action="" method="GET">
       <div class="row">
         <div class="col-sm-3">
           <div class="form-group">
@@ -33,7 +33,7 @@
           <div class="form-group">
             <label> Select Role</label>
             <select name="user_type" id="user_type" class="form-control">
-              <option value="">Select Role</option>
+              <option value="">All</option>
               <option value="3" <?php if (isset($_REQUEST['user_type']) && $_REQUEST['user_type'] == 3) {
                                   echo 'selected';
                                 } ?>>Owner</option>
@@ -47,7 +47,7 @@
           <div class="form-group">
             <label> Select Franchise</label>
             <select name="franchise_id" id="franchise_id" class="form-control">
-              <option value="">Select Franchise</option>
+              <option value="">All</option>
               <?php foreach ($franchises as $franchise) { ?>
                 <option value="<?= $franchise->id ?>" <?php if (isset($_REQUEST['franchise_id']) && $_REQUEST['franchise_id'] == $franchise->id) {
                                                         echo 'selected';
@@ -59,9 +59,10 @@
         </div>
 
 
-        <div class="col-sm-4">
-          <button type="submit" class="btn btn-primary">Update</button>
+        <div class="col-sm-6">
+          <button type="submit" formaction="<?php echo base_url(); ?>admin/Vendor" class="btn btn-primary">Filter</button>
           <a href="<?php echo base_url(); ?>admin/Vendor" class="btn btn-warning">Reset</a>
+          <button type="submit" formaction="<?php echo base_url(); ?>admin/exportVendor" class="btn btn-success">Export</button>
         </div>
       </div>
     </form>

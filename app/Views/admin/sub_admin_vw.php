@@ -82,6 +82,9 @@
                             <?php
                             $i = 1;
                             foreach ($allsubadmin as $subadmin) {
+                                if($subadmin->id == 1){
+                                    continue;
+                                }
                             ?>
                                 <tr>
                                     <td class="text-center"><?= $i++; ?></td>

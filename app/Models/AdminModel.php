@@ -1063,7 +1063,7 @@ class AdminModel extends Model
 	function getMemberAttendanceData($franchise_id,$member_id,$from_date,$to_date)
 	{
 		$builder = $this->db->table('members_checkin');
-		$builder->select('members_checkin.*,u.full_name');
+		$builder->select('members_checkin.*,u.full_name,u.franchise_id,franchises.franchise_name');
 
 		if($franchise_id != '' && $member_id == 'all'){
 			$subQuery = $this->db->table('user')->select('id')->where('franchise_id', $franchise_id);
@@ -1079,28 +1079,109 @@ class AdminModel extends Model
 			$builder->where('members_checkin.date <=', $to_date);
 		}
 		$builder->join('user u', "u.id = members_checkin.member_id",'left');
+		$builder->join('franchises', 'franchises.id = u.franchise_id', 'left');
 		$builder->orderBy('members_checkin.id', 'ASC');
 		return $builder->get()->getResult();
 	}
 
 	function getDriverListOwnerwise($owner_id)
 	{
-		$builder = $this->db->table('user');
-		$builder->select('user.*');
-		$builder->join('vehicle_details v', "v.driver_id = user.id AND v.vendor_id = $owner_id");
-		$builder->where('user.user_type',4);
-		// $builder->where('v.driver_id !=',null);
-		$builder->orderBy('user.full_name','DESC');
-
-		$builderB = $this->db->table('user');
-		$builderB->select('user.*');
+	    $builderB = $this->db->table('user');
+		$builderB->select('user.*,v.id as vehicleId');
+		$builderB->join('vehicle_details v', "v.driver_id = user.id",'left');
 		$builderB->where('user.user_type',4);
 		$builderB->where('user.created_by',$owner_id);
 		$builderB->orderBy('user.full_name','DESC');
+		
+		$builder = $this->db->table('user');
+		$builder->select('user.*,v.id as vehicleId');
+		$builder->join('vehicle_details v', "v.driver_id = user.id AND v.vendor_id = $owner_id");
+		$builder->where('user.user_type',4);
+		$builder->orWhere('user.user_type',3);
+		// $builder->where('v.driver_id !=',null);
+		$builder->orderBy('user.full_name','DESC');
+		
 
-		return $result = $builder->union($builderB)
+		return $result = $builderB->union($builder)
 		->get()
 		->getResult();
+	}
+
+	function driverVehicleDetails($driver_id)
+	{
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('vehicle_details.*,u.full_name as vendorName, u.contact_no as vendorPhone');
+		$builder->join('user u', "u.id = vehicle_details.vendor_id",'left');
+		$builder->where('vehicle_details.driver_id',$driver_id);
+		return $builder->get()->getResult();
+	}
+
+	function GetAllOwnerDriver($from_date,$to_date,$user_type,$franchise_id)
+	{
+		$where = array();
+		if($franchise_id != ''){
+			$where[] = "user.franchise_id = $franchise_id"; 
+		}
+		if($user_type != ''){
+			$where[] = "user.user_type = $user_type"; 
+		}else{
+			$where[] = "(user.user_type = 3 OR user.user_type = 4)";
+		}
+		if($from_date != ''){
+			$where[] = "user.created_date >= $from_date"; 
+		}
+		if($to_date != ''){
+			$where[] = "user.created_date <= $to_date"; 
+		}
+
+		if(count($where) > 0)
+		{
+			$where = implode("AND", $where);
+		}
+		
+
+		$builder = $this->db->table('user');
+		$builder->select('user.*,franchises.franchise_name,u.full_name as member_name');
+		$builder->join('user u', "u.id = user.created_by",'left');
+		$builder->join('franchises', "franchises.id = u.franchise_id",'left');
+		$builder->where($where);
+		return $builder->get()->getResult();
+	}
+
+	function getAllVehicleData($from_date, $to_date, $owner_id, $franchise_id)
+	{
+
+		$where = array();
+		if($owner_id != ''){
+			$where[] = "vehicle_details.vendor_id = $owner_id"; 
+		}
+
+		if($from_date != ''){
+			$where[] = "vehicle_details.create_at >= $from_date"; 
+		}
+		if($to_date != ''){
+			$where[] = "vehicle_details.create_at <= $to_date"; 
+		}
+
+		if(count($where) > 0)
+		{
+			$where = implode("AND", $where);
+		}
+
+		$builder = $this->db->table('vehicle_details');
+		$builder->select('vehicle_details.*,vehicle_types.type_name,user.full_name,user.created_by,u.full_name as registeredBy,driver.full_name as driverName');
+		$builder->join('vehicle_types', 'vehicle_types.id = vehicle_details.type_id','left');
+		$builder->join('user', 'user.id = vehicle_details.vendor_id');
+		$builder->join('user u', 'u.id = vehicle_details.added_by','left');
+		$builder->join('user driver', 'driver.id = vehicle_details.driver_id','left');
+
+		if($franchise_id != ''){
+		$builder->join('user ur', "ur.id = user.created_by AND ur.franchise_id = ".$franchise_id);
+		}
+
+		$builder->where($where);
+
+		return $builder->get()->getResult();
 	}
 	
 }

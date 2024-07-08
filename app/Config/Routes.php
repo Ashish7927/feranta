@@ -46,7 +46,7 @@ $routes->get('/vehicle/driver-vehicle', 'Vehicle::driverVehicle');
 $routes->get('/vehicle/accept/(:num)', 'Vehicle::acceptRequest/$1');
 $routes->get('/vehicle/reject/(:num)', 'Vehicle::rejectRequest/$1');
 $routes->get('/vehicle/leave/(:num)', 'Vehicle::leaveVehicle/$1');
-
+$routes->get('/vehicle/export-data', 'Vehicle::exportData');
 
 
 $routes->get('/service', 'Service::index');

@@ -78,7 +78,7 @@ class Admin extends BaseController
 
 			$user_id = $this->session->get('user_id');
 			$data['allstate'] = $this->AdminModel->GetAllstate();
-            $data['allcity'] = $this->AdminModel->GetAllcity();
+			$data['allcity'] = $this->AdminModel->GetAllcity();
 
 			$data['setting'] = $this->AdminModel->Settingdata();
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);
@@ -348,7 +348,7 @@ class Admin extends BaseController
 
 			$data['setting'] = $this->AdminModel->Settingdata();
 			$data['singleuser'] = $this->AdminModel->userdata($user_id);
-			$data['allsubadmin'] = $this->AdminModel->GetAllCustomer(2);
+			$data['allsubadmin'] = $this->AdminModel->GetAllCustomer(1);
 
 			return view('admin/sub_admin_vw', $data);
 		} else {
@@ -1604,12 +1604,21 @@ class Admin extends BaseController
 
 			$data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
 
+			$from_date = $this->request->getGet('from_date') ? $this->request->getGet('from_date') : '';
+			$to_date = $this->request->getGet('to_date') ? $this->request->getGet('to_date') : '';
+			$user_type = $this->request->getGet('user_type') ? $this->request->getGet('user_type') : '';
+			$franchise_id = $this->request->getGet('franchise_id') ? $this->request->getGet('franchise_id') : '';
+
+
 			if ($this->session->get('user_type') == 2) {
 
-				$data['allvendor'] = $this->AdminModel->GetFranchiseUser($this->session->get('franchise_id'));
+				$data['allvendor'] = $this->AdminModel->GetAllOwnerDriver($from_date, $to_date, $user_type, $this->session->get('franchise_id'));
 			} else {
-				$data['allvendor'] = $this->AdminModel->GetAllUser();
+				
+				$data['allvendor'] = $this->AdminModel->GetAllOwnerDriver($from_date, $to_date, $user_type, $franchise_id);
 			}
+
+
 			return view('admin/vendor_vw.php', $data);
 		} else {
 			return redirect()->to('admin/');
@@ -2475,9 +2484,9 @@ class Admin extends BaseController
 			$html = '';
 			$i = 1;
 			foreach ($Listdata as $data) {
-				if($data->status == 1){
+				if ($data->status == 1) {
 					$status = 'Active';
-				}else{
+				} else {
 					$status = 'Expire';
 				}
 				$html .= "<tr>
@@ -2496,7 +2505,7 @@ class Admin extends BaseController
 		}
 	}
 
-	
+
 
 	function renewSubscription($id)
 	{
@@ -2513,12 +2522,74 @@ class Admin extends BaseController
 				'status' => 1,
 				'recharge_date' => date('Y-m-d'),
 				'expiry_date' => $expireDate,
-				'created_by'=> $this->session->get('user_id')
+				'created_by' => $this->session->get('user_id')
 			];
 
-			$this->AdminModel->InsertRecord('driver_subscription_history',$data);
+			$this->AdminModel->InsertRecord('driver_subscription_history', $data);
 
 			return redirect()->to('driver-subscription');
+		} else {
+			return redirect()->to('admin/');
+		}
+	}
+
+	function exportVendor()
+	{
+		if ($this->session->get('user_id')) {
+
+			$from_date = $this->request->getGet('from_date') ? $this->request->getGet('from_date') : '';
+			$to_date = $this->request->getGet('to_date') ? $this->request->getGet('to_date') : '';
+			$user_type = $this->request->getGet('user_type') ? $this->request->getGet('user_type') : '';
+			$franchise_id = $this->request->getGet('franchise_id') ? $this->request->getGet('franchise_id') : '';
+
+
+			if ($this->session->get('user_type') == 2) {
+				$allvendor = $this->AdminModel->GetAllOwnerDriver($from_date, $to_date, $user_type, $this->session->get('franchise_id'));
+			} else {
+				$allvendor = $this->AdminModel->GetAllOwnerDriver($from_date, $to_date, $user_type, $franchise_id);
+			}
+
+
+			$spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+			$sheet = $spreadsheet->getActiveSheet();
+
+
+			$sheet->setCellValue('A1', 'Sl No');
+			$sheet->setCellValue('B1', 'User Name');
+			$sheet->setCellValue('C1', 'Role');
+			$sheet->setCellValue('D1', 'Registered By');
+			$sheet->setCellValue('E1', 'Franchise Name');
+			$sheet->setCellValue('F1', 'Date');
+			$sheet->setCellValue('G1', 'Time');
+
+
+
+			$row = 2;
+			foreach ($allvendor as $item) {
+				$rolename = ($item->user_type == 3) ? 'Owner' : 'Driver';
+				if ($item->created_by == 1) {
+					$createdBy = 'Super Admin';
+				  } elseif ($item->created_by == '') {
+					$createdBy = 'Self';
+				  } else {
+					$createdBy = $item->franchise_name;
+				  } 
+				$sheet->setCellValue('A' . $row, $row-1);
+				$sheet->setCellValue('B' . $row, $item->full_name);
+				$sheet->setCellValue('C' . $row, $rolename);
+				$sheet->setCellValue('D' . $row, $item->member_name);
+				$sheet->setCellValue('E' . $row, $createdBy);
+				$sheet->setCellValue('F' . $row, date("d-m-Y", strtotime($item->created_date)));
+				$sheet->setCellValue('G' . $row, date("H:i", strtotime($item->created_date)));
+				$row++;
+			}
+
+			$writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+			$fileName = 'owner-driver-data.xlsx';
+			$writer->save($fileName);
+
+			return $this->response->download($fileName, null)->setFileName($fileName);
 		} else {
 			return redirect()->to('admin/');
 		}

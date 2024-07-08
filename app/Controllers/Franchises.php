@@ -265,20 +265,24 @@ class Franchises extends BaseController
 
 
         $sheet->setCellValue('A1', 'Sl No');
-        $sheet->setCellValue('B1', 'Member Name');
-        $sheet->setCellValue('C1', 'Location');
+        $sheet->setCellValue('B1', 'Franchise Name');
+        $sheet->setCellValue('C1', 'Member Name');
         $sheet->setCellValue('D1', 'Type');
         $sheet->setCellValue('E1', 'Date');
         $sheet->setCellValue('F1', 'Time');
+        $sheet->setCellValue('G1', 'Location');
+        
+        
 
         $row = 2;
         foreach ($data as $item) {
-            $sheet->setCellValue('A' . $row, $row);
-            $sheet->setCellValue('B' . $row, $item->full_name);
-            $sheet->setCellValue('C' . $row, $item->location);
+            $sheet->setCellValue('A' . $row, $row-1);
+            $sheet->setCellValue('B' . $row, $item->franchise_name);
+            $sheet->setCellValue('C' . $row, $item->full_name);
             $sheet->setCellValue('D' . $row, $item->type);
             $sheet->setCellValue('E' . $row, $item->date);
             $sheet->setCellValue('F' . $row, $item->time);
+            $sheet->setCellValue('G' . $row, $item->location);
             $row++;
         }
 

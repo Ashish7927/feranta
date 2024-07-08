@@ -22,17 +22,23 @@ class Vehicle extends BaseController
         if ($this->session->get('user_id')) {
 
             $user_id = $this->session->get('user_id');
+
+            $from_date = $this->request->getGet('from_date') ? $this->request->getGet('from_date') : '';
+			$to_date = $this->request->getGet('to_date') ? $this->request->getGet('to_date') : '';
+			$owner_id = $this->request->getGet('user_type') ? $this->request->getGet('owner_id') : '';
+			$franchise_id = $this->request->getGet('franchise_id') ? $this->request->getGet('franchise_id') : '';
+
             if ($this->session->get('user_type') == 2) {
 
-                $data['Allstate'] = $this->AdminModel->getFranchiseVehicle($this->session->get('franchise_id'));
-            } else {
-                $data['Allstate'] = $this->AdminModel->getAllVehicle();
-            }
+				$data['Allstate'] = $this->AdminModel->getAllVehicleData($from_date, $to_date, $owner_id, $this->session->get('franchise_id'));
+			} else {
+				$data['Allstate'] = $this->AdminModel->getAllVehicleData($from_date, $to_date, $owner_id, $franchise_id);
+			}
 
             $data['vehicleType'] = $this->AdminModel->getAllActiveRecord('vehicle_types');
             $data['AllVendor'] = $this->AdminModel->getAllVendor();
             $data['AllDriver'] = $this->AdminModel->getAllDriver();
-
+            $data['franchises'] = $this->AdminModel->GetAllRecord('franchises');
 
             return view('admin/vehicle_vw', $data);
         } else {
@@ -454,4 +460,77 @@ class Vehicle extends BaseController
             return redirect()->to('admin/');
         }
     }
+
+    function exportData()
+    {
+		if ($this->session->get('user_id')) {
+
+            $from_date = $this->request->getGet('from_date') ? $this->request->getGet('from_date') : '';
+			$to_date = $this->request->getGet('to_date') ? $this->request->getGet('to_date') : '';
+			$owner_id = $this->request->getGet('user_type') ? $this->request->getGet('owner_id') : '';
+			$franchise_id = $this->request->getGet('franchise_id') ? $this->request->getGet('franchise_id') : '';
+
+            if ($this->session->get('user_type') == 2) {
+
+				$allVehicleData = $this->AdminModel->getAllVehicleData($from_date, $to_date, $owner_id, $this->session->get('franchise_id'));
+			} else {
+				$allVehicleData = $this->AdminModel->getAllVehicleData($from_date, $to_date, $owner_id, $franchise_id);
+			}
+
+
+			$spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+			$sheet = $spreadsheet->getActiveSheet();
+
+
+			$sheet->setCellValue('A1', 'Sl No');
+			$sheet->setCellValue('B1', 'Vehicle Name');
+			$sheet->setCellValue('C1', 'Owner Name');
+			$sheet->setCellValue('D1', 'Driver name');
+			$sheet->setCellValue('E1', 'Vehicle Booking Type');
+			$sheet->setCellValue('F1', 'Vehicle Type');
+			$sheet->setCellValue('G1', 'Register By');
+            $sheet->setCellValue('H1', 'Franchise Name');
+			$sheet->setCellValue('I1', 'Date');
+			$sheet->setCellValue('J1', 'Time');
+
+
+
+			$row = 2;
+			foreach ($allVehicleData as $item) {
+
+                if ($item->booking_type == 1) {
+                    $booking_type = 'Cab Booking';
+                } else {
+                    $booking_type = 'Lift Booking';
+                }
+
+                if ($item->booking_type == 2) {
+                    $type_name = $item->lift_vehicle_type == 1 ? 'Car' : 'Bike';
+                } else {
+                    $type_name = $item->type_name;
+                }
+
+				$sheet->setCellValue('A' . $row, $row-1);
+				$sheet->setCellValue('B' . $row, $item->model_name);
+				$sheet->setCellValue('C' . $row, $item->full_name);
+				$sheet->setCellValue('D' . $row, $item->driverName);
+				$sheet->setCellValue('E' . $row, $booking_type);
+				$sheet->setCellValue('F' . $row, $type_name);
+				$sheet->setCellValue('G' . $row, $item->registeredBy);
+                $sheet->setCellValue('H' . $row, '');
+				$sheet->setCellValue('I' . $row, date("d-m-Y", strtotime($item->create_at)));
+				$sheet->setCellValue('J' . $row, date("H:i", strtotime($item->create_at)));
+				$row++;
+			}
+
+			$writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+			$fileName = 'vehicle-data.xlsx';
+			$writer->save($fileName);
+
+			return $this->response->download($fileName, null)->setFileName($fileName);
+		} else {
+			return redirect()->to('admin/');
+		}
+	}
 }
